@@ -167,11 +167,6 @@ Hide this node (and sub-graph), also invisible to queries (ray casting, picking)
 myNode.hide()
 */
 hide(){
-<<<<<<< HEAD
-=======
-    let bPrev = this.visible;
-
->>>>>>> master
     this.visible = false;
 
     //this.traverse((o) => { o.layers.disable(this.type); });
@@ -181,13 +176,6 @@ hide(){
         ATON._dMainL.shadow.needsUpdate = true;
     }
 
-<<<<<<< HEAD
-=======
-    if (bPrev){
-        ATON.updateLightProbes();
-    }
-
->>>>>>> master
     return this;
 }
 
@@ -197,11 +185,6 @@ Show this node (and sub-graph). If pickable, becomes sensible to queries (ray ca
 myNode.show()
 */
 show(){
-<<<<<<< HEAD
-=======
-    let bPrev = this.visible;
-
->>>>>>> master
     this.visible = true;
 
     //if (this.bPickable) ATON.Utils.setPicking(this, this.type, true); //this.traverse((o) => { o.layers.enable(this.type); });
@@ -211,13 +194,6 @@ show(){
         if (ATON._dMainL!==undefined && ATON._dMainL.shadow!==undefined) ATON._dMainL.shadow.needsUpdate = true;
     }
 
-<<<<<<< HEAD
-=======
-    if (!bPrev){
-        ATON.updateLightProbes();
-    }
-
->>>>>>> master
     return this;
 }
 
@@ -562,10 +538,6 @@ autoFit(bCenter, maxRad){
         this.scale.set(s,s,s);
     }
 
-<<<<<<< HEAD
-=======
-    return this;
->>>>>>> master
 }
 
 /**
@@ -614,10 +586,6 @@ setRotation(rx,ry,rz){
     
     return this;
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 /**
 Orient this node to current camera
 */
@@ -627,29 +595,6 @@ orientToCamera(){
 }
 
 /**
-<<<<<<< HEAD
-=======
-Orient this node to a location
-*/
-orientToLocation(x,y,z){
-    if (x instanceof THREE.Vector3) this.lookAt(x);
-    else this.lookAt(x,y,z);
-
-    return this;
-}
-
-/**
-Orient this node to another node
-*/
-orientToNode(N){
-    if (!N) return this;
-    this.orientToLocation(N.position);
-
-    return this;
-}
-
-/**
->>>>>>> master
 Orient this node from z-up to y-up
 */
 setYup(){
@@ -702,13 +647,8 @@ load(url, onComplete){
     
     let ext = ATON.Utils.getFileExtension(url);
 
-<<<<<<< HEAD
     // Tileset
     if ( ext === "json" ){
-=======
-    // Cesium 3D Tiles datasets
-    if ( ext === "json" || ext === "dzi" ){
->>>>>>> master
         ATON.MRes.loadTileSetFromURL(url, N);
         //ATON._bqScene = true;
         if (onComplete) onComplete();
@@ -716,10 +656,6 @@ load(url, onComplete){
     }
 
     // IFC
-<<<<<<< HEAD
-=======
-/*
->>>>>>> master
     if ( ext === "ifc" && ATON._ifcLoader!==undefined ){
         // TODO:
 
@@ -738,21 +674,11 @@ load(url, onComplete){
 
         return N;
     }
-<<<<<<< HEAD
 
     // Check custom resource handler for given extension if any
     if ( ATON._resHandler && ATON._resHandler[ext] ){
         ATON._resHandler[ext]( url, N );
         return N;
-=======
-*/
-    // Check custom resource handlers if any match
-    if ( ATON._resHandler){
-        for (let rh in ATON._resHandler){
-            let br = ATON._resHandler[rh](url, N);
-            if ( br ) return N;
-        }
->>>>>>> master
     }
 
     // [C] Promise already requested

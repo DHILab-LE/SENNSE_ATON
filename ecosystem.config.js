@@ -1,54 +1,31 @@
 module.exports = {
 
   apps: [
-<<<<<<< HEAD
     // Main service
-=======
-    // Main service (gateway)
->>>>>>> master
     {
       name          : 'ATON Main Service',
       script        : 'services/ATON.service.main.js',
       instances     : 'max',
       exec_mode     : 'cluster',
       watch         : ["services","config"],
-<<<<<<< HEAD
       instance_var  : 'INSTANCE_ID',
       merge_logs    : true,
       //restart_delay : 1000,
-=======
-      ignore_watch  : ["config/flares"], 
-      instance_var  : 'INSTANCE_ID',
-      merge_logs    : true,
-      max_memory_restart: "400M",
-      restart_delay : 1000,
->>>>>>> master
       //out_file     : "./logs/ATON.service.main.log",
       env: {
         "NODE_ENV" : "production",
       }
     },
 
-<<<<<<< HEAD
     // VRoadcast service
-=======
-    // Photon service
->>>>>>> master
     {
       name          : 'ATON Photon Service',
       script        : 'services/photon/ATON.service.photon.js',
       instances     : 1,
       exec_mode     : 'cluster',
       watch         : ["services","config"],
-<<<<<<< HEAD
       merge_logs    : true,
       //restart_delay : 1000,
-=======
-      ignore_watch  : ["config/flares"],
-      merge_logs    : true,
-      max_memory_restart: "400M",
-      restart_delay : 1000,
->>>>>>> master
       //out_file     : "./logs/ATON.service.photon.log",
       env: {
         "NODE_ENV" : "production",
@@ -62,15 +39,8 @@ module.exports = {
       instances     : 1,
       exec_mode     : 'cluster',
       watch         : ["services", "config"],
-<<<<<<< HEAD
       merge_logs    : true,
       //restart_delay : 1000,
-=======
-      ignore_watch  : ["config/flares"],
-      merge_logs    : true,
-      max_memory_restart: "200M",
-      restart_delay : 1000,
->>>>>>> master
       //out_file     : "./logs/ATON.service.webdav.log",
       env: {
         "NODE_ENV" : "production",

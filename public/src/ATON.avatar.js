@@ -109,21 +109,12 @@ _buildLabel(){
     this.userlabelnode = ATON.createUINode();
 
     this.labelcontainer = new ThreeMeshUI.Block({
-<<<<<<< HEAD
         width: 0.7,
         height: 0.25,
         padding: 0.03,
         borderRadius: 0.05,
 
         backgroundColor: ATON.MatHub.colors.black,
-=======
-        width: 0.5, //0.7,
-        height: 0.2, //0.25,
-        padding: 0.03,
-        borderRadius: 0.05,
-
-        backgroundColor: ATON.MatHub.colors.black, // ATON.MatHub.colors.white,
->>>>>>> master
 
         fontFamily: ATON.SUI.PATH_FONT_JSON,
         fontTexture: ATON.SUI.PATH_FONT_TEX,
@@ -138,7 +129,6 @@ _buildLabel(){
     // username text
     this.usernametext = new ThreeMeshUI.Text({ 
         content: "User #"+this.userid,
-<<<<<<< HEAD
         fontSize: 0.09,
         //fontColor: ATON.MatHub.colors.white
         fontColor: this.color
@@ -146,32 +136,15 @@ _buildLabel(){
     this.usernametext.position.y = 0.0;
 
     // message text
-=======
-        fontSize: 0.07, //0.09,
-        //fontColor: ATON.MatHub.colors.white
-        fontColor: this.color
-    });
-    this.usernametext.position.y = 0.01;
-
-    // message text
-/*
->>>>>>> master
     this.usermessagetext = new ThreeMeshUI.Text({ 
         content: "\n...",
         fontSize: 0.03,
         fontColor: ATON.MatHub.colors.white
     });
-<<<<<<< HEAD
     this.usermessagetext.position.y = -0.03;
 
     this.labelcontainer.add(this.usernametext);
     this.labelcontainer.add(this.usermessagetext);
-=======
-    this.usermessagetext.position.y = 0.0;
-*/
-    this.labelcontainer.add(this.usernametext);
-    //this.labelcontainer.add(this.usermessagetext);
->>>>>>> master
  
     this.add(this.userlabelnode);
 
@@ -352,14 +325,7 @@ setMessage(msg){
 
     this.message = msg;
 
-<<<<<<< HEAD
     // TODO: check for text length
-=======
-    return;
-
-    // TODO: check for text length
-
->>>>>>> master
     this.usermessagetext.set({ 
         content: "\n"+msg
     });

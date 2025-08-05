@@ -52,12 +52,7 @@ let renderGallery = ()=>{
             let scene = data[i];
             let sid = scene.sid;
 
-<<<<<<< HEAD
             let urlCover = (scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
-=======
-            let urlCover = ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover"; //(scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
-            //let urlCover = ATON.PATH_RESTAPI+"cover/"+sid;
->>>>>>> master
 
             let shtml = "";
             shtml += "<div id='s"+i+"' class='atonGalleryItem' style='background-color:rgba(255,255,255, 0.1)'>";
@@ -210,32 +205,6 @@ let renderScene = (sid)=>{
 
         $('#idContent').append(shtml);
 
-<<<<<<< HEAD
-=======
-
-        let bPublic = false;
-        let impath = ATON.PATH_RESTAPI+"cover/"+sid;
-        $('#idCoverImg').attr("src", impath);
-
-        if (data.visibility){
-            $("#idPublic").html("<img src='"+ATON.PATH_RES+"icons/lock.png'>Make Private");
-            bPublic = true;
-        }
-        else {
-            $("#idPublic").html("<img src='"+ATON.PATH_RES+"icons/users.png'>Make Public");
-        }
-
-        $('#idPublic').click(()=>{
-            let O = {};
-            O.sid = sid;
-            O.vis = bPublic? "private" : "public";
-            ATON.Utils.postJSON(ATON.PATH_RESTAPI+"visibility/scene", O, (data)=>{
-                if (data) window.location.reload(true);
-            });
-        });
-
-/*
->>>>>>> master
         // Scene data info
         $.getJSON( ATON.PATH_RESTAPI+"info/scene/"+sid, (data)=>{
             if (data === undefined) return;
@@ -247,11 +216,7 @@ let renderScene = (sid)=>{
                 //$('#idBGBlur').css("background-image", "url('"+impath+"')");
             }
 
-<<<<<<< HEAD
             if (data.public){
-=======
-            if (data.visibility){
->>>>>>> master
                 $("#idPublic").html("<img src='"+ATON.PATH_RES+"icons/lock.png'>Make Private");
                 bPublic = true;
             }
@@ -268,10 +233,6 @@ let renderScene = (sid)=>{
                 });
             });
         });
-<<<<<<< HEAD
-=======
-*/
->>>>>>> master
 
         $('#idNewTitle').click(()=>{
             let title = $('#idTitleText').val();

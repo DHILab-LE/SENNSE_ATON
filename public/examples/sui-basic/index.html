@@ -75,10 +75,6 @@ window.addEventListener( 'load', ()=>{
             if (currItem<0) currItem = (itemURLs.length-1);
             N.removeChildren();
             N.load(itemURLs[currItem]);
-<<<<<<< HEAD
-=======
-            ATON.AudioHub.playOnceGlobally(ATON.PATH_RES+"audio/blop.mp3");
->>>>>>> master
         };
 
     ATON.getUINode("SUI_Next")
@@ -88,10 +84,6 @@ window.addEventListener( 'load', ()=>{
             currItem = (currItem+1)%itemURLs.length;
             N.removeChildren();
             N.load(itemURLs[currItem]);
-<<<<<<< HEAD
-=======
-            ATON.AudioHub.playOnceGlobally(ATON.PATH_RES+"audio/blop.mp3");
->>>>>>> master
         };
 
     ATON.getUINode("SUI_VR")
@@ -103,12 +95,8 @@ window.addEventListener( 'load', ()=>{
         };
 
     for (let b in suiButtons){
-<<<<<<< HEAD
         suiButtons[b].onHover = ()=>{ 
             ATON.AudioHub.playOnceGlobally(ATON.PATH_RES+"audio/blop.mp3");
-=======
-        suiButtons[b].onHover = ()=>{
->>>>>>> master
             suiButtons[b].setBackgroundOpacity(0.9);
         };
 
@@ -122,24 +110,6 @@ window.addEventListener( 'load', ()=>{
     let suiToolbar = ATON.SUI.createToolbar( suiButtons );
     suiToolbar.setPosition(-4.0,0.2,1.0).setRotation(1.0,3.14,0).setScale(5.0).attachToRoot();
 
-<<<<<<< HEAD
-=======
-    // We setup a MediaPanel with a videostream (HLS)
-    let P = new ATON.SUI.MediaPanel("panel1").load("samples/media/sample-hls1/index.m3u8").setTitle("HLS Video").setBackdrop();
-    P.setScale(8.0).setPosition(4.0,2.5,8.0).orientToLocation(0,2.5,0).attachToRoot(); // setRotation(0.0,3.14,0.0)
-
-    // We setup a MediaPanel with static image, we also orient it towards the SUI toolbar previously created
-    let I = new ATON.SUI.MediaPanel("panel2")
-        .load("samples/media/aton-cover.jpg")
-        .setTitle("Static Image")
-        .setColor(ATON.MatHub.colors.blue)
-        .setScale(4.0)
-        .setPosition(-8.0,2.0,8.0)
-        .orientToNode(suiToolbar);
-    
-    I.attachToRoot();
-
->>>>>>> master
     ATON.on("AllNodeRequestsCompleted",()=>{
         ATON.Nav.requestHome(0.1);
     });

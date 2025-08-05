@@ -74,11 +74,6 @@ constructor(uiid, ratio=1.0, fsize=1.0){
     };
 
     this.enablePicking();
-<<<<<<< HEAD
-=======
-    
-    this.traverse((o)=>{ if (o.material) o.material.depthWrite = false; });
->>>>>>> master
 
     ThreeMeshUI.update();
 }

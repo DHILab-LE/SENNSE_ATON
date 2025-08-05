@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "status": "complete",
     "environment": { "lightprobes": { "auto": false } },
     "scenegraph": {
@@ -76,33 +75,3 @@
     }
   }
   
-=======
-	"status": "complete",
-
-    "title": "Sample Scene",
-
-	"environment":{
-		"mainpano":{
-			"url": "hemi-sky-green.jpg"
-        },
-        "lightprobes": {
-            "auto": true
-        },
-        "mainlight":{
-            "direction": [-0.1,-1,-1],
-			"shadows": false
-        }
-	},
-
-    "scenegraph": {
-        "nodes": {
-            "atoncube":{
-                "urls": "atoncube.glb"
-            }
-        },
-        "edges": {
-            ".": ["atoncube"]
-        }
-    }
-}
->>>>>>> master

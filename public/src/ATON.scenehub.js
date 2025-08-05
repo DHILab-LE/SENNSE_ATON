@@ -70,11 +70,7 @@ SceneHub.load = (reqpath, sid, onSuccess/*, onFail*/)=>{
         SceneHub.parseScene(data);
 
         if (onSuccess) onSuccess();
-<<<<<<< HEAD
         ATON.fireEvent("SceneJSONLoaded", sid);
-=======
-        ATON.fire("SceneJSONLoaded", sid);
->>>>>>> master
     });
 /*
     .fail(()=>{
@@ -91,15 +87,8 @@ SceneHub.clearScene = ()=>{
     if (ATON._rootVisible.children.length <= 0) return;
 
     ATON._rootVisible.removeChildren();
-<<<<<<< HEAD
     for (let i in ATON.snodes) {
         if (i !== ATON.ROOT_NID){
-=======
-
-    for (let i in ATON.snodes) {
-        if (i !== ATON.ROOT_NID && ATON.snodes[i]){
-            ATON.snodes[i].removeChildren();
->>>>>>> master
             delete ATON.snodes[i];
         }
     }
@@ -113,15 +102,8 @@ SceneHub.clearSemantics = ()=>{
     if (ATON._rootSem.children.length <= 0) return;
 
     ATON._rootSem.removeChildren();
-<<<<<<< HEAD
     for (let i in ATON.semnodes){
         if (i !== ATON.ROOT_NID) {
-=======
-
-    for (let i in ATON.semnodes){
-        if (i !== ATON.ROOT_NID && ATON.semnodes[i]){
-            ATON.semnodes[i].removeChildren();
->>>>>>> master
             delete ATON.semnodes[i];
         }
     }
@@ -137,14 +119,7 @@ SceneHub.clear = ()=>{
     SceneHub.clearScene();
     SceneHub.clearSemantics();
 
-<<<<<<< HEAD
     ATON.Nav.clear();
-=======
-    ATON.clearLightProbes();
-
-    ATON.Nav.clear();
-    ATON.FX.reset();
->>>>>>> master
 };
 
 // Parse JSON scene obj
@@ -450,11 +425,7 @@ SceneHub.initBaseParsers = ()=>{
         }
     };
 
-<<<<<<< HEAD
     // Visible scene-graph
-=======
-    // Default scene-graph
->>>>>>> master
     SceneHub._jsonParsers.scenegraph = (sg)=>{
         if (sg === undefined) return;
 
@@ -528,10 +499,6 @@ SceneHub.initBaseParsers = ()=>{
                 }
 
                 // Auto build geom
-<<<<<<< HEAD
-=======
-                // TODO: move to SUI media panel
->>>>>>> master
                 if (!N.urls){
                     let gStream = new THREE.PlaneGeometry(1,1);
     
@@ -540,7 +507,6 @@ SceneHub.initBaseParsers = ()=>{
                     mStream.scale.x = 1.0
                     mStream.scale.y = -1.0;
 
-<<<<<<< HEAD
                     ATON._assetReqNew();
                 
                     vs.el.addEventListener('loadedmetadata', (e)=>{
@@ -549,17 +515,6 @@ SceneHub.initBaseParsers = ()=>{
                         //mStream.position.y = 0.006 * vs.el.videoHeight;
 
                         ATON._assetReqComplete();
-=======
-                    //ATON._assetReqNew();
-                
-                    vs.el.addEventListener('loadedmetadata', (e)=>{
-                        let r = vs.el.videoWidth / vs.el.videoHeight;
-                        mStream.scale.x    = r;
-                        mStream.scale.y    = -1.0;
-                        //mStream.position.y = 0.006 * vs.el.videoHeight;
-
-                        //ATON._assetReqComplete();
->>>>>>> master
                         //ATON.recomputeSceneBounds();
                     });
 
@@ -687,13 +642,10 @@ SceneHub.initBaseParsers = ()=>{
         for (let nid in nodes){
             let N = nodes[nid]; // JSON node
 
-<<<<<<< HEAD
             console.log("11111111111111111");
             console.log(nid);
             
 
-=======
->>>>>>> master
             //let G = ATON.createSemanticNode(nid);
             let G = ATON.getOrCreateSemanticNode(nid).removeChildren();
             
@@ -740,10 +692,7 @@ SceneHub.initBaseParsers = ()=>{
                         points.push(p);
                     }
 
-<<<<<<< HEAD
                     console.log("From here !!");
-=======
->>>>>>> master
                     ATON.SemFactory.createConvexShape(nid, points);
                 }
 
@@ -847,15 +796,9 @@ SceneHub.addSceneParser = (key, parser)=>{
     SceneHub._jsonParsers[key] = parser;
 };
 
-<<<<<<< HEAD
 // [C] Sends JSON edit to server node
 // previously used: https://tools.ietf.org/html/rfc6902
 SceneHub.sendEdit = (patch, mode, onComplete)=>{
-=======
-// Send JSON patch to server node for persistent modifications
-// previously used: https://tools.ietf.org/html/rfc6902
-SceneHub.patch = (patch, mode, onComplete)=>{
->>>>>>> master
     if (SceneHub._bLoading || !SceneHub._bEdit) return;
     if (patch === undefined) return;
     if (mode === undefined) mode = SceneHub.MODE_ADD;
@@ -863,11 +806,7 @@ SceneHub.patch = (patch, mode, onComplete)=>{
     let sid = SceneHub.currID;
 
     let O = {};
-<<<<<<< HEAD
     O.sid  = sid;
-=======
-    //O.sid  = sid;
->>>>>>> master
     O.data = patch;
     O.mode = (mode === SceneHub.MODE_DEL)? "DEL" : "ADD";
 
@@ -878,13 +817,8 @@ SceneHub.patch = (patch, mode, onComplete)=>{
     O = null;
 
     $.ajax({
-<<<<<<< HEAD
         url: ATON.PATH_RESTAPI+"edit/scene",
         type:"POST",
-=======
-        url: ATON.PATH_RESTAPI2 + "scenes/"+sid, //ATON.PATH_RESTAPI+"edit/scene",
-        type:"PATCH",
->>>>>>> master
         data: jstr,
         contentType:"application/json; charset=utf-8",
         dataType:"json",
@@ -901,18 +835,6 @@ SceneHub.patch = (patch, mode, onComplete)=>{
     });
 };
 
-<<<<<<< HEAD
-=======
-// Previous name
-SceneHub.sendEdit = SceneHub.patch;
-
-// Visibility
-SceneHub.setVisibility = (v, onSuccess)=>{
-    SceneHub.currData.visibility = v;
-    SceneHub.sendEdit({ visibility: v }, ATON.SceneHub.MODE_ADD, onSuccess );
-};
-
->>>>>>> master
 SceneHub.currSceneHasHomeConfig = ()=>{
     if (SceneHub.currData === undefined) return false;
     if (SceneHub.currData.viewpoints === undefined) return false;
@@ -921,11 +843,7 @@ SceneHub.currSceneHasHomeConfig = ()=>{
     return true;
 };
 
-<<<<<<< HEAD
 // FIXME:
-=======
-// FIXME: should modify local currData + send patch in edit mode
->>>>>>> master
 SceneHub.setTitle = (title)=>{
     SceneHub._title = title;
 };

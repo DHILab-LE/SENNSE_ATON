@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 FROM node:18
-=======
-FROM node:20
->>>>>>> master
 
 RUN npm install -g npm
 
@@ -18,11 +14,7 @@ RUN npm install pm2 -g
 # Bundle app source
 COPY . .
 
-<<<<<<< HEAD
 EXPOSE 8083
-=======
-#EXPOSE 8080
->>>>>>> master
 
 # Single
 #CMD [ "node", "services/ATON.service.main.js" ]

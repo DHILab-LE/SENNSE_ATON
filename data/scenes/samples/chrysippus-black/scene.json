@@ -1,11 +1,5 @@
 {
     "status": "complete",
-<<<<<<< HEAD
-=======
-    "visibility": 1,
-    "title": "Chrysippus head",
-
->>>>>>> master
     "environment": {
         "bgcolor": [
             0,
@@ -38,13 +32,10 @@
                 "main"
             ]
         }
-<<<<<<< HEAD
     },
     "fx": {
         "ao": {
             "i": "0.20000"
         }
-=======
->>>>>>> master
     }
 }

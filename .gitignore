@@ -91,20 +91,13 @@ _prv
 /data/collections/*
 !/data/collections/samples/
 
-<<<<<<< HEAD
 data/collections/samples/models/CaveOfAnimals.glb
 data/collections/samples/models/CaveOfAnimalsBetaVersion.glb
 
-=======
->>>>>>> master
 # Apps
 /wapps/*
 !/wapps/README.txt
 !/wapps/app_template/
-<<<<<<< HEAD
 /wapps/app_template/data/data/collections/samples/models/CaveOfAnimals.glb
 /wapps/app_template/data/data/collections/samples/models/CaveOfAnimalsBetaVersion.glb
 
-=======
-/wapps/app_template/data/
->>>>>>> master

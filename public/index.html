@@ -66,15 +66,6 @@ let search = ()=>{
     else $("#btn-go").hide();
 };
 
-<<<<<<< HEAD
-=======
-let searchClear = ()=>{
-    $("#sid").val("");
-    showAllScenes();
-    $("#idTCtools").hide();
-};
-
->>>>>>> master
 let searchByTerm = (searchTerm)=>{
     if (searchTerm === undefined) return;
 
@@ -103,11 +94,7 @@ let onLandingData = (data)=>{
     }
 
     if (query){
-<<<<<<< HEAD
         if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'>"+query+"</div><br>";
-=======
-        if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'><img class='atonDefIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>"+query+"</div><br>";
->>>>>>> master
         htmlcontent += "<div id='idPubGallery'></div>";
 
         htmlcontent += "<br><br>";
@@ -128,7 +115,6 @@ let onLandingData = (data)=>{
         return;
     }
 
-<<<<<<< HEAD
     if (data.header){
         htmlcontent += "<div class='atonHeader'>";
         htmlcontent += data.header;
@@ -145,19 +131,6 @@ let onLandingData = (data)=>{
 
         //htmlcontent += "<div class='atonBlockTitle'>Public Scenes</div><br>";
 
-=======
-    if (data.gallery){
-        htmlcontent += "<br><a href='shu/scenes/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/user.png'></a>";
-        htmlcontent += "<div id='idScenes' style='display:inline-block; width:50%; max-width:500px; margin-right:15px'></div>";
-        htmlcontent += "<div id='btn-go' class='atonBTN atonBTN-green' style='display:inline-block;'><img src='"+ATON.PATH_RES+"icons/play.png'></div>";
-        if (data.samples === undefined || data.samples === true) htmlcontent += "<a href='examples/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/samples.png'></a>";
-        htmlcontent += "<br>";
-
-        //htmlcontent += "<div class='atonBlockTitle'>Public Scenes</div><br>";
-
-        htmlcontent += "<div id='idTagCloud' class='scrollableX' style='margin:10px; height:50px'></div>";
-        htmlcontent += "<div id='idTCtools'></div>";
->>>>>>> master
         htmlcontent += "<div id='idPubGallery'></div>";
     }
 
@@ -165,7 +138,6 @@ let onLandingData = (data)=>{
 
     $("#idMainContent").html(htmlcontent);
 
-<<<<<<< HEAD
     if (data.gallery){
         SHU.createScenesInputList("idScenes", openSID, search, (scenes)=>{
             $("#sid").attr("placeholder", "search by term, user or paste a scene-ID...");
@@ -175,68 +147,17 @@ let onLandingData = (data)=>{
             });
 */
             
-=======
-    if (data.header){
-        ATON.UI.loadPartial("/common/"+data.header, "idMainContent", true);
-    }
-    //else htmlcontent += "<img src='/res/aton-logo.png' style='width:100px; height:auto;'><br>";
-    else document.getElementById("idMainContent").prepend( ATON.UI.createElementFromHTMLString("<img src='/res/aton-logo.png' style='width:100px; height:auto;'>") );
-
-    if (data.gallery){
-        SHU.createScenesInputList("idScenes", openSID, search, (scenes)=>{
-            $("#sid").attr("placeholder", "search by term, user or paste a scene-ID...");
->>>>>>> master
         });
 
         $("#btn-go").click( openSID );
 
-<<<<<<< HEAD
         SHU.createPubScenesGallery("idPubGallery", data.samples);
-=======
-        SHU.createPubScenesGallery("idPubGallery", data.samples, ()=>{
-            let akws = Object.entries(SHU.pubScenesKwords).sort((a,b)=>b[1]-a[1]).map(el=>el[0]);
-            //console.log(akws);
-
-            for (let i in akws){
-                let k = akws[i];
-                let w = SHU.pubScenesKwords[k];
-                let f = w - 1;
-                f = 0.8 + (f * 0.1);
-                if (f > 1.5) f = 1.5;
-
-                //if (i<20){
-                    $("#idTagCloud").append("<div id='idTC-"+k+"' class='atonKeyword atonKeywordActivable'>"+k+" <span class='atonKeywordCount'>"+w+"</span></div>");
-
-                    $("#idTC-"+k).click(()=>{
-                        $("#sid").val(k);
-                        search();
-                        $("#idTCtools").show();
-
-                        $("#idKeyGallery").attr("href", "/?q="+k); 
-                        $("#idKeyGallery").html("<img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>'"+k+"' Gallery");
-                    });
-                //}
-            }
-
-            let htTCtools = "";
-            htTCtools += "<div class='atonBTN atonBTN-text atonBTN-red' onclick='searchClear()'><img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/cancel.png'>Clear</div>";
-            htTCtools += "<a class='atonBTN atonBTN-text' id='idKeyGallery'><img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>Gallery</a>";
-
-            $("#idTCtools").append(htTCtools);
-            $("#idTCtools").hide();
-        });
->>>>>>> master
     }
 
     $("#btn-go").hide();
 };
 
 window.addEventListener( 'load', ()=>{
-<<<<<<< HEAD
-=======
-    //ATON.realize2D();
-
->>>>>>> master
     $.getJSON( ATON.PATH_RESTAPI+"landing", onLandingData );
 });
 

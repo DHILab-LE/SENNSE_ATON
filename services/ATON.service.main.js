@@ -23,13 +23,7 @@ const nanoid = require("nanoid");
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const Core = require('./Core');
-<<<<<<< HEAD
 const bodyParser = require("body-parser");
-=======
-const Auth = require('./Auth');
-const Render = require('./Render');
-const API  = require("./API/v2"); // v2
->>>>>>> master
 
 
 // Initialize & load config files
@@ -99,7 +93,6 @@ app.use((req, res, next)=>{
 */
 app.use(express.json({ limit: '50mb' }));
 
-<<<<<<< HEAD
 // Serve static files from the "public" folder
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
@@ -128,8 +121,6 @@ app.get(/^\/s\/(.*)$/, (req,res,next)=>{
 });
 
 
-=======
->>>>>>> master
 // Scenes redirect /s/<sid>
 /*
 app.get(/^\/s\/(.*)$/, function(req,res,next){
@@ -155,19 +146,10 @@ const CACHING_OPT = {
 };
 
 app.use('/', express.static(Core.DIR_PUBLIC, CACHING_OPT ));
-<<<<<<< HEAD
 //app.use('/mods', express.static(Core.DIR_NODE_MODULES, /*CACHING_OPT*/));
 
 // Official front-end (Hathor)
 app.use('/fe', express.static(Core.DIR_FE));
-=======
-
-// Official front-end (Hathor)
-//app.use('/fe', express.static(Core.DIR_FE));
-
-// Common public resources (config/public/)
-if (fs.existsSync(Core.DIR_CONFIGPUB)) app.use('/common', express.static(Core.DIR_CONFIGPUB));
->>>>>>> master
 
 // Web-apps
 app.use('/a', express.static(Core.DIR_WAPPS));
@@ -175,27 +157,12 @@ app.use('/a', express.static(Core.DIR_WAPPS));
 // Data (static)
 app.use('/', express.static(Core.DIR_DATA, CACHING_OPT));
 
-<<<<<<< HEAD
 
 Core.setupPassport();
 Core.realizeAuth(app);
 
 // REST API
 Core.realizeBaseAPI(app);
-=======
-// Setup authentication
-Auth.init(app);
-
-
-// REST API
-Core.realizeBaseAPI(app); 	// v1 (for backward compatibility)
-API.init( app );			// v2
-
-
-// Rendering
-Core.Render.setup(app);
-
->>>>>>> master
 
 // Micro-services proxies
 //=================================================
@@ -215,7 +182,6 @@ app.use('/svrc', createProxyMiddleware({
 	changeOrigin: true 
 }));
 
-<<<<<<< HEAD
 
 // Proxy route
 app.use('/api', (req, res) => {
@@ -228,8 +194,6 @@ app.use((req, res, next) => {
     next();
 });
 
-=======
->>>>>>> master
 // WebDav
 /*
 app.use('/dav', createProxyMiddleware({ 
@@ -248,7 +212,6 @@ app.use('/dav', createProxyMiddleware({
 //==================================
 Core.setupFlares(app);
 
-<<<<<<< HEAD
 for (let f in Core.flares){
 	let flarename = Core.flares[f];
 	app.use('/flares/'+flarename, express.static(Core.DIR_FLARES+flarename+"/public/"));
@@ -256,13 +219,6 @@ for (let f in Core.flares){
 
 app.use(express.static(path.join(__dirname, '../public/hathor'))); // Serve static files
 
-=======
-for (let fid in Core.flares){
-	//let fid = Core.flares[f];
-	app.use('/flares/'+fid, express.static(Core.DIR_FLARES+fid+"/public/"));
-}
-
->>>>>>> master
 // START
 //==================================
 http.createServer(app).listen(PORT, ()=>{

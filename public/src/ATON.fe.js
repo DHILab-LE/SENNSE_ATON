@@ -10,17 +10,12 @@ Generic front-end routines for ATON-based web-apps.
 A set of blueprints to facilitate or support creation of a front-end
 @namespace FE
 */
-<<<<<<< HEAD
 import html2canvas from 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js';
 
 let FE = {};
 
 let configData = null;
 
-=======
-let FE = {};
-
->>>>>>> master
 // Semantic-shapes types
 FE.SEMSHAPE_SPHERE = 0;
 FE.SEMSHAPE_CONVEX = 1;
@@ -29,7 +24,6 @@ FE.POPUP_DT = 500; //300;
 
 FE.STD_SEL_RAD = 0.05;
 
-<<<<<<< HEAD
 /**
 Initialize Front-end
 */
@@ -40,22 +34,6 @@ FE.realize = () => {
     FE._tPopup = undefined;
     FE.popupBlurBG = 0;      // blur 3D canvas on popup show (in pixels), 0 to disable
 
-=======
-FE._bRealized = false;
-
-/**
-Initialize Front-end
-*/
-FE.realize = ()=>{
-    if (FE._bRealized) return;
-
-    FE.PATH_RES_ICONS = ATON.PATH_RES+"icons/";
-
-    FE._bPopup     = false;  // showing popup
-    FE._tPopup     = undefined;
-    FE.popupBlurBG = 0;      // blur 3D canvas on popup show (in pixels), 0 to disable
-    
->>>>>>> master
     FE._userAuth = {};
 
     FE._bControlLight = false;
@@ -74,38 +52,22 @@ FE.realize = ()=>{
     FE._uiSetupBase();
 
     // UI profiles
-<<<<<<< HEAD
     FE._uiProfiles = {};
     FE._uiCurrProfile = undefined;
 
     FE._selRanges = [0.01, 50.0]; // 3D Selector ranges
-=======
-    FE._uiProfiles    = {};
-    FE._uiCurrProfile = undefined;
-
-    FE._selRanges    = [0.01, 50.0]; // 3D Selector ranges
->>>>>>> master
     FE._selRefRadius = 0.5;
 
     ATON.realize();
 
     // Built-in events
-<<<<<<< HEAD
     ATON.on("Fullscreen", (b) => {
         FE.uiSwitchButton("fullscreen", b);
-=======
-    ATON.on("Fullscreen", (b)=>{
-        FE.uiSwitchButton("fullscreen",b);
->>>>>>> master
     });
 
     // built-in base front-end parameters
     let ddens = ATON.FE.urlParams.get('d');
-<<<<<<< HEAD
     if (ddens && ddens > 0.0) {
-=======
-    if (ddens && ddens>0.0){
->>>>>>> master
         ATON.setDefaultPixelDensity(ddens);
         ATON.toggleAdaptiveDensity(false);
     }
@@ -114,26 +76,12 @@ FE.realize = ()=>{
     if (dynd && dynd > 0) ATON.toggleAdaptiveDensity(true);
 
     FE._canvas = ATON._renderer.domElement;
-<<<<<<< HEAD
 
     FE._bSem = false; // hovering semantic node or mask
     FE._bShowSemLabel = true;
 };
 
 FE._handleHomeReq = () => {
-=======
-    
-    FE._bSem = false; // hovering semantic node or mask
-    FE._bShowSemLabel = true;
-
-    FE._bRealized = true;
-
-    // Backwards compatibility
-    FE.loadSceneID = ATON.App.loadScene;
-};
-
-FE._handleHomeReq = ()=>{
->>>>>>> master
     if (FE._bReqHome) return;
 
     // Check we have a valid scene bs
@@ -142,24 +90,15 @@ FE._handleHomeReq = ()=>{
 
     FE._bReqHome = true;
 
-<<<<<<< HEAD
     if (ATON.Nav.homePOV === undefined) {
         ATON.Nav.computeAndRequestDefaultHome(0.5);
         return;
     }
 
-=======
-    if (ATON.Nav.homePOV === undefined){
-        ATON.Nav.computeAndRequestDefaultHome(0.5);
-        return;
-    }
-    
->>>>>>> master
     ATON.Nav.requestHome(1.0);
     //console.log(ATON.Nav.homePOV);
 };
 
-<<<<<<< HEAD
 // Load configuration JSON file
 async function loadConfig() {
     try {
@@ -791,37 +730,21 @@ async function saveImageToServer(imageData) {
 }
 FE.addBasicLoaderEvents = () => {
     ATON.on("NodeRequestFired", () => {
-=======
-/**
-Add basic front-end events such as showing spinner while loading assets and home viewpoint setup
-*/
-FE.addBasicLoaderEvents = ()=>{
-    ATON.on("NodeRequestFired", ()=>{
->>>>>>> master
         $("#idLoader").show();
         //$('#idBGcover').show(); // TODO: is it worth? only first time
     });
 
-<<<<<<< HEAD
     ATON.on("SceneJSONLoaded", () => {
-=======
-    ATON.on("SceneJSONLoaded",()=>{
->>>>>>> master
         if (ATON.SceneHub.getDescription()) $("#btn-info").show();
         if (ATON.Nav.homePOV !== undefined) ATON.Nav.requestHome(1.0);
 
         // If we have an XPF network and no home set, move to first XPF
-<<<<<<< HEAD
         if (ATON.XPFNetwork._list.length > 0 && ATON.Nav.homePOV === undefined) {
-=======
-        if (ATON.XPFNetwork._list.length>0 && ATON.Nav.homePOV === undefined){
->>>>>>> master
             ATON.XPFNetwork.setHomeXPF(0);
             ATON.XPFNetwork.requestTransitionByIndex(0);
         }
     });
 
-<<<<<<< HEAD
     ATON.on("AllNodeRequestsCompleted", () => {
         $("#idLoader").hide();
         //$('#idBGcover').fadeOut("slow");
@@ -831,22 +754,10 @@ FE.addBasicLoaderEvents = ()=>{
         FE.computeSelectorRanges();
         //if (ATON.Nav.isOrbit()) ATON.SUI.setSelectorRadius( FE._selRefRadius );
         ATON.SUI.setSelectorRadius(Math.min(FE.STD_SEL_RAD, FE._selRefRadius));
-=======
-    ATON.on("AllNodeRequestsCompleted", ()=>{ 
-        $("#idLoader").hide();
-        //$('#idBGcover').fadeOut("slow");
-
-        if ( ATON.CC.anyCopyrightFound() ) $("#btn-cc").show();
-        
-        FE.computeSelectorRanges();
-        //if (ATON.Nav.isOrbit()) ATON.SUI.setSelectorRadius( FE._selRefRadius );
-        ATON.SUI.setSelectorRadius( Math.min(FE.STD_SEL_RAD,FE._selRefRadius) );
->>>>>>> master
 
         FE._handleHomeReq();
     });
 
-<<<<<<< HEAD
     ATON.on("XR_support", (d) => {
         if (d.type === 'immersive-vr') {
             if (d.v) $("#btn-vr").show();
@@ -933,39 +844,13 @@ FE.addBasicLoaderEvents = ()=>{
             FE.showSemLabel(semid);
             FE._bSem = true;
         }
-=======
-    ATON.on("XR_support", (d)=>{
-        if (d.type==='immersive-vr'){
-            if (d.v) $("#btn-vr").show();
-            else $("#btn-vr").hide();
-        }
-/*
-        if (d.type==='immersive-ar'){
-            if (d.v) $("#btn-ar").show();
-            else $("#btn-ar").hide();
-        }
-*/
-    });
-
-    // Semantic
-    ATON.on("SemanticNodeHover", (semid)=>{
-        let S = ATON.getSemanticNode(semid);
-        if (S === undefined) return;
-
-        FE.showSemLabel(semid);
-        FE._bSem = true;
->>>>>>> master
 
         S.highlight();
         $('canvas').css({ cursor: 'crosshair' });
 
         if (ATON.SUI.gSemIcons) ATON.SUI.gSemIcons.hide();
     });
-<<<<<<< HEAD
     ATON.on("SemanticNodeLeave", (semid) => {
-=======
-    ATON.on("SemanticNodeLeave", (semid)=>{
->>>>>>> master
         let S = ATON.getSemanticNode(semid);
         if (S === undefined) return;
 
@@ -994,7 +879,6 @@ FE.addBasicLoaderEvents = ()=>{
     ATON.addUpdateRoutine(FE._update);
 };
 
-<<<<<<< HEAD
 // Change the Semantic ID from a simple String Text to displaying an image
 FE.showSemLabel = (txt) => {
     if (!FE._bShowSemLabel) return;
@@ -1006,57 +890,34 @@ FE.showSemLabel = (txt) => {
         // If the input is not an image URL, show the text
         $("#idPopupLabel").html(txt);
     }
-=======
-FE.showSemLabel = (txt)=>{
-    if (!FE._bShowSemLabel) return;
-
-    $("#idPopupLabel").html(txt);
->>>>>>> master
     $("#idPopupLabel").show();
 
     ATON.SUI.setInfoNodeText(txt);
 };
 
-<<<<<<< HEAD
 FE.hideSemLabel = () => {
-=======
-FE.hideSemLabel = ()=>{
->>>>>>> master
     $("#idPopupLabel").hide();
     $("#idPopupLabel").html("");
 };
 
-<<<<<<< HEAD
 FE.controlLight = (b) => {
-=======
-FE.controlLight = (b)=>{
->>>>>>> master
     FE._bControlLight = b;
     ATON.Nav.setUserControl(!b);
 };
 
-<<<<<<< HEAD
 FE.controlSelectorScale = (b) => {
-=======
-FE.controlSelectorScale = (b)=>{
->>>>>>> master
     FE._bControlSelScale = b;
     ATON._bPauseQuery = b;
     ATON.Nav.setUserControl(!b);
 };
 
 // Gizmo transforms
-<<<<<<< HEAD
 FE.attachGizmoToNode = (nid) => {
-=======
-FE.attachGizmoToNode = (nid)=>{
->>>>>>> master
     if (ATON._gizmo === undefined) return;
 
     let N = ATON.getSceneNode(nid);
     if (N === undefined) return;
 
-<<<<<<< HEAD
     ATON._gizmo.attach(N);
 };
 
@@ -1068,19 +929,6 @@ FE.useMouseWheelToScaleSelector = (f) => {
         if (ATON._kModCtrl) {
             let ff = ATON.Nav.getFOV();
 
-=======
-    ATON._gizmo.attach( N );
-};
-
-FE.useMouseWheelToScaleSelector = (f)=>{
-    if (f === undefined) f = 0.9; 
-
-    ATON.on("MouseWheel", (d)=>{
-
-        if (ATON._kModCtrl){
-            let ff = ATON.Nav.getFOV();
-            
->>>>>>> master
             if (d > 0.0) ff += 1.0;
             else ff -= 1.0;
 
@@ -1088,11 +936,7 @@ FE.useMouseWheelToScaleSelector = (f)=>{
             return;
         }
 
-<<<<<<< HEAD
         if (ATON._kModShift) {
-=======
-        if (ATON._kModShift){
->>>>>>> master
             let r = ATON.SUI.mainSelector.scale.x;
 
             if (d > 0.0) r *= f;
@@ -1108,17 +952,12 @@ FE.useMouseWheelToScaleSelector = (f)=>{
 };
 
 
-<<<<<<< HEAD
 /**
 Load a scene. 
 You can use ATON.on("SceneJSONLoaded", ...) to perform additional tasks when the scene JSON is fully loaded
 @param {string} sid - the scene ID (e.g.: 'sample/venus')
 */
 FE.loadSceneID = (sid, onSuccess) => {
-=======
-/*
-FE.loadSceneID = (sid, onSuccess)=>{
->>>>>>> master
     if (sid === undefined) return;
 
     let reqstr = ATON.PATH_RESTAPI_SCENE + sid;
@@ -1128,20 +967,11 @@ FE.loadSceneID = (sid, onSuccess)=>{
 
     console.log(reqstr);
 };
-<<<<<<< HEAD
 
 FE._update = () => {
     //if (ATON.XR._bPresenting) return;
 
     if (FE._bControlLight) {
-=======
-*/
-
-FE._update = ()=>{
-    //if (ATON.XR._bPresenting) return;
-
-    if (FE._bControlLight){
->>>>>>> master
         // Normalized
         const sx = ATON._screenPointerCoords.x;
         const sy = ATON._screenPointerCoords.y;
@@ -1160,17 +990,10 @@ FE._update = ()=>{
     }
 
     // Immersive VR/AR
-<<<<<<< HEAD
     if (ATON.XR._bPresenting) {
         let v = ATON.XR.getAxisValue(ATON.XR.HAND_R);
 
         if (!ATON.Photon._bStreamFocus) {
-=======
-    if (ATON.XR._bPresenting){
-        let v = ATON.XR.getAxisValue(ATON.XR.HAND_R);
-        
-        if (!ATON.Photon._bStreamFocus){
->>>>>>> master
             let s = ATON.SUI._selectorRad;
             s += (v.y * 0.01);
 
@@ -1179,16 +1002,11 @@ FE._update = ()=>{
     }
     // Default
     else {
-<<<<<<< HEAD
         if (ATON.Nav.isTransitioning() || ATON.Nav._bInteracting || ATON._bPauseQuery) {
-=======
-        if (ATON.Nav.isTransitioning() || ATON.Nav._bInteracting || ATON._bPauseQuery){
->>>>>>> master
             $("#idPopupLabel").hide();
             return;
         }
 
-<<<<<<< HEAD
         if (FE._bSem && FE._bShowSemLabel) {
             $("#idPopupLabel").show();
 
@@ -1197,22 +1015,11 @@ FE._update = ()=>{
             y -= 55;
 
             $("#idPopupLabel").css('transform', "translate(" + x + "px, " + y + "px)");
-=======
-        if (FE._bSem && FE._bShowSemLabel){
-            $("#idPopupLabel").show();
-
-            let x = ((ATON._screenPointerCoords.x)*0.5) * window.innerWidth; //FE._canvas.width;
-            let y = ((1.0 - ATON._screenPointerCoords.y)*0.5) * window.innerHeight; //FE._canvas.height;
-            y -= 55;
-
-            $("#idPopupLabel").css('transform', "translate("+x+"px, "+y+"px)");
->>>>>>> master
         }
         else $("#idPopupLabel").hide();
     }
 
 
-<<<<<<< HEAD
     /*
         if (FE._bControlSelScale){
             //const sx = ATON._screenPointerCoords.x;
@@ -1222,24 +1029,12 @@ FE._update = ()=>{
             if (r > 0.0001) ATON.SUI.setSelectorRadius(r);
         }
     */
-=======
-/*
-    if (FE._bControlSelScale){
-        //const sx = ATON._screenPointerCoords.x;
-        const f = ATON._screenPointerCoords.y;
-
-        const r = ATON.SUI.mainSelector.scale.x + f;
-        if (r > 0.0001) ATON.SUI.setSelectorRadius(r);
-    }
-*/
->>>>>>> master
 };
 
 
 // HTML UI
 //=======================================
 // Sample basic UI setup
-<<<<<<< HEAD
 FE.uiBasicSetup = () => {
     FE.uiAddButton("idTopToolbar", "fullscreen", ATON.toggleFullScreen);
     if (ATON.Utils.isConnectionSecure()) FE.uiAddButton("idTopToolbar", "vr", ATON.XR.toggle);
@@ -1250,18 +1045,6 @@ FE.uiBasicSetup = () => {
 FE._uiSetupBase = () => {
     $("#idPopup").click(FE.popupClose);
     $("#idLoader").html("<img src='" + ATON.PATH_RES + "loader.png'>");
-=======
-FE.uiBasicSetup = ()=>{
-    FE.uiAddButton("idTopToolbar","fullscreen", ATON.toggleFullScreen );
-    if (ATON.Utils.isConnectionSecure()) FE.uiAddButton("idTopToolbar","vr", ATON.XR.toggle );
-
-    FE.uiAddButton("idBottomToolbar","home", ()=>{ ATON.Nav.requestHome(0.1); });
-};
-
-FE._uiSetupBase = ()=>{
-    $("#idPopup").click( FE.popupClose );
-    $("#idLoader").html("<img src='"+ATON.PATH_RES+"loader.png'>");
->>>>>>> master
 
     $("body").prepend("<div class='atonPopupLabelContainer'><div id='idPopupLabel' class='atonPopupLabel'></div></div>");
     FE.hideSemLabel();
@@ -1274,7 +1057,6 @@ Add generic icon button inside a specific div container
 @param {function} onPress - function triggered when pressing the button
 @param {string} tooltip - (optional) tooltip
 */
-<<<<<<< HEAD
 FE.uiAddButton = (idcontainer, icon, onPress, tooltip) => {
     let iconurl;
     let iconid;
@@ -1305,51 +1087,14 @@ FE.uiSwitchButton = (iconid, b) => {
 
 FE.uiSetButtonHandler = (id, handler) => {
     $("#" + id).click(handler);
-=======
-FE.uiAddButton = (idcontainer, icon, onPress, tooltip)=>{
-    let iconurl;
-    let iconid;
-
-    if (icon.endsWith(".png")){
-        iconurl = icon;
-        iconid  = icon.slice(0,-4);
-    }
-    else {
-        iconurl = FE.PATH_RES_ICONS+icon+".png";
-        iconid  = icon;
-    }
-
-    let elid = "btn-"+iconid;
-    //let htmlcode = "<div id='"+elid+"' class='atonBTN' ><img src='"+iconurl+"'></div>";
-    let el = $("<div id='"+elid+"' class='atonBTN' ><img src='"+iconurl+"'></div>");
-    
-    $("#"+idcontainer).append(el);
-
-    if (onPress) el.click( onPress ); //$("#"+elid).click( onPress );
-    if (tooltip) el.attr("title", tooltip); //$("#"+elid).attr("title", tooltip);
-};
-
-FE.uiSwitchButton = (iconid, b)=>{
-    if (b) $("#btn-"+iconid).addClass("switchedON");
-    else $("#btn-"+iconid).removeClass("switchedON");
-};
-
-FE.uiSetButtonHandler = (id, handler)=>{
-    $("#"+id).click( handler );
->>>>>>> master
 };
 
 /**
 Add home button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonHome = (idcontainer) => {
     FE.uiAddButton(idcontainer, "home", () => {
-=======
-FE.uiAddButtonHome = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "home", ()=>{ 
->>>>>>> master
         ATON.Nav.requestHome(0.3);
     }, "Home viewpoint");
 };
@@ -1359,13 +1104,8 @@ Add back button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 @param {string} url - (optional) url
 */
-<<<<<<< HEAD
 FE.uiAddButtonBack = (idcontainer, url) => {
     FE.uiAddButton(idcontainer, "back", () => {
-=======
-FE.uiAddButtonBack = (idcontainer, url)=>{
-    FE.uiAddButton(idcontainer, "back", ()=>{ 
->>>>>>> master
         if (url && url.length > 1 && url.startsWith("http:")) ATON.Utils.goToURL(url);
         else history.back();
     }, "Go Back");
@@ -1375,7 +1115,6 @@ FE.uiAddButtonBack = (idcontainer, url)=>{
 Add first-person button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonFirstPerson = (idcontainer) => {
     FE.uiAddButton(idcontainer, "fp", () => {
         if (ATON.Nav.isFirstPerson()) {
@@ -1391,30 +1130,12 @@ FE.uiAddButtonFirstPerson = (idcontainer) => {
 
     if (ATON.Nav.isFirstPerson()) FE.uiSwitchButton("fp", true);
     else FE.uiSwitchButton("fp", false);
-=======
-FE.uiAddButtonFirstPerson = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "fp", ()=>{
-        if (ATON.Nav.isFirstPerson()){
-            ATON.Nav.setOrbitControl();
-            //ATON.Nav.restorePreviousNavMode();
-            FE.uiSwitchButton("fp",false);
-        }
-        else {
-            ATON.Nav.setFirstPersonControl();
-            FE.uiSwitchButton("fp",true);
-        }
-    }, "First-person navigation mode");
-
-    if (ATON.Nav.isFirstPerson()) FE.uiSwitchButton("fp",true);
-    else FE.uiSwitchButton("fp",false);
->>>>>>> master
 };
 
 /**
 Add immersive-VR button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonVR = (idcontainer) => {
     if (!ATON.Utils.isConnectionSecure()) return;
 
@@ -1422,15 +1143,6 @@ FE.uiAddButtonVR = (idcontainer) => {
         ATON.XR.toggle("immersive-vr");
     },
         "Immersive VR mode");
-=======
-FE.uiAddButtonVR = (idcontainer)=>{
-    if (!ATON.Utils.isConnectionSecure()) return;
-
-    FE.uiAddButton(idcontainer, "vr", ()=>{
-        ATON.XR.toggle("immersive-vr");
-    },
-    "Immersive VR mode" );
->>>>>>> master
 
     if (!ATON.Utils.isVRsupported()) $("#btn-vr").hide();
 };
@@ -1439,7 +1151,6 @@ FE.uiAddButtonVR = (idcontainer)=>{
 Add immersive-AR button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonAR = (idcontainer) => {
     if (!ATON.Utils.isConnectionSecure()) return;
     //if (!ATON.Utils.isARsupported()) return; //Not showing on mobile
@@ -1448,31 +1159,14 @@ FE.uiAddButtonAR = (idcontainer) => {
         if (ATON.Utils.isARsupported()) {
             ATON.XR.toggle("immersive-ar");
         }
-=======
-FE.uiAddButtonAR = (idcontainer)=>{
-    if (!ATON.Utils.isConnectionSecure()) return;
-    //if (!ATON.Utils.isARsupported()) return; //Not showing on mobile
-
-    FE.uiAddButton(idcontainer, "ar", ()=>{
-        if (ATON.Utils.isARsupported()){
-            ATON.XR.toggle("immersive-ar");
-        }
-/*
->>>>>>> master
         // Apple USDZ
         else {
             let fname = "scene.usdz";
             //if (ATON.SceneHub.currID) fname = 
             ATON.Utils.exportNode(ATON.getRootScene(), fname);
         }
-<<<<<<< HEAD
     },
         "Immersive AR mode");
-=======
-*/
-    }, 
-    "Immersive AR mode" );
->>>>>>> master
 
     //if (!ATON.Utils.isARsupported()) $("#btn-ar").hide();
 };
@@ -1481,7 +1175,6 @@ FE.uiAddButtonAR = (idcontainer)=>{
 Add device-orientation button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonDeviceOrientation = (idcontainer) => {
     if (!ATON.Utils.isConnectionSecure()) return;
     if (!ATON.Utils.isMobile()) return;
@@ -1500,39 +1193,14 @@ FE.uiAddButtonDeviceOrientation = (idcontainer) => {
 
     if (ATON.Nav.isDevOri()) FE.uiSwitchButton("devori", true);
     else FE.uiSwitchButton("devori", false);
-=======
-FE.uiAddButtonDeviceOrientation = (idcontainer)=>{
-    if (!ATON.Utils.isConnectionSecure()) return;
-    if (!ATON.Utils.isMobile()) return;
-
-    FE.uiAddButton(idcontainer,"devori", ()=>{
-        if (ATON.Nav.isDevOri()){
-            //ATON.Nav.setOrbitControl();
-            ATON.Nav.restorePreviousNavMode();
-            FE.uiSwitchButton("devori",false);
-        }
-        else {
-            ATON.Nav.setDeviceOrientationControl();
-            FE.uiSwitchButton("devori",true);
-        }
-    }, "Device-orientation mode");
-
-    if (ATON.Nav.isDevOri()) FE.uiSwitchButton("devori",true);
-    else FE.uiSwitchButton("devori",false);
->>>>>>> master
 };
 
 /**
 Add Navigation button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonNav = (idcontainer) => {
     FE.uiAddButton(idcontainer, "nav", () => {
-=======
-FE.uiAddButtonNav = (idcontainer)=>{
-    FE.uiAddButton(idcontainer,"nav", ()=>{
->>>>>>> master
         FE.popupNav();
     }, "Navigation");
 };
@@ -1541,19 +1209,11 @@ FE.uiAddButtonNav = (idcontainer)=>{
 Add talk button (Photon)
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonTalk = (idcontainer) => {
     if (!ATON.Utils.isConnectionSecure()) return;
 
     FE.uiAddButton(idcontainer, "talk", () => {
         if (ATON.MediaFlow.isAudioRecording()) {
-=======
-FE.uiAddButtonTalk = (idcontainer)=>{
-    if (!ATON.Utils.isConnectionSecure()) return;
-
-    FE.uiAddButton(idcontainer, "talk", ()=>{
-        if (ATON.MediaFlow.isAudioRecording()){
->>>>>>> master
             ATON.MediaFlow.stopAudioStreaming();
             //FE.uiSwitchButton("talk",false);
             $("#btn-talk").removeClass("atonBTN-rec");
@@ -1573,17 +1233,10 @@ FE.uiAddButtonTalk = (idcontainer)=>{
 Add focus stream button (Photon)
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonStreamFocus = (idcontainer) => {
 
     FE.uiAddButton(idcontainer, "focus", () => {
         if (ATON.Photon._bStreamFocus) {
-=======
-FE.uiAddButtonStreamFocus = (idcontainer)=>{
-
-    FE.uiAddButton(idcontainer, "focus", ()=>{
-        if (ATON.Photon._bStreamFocus){
->>>>>>> master
             ATON.Photon.setFocusStreaming(false);
             $("#btn-focus").removeClass("atonBTN-rec");
         }
@@ -1601,27 +1254,16 @@ FE.uiAddButtonStreamFocus = (idcontainer)=>{
 Add main videopano control button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonMainVideoPanoPlayPause = (idcontainer) => {
     FE.uiAddButton(idcontainer, "playpause", () => {
         if (ATON._vpanoPlaying) {
             if (ATON._elPanoVideo) {
-=======
-FE.uiAddButtonMainVideoPanoPlayPause = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "playpause", ()=>{
-        if (ATON._vpanoPlaying){
-            if (ATON._elPanoVideo){
->>>>>>> master
                 ATON._elPanoVideo.pause();
                 //FE.uiSwitchButton("playpause",false);
             }
         }
         else {
-<<<<<<< HEAD
             if (ATON._elPanoVideo) {
-=======
-            if (ATON._elPanoVideo){
->>>>>>> master
                 ATON._elPanoVideo.play();
                 //FE.uiSwitchButton("playpause",true);
             }
@@ -1636,41 +1278,25 @@ FE.uiAddButtonMainVideoPanoPlayPause = (idcontainer)=>{
 Add QR-code button (hidden on localhost/offline scenarios)
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonQR = (idcontainer) => {
     if (ATON.Utils.isLocalhost()) return;
 
     FE.uiAddButton(idcontainer, "qr", FE.popupQR, "QR-code");
-=======
-FE.uiAddButtonQR = (idcontainer)=>{
-    if (ATON.Utils.isLocalhost()) return;
-
-    FE.uiAddButton(idcontainer,"qr", FE.popupQR, "QR-code" );
->>>>>>> master
 };
 
 /**
 Add screenshot button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonScreenshot = (idcontainer) => {
     FE.uiAddButton(idcontainer, "sshot", FE.popupScreenShot, "Screenshot");
-=======
-FE.uiAddButtonScreenshot = (idcontainer)=>{
-    FE.uiAddButton(idcontainer,"sshot", FE.popupScreenShot, "Screenshot" );
->>>>>>> master
 };
 
 /**
 Add scene information button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonInfo = (idcontainer) => {
-=======
-FE.uiAddButtonInfo = (idcontainer)=>{
->>>>>>> master
     FE.uiAddButton(idcontainer, "info", ATON.FE.popupSceneInfo, "Scene information");
     $("#btn-info").hide();
 };
@@ -1679,13 +1305,8 @@ FE.uiAddButtonInfo = (idcontainer)=>{
 Add fullscreen button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonFullScreen = (idcontainer) => {
     FE.uiAddButton(idcontainer, "fullscreen", () => {
-=======
-FE.uiAddButtonFullScreen = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "fullscreen", ()=>{
->>>>>>> master
         ATON.toggleFullScreen();
     }, "Fullscreen");
 
@@ -1693,50 +1314,28 @@ FE.uiAddButtonFullScreen = (idcontainer)=>{
 };
 
 //TODO:
-<<<<<<< HEAD
 FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword) => {
     let htmlcode = "";
     htmlcode += "Add keyword: <input id='idKWordInput' list='lkwords' type='text' maxlength='100' size='20'><div class='atonBTN atonBTN-green' id='idKWadd'><img src='" + ATON.FE.PATH_RES_ICONS + "add.png'></div><br>";
     htmlcode += "<div id='idKWords'></div>";
 
     $("#" + idcontainer).html(htmlcode);
-=======
-FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword)=>{
-    let htmlcode = "";
-    htmlcode += "Add keyword: <input id='idKWordInput' list='lkwords' type='text' maxlength='100' size='20'><div class='atonBTN atonBTN-green' id='idKWadd'><img src='"+ATON.FE.PATH_RES_ICONS+"add.png'></div><br>";
-    htmlcode += "<div id='idKWords'></div>";
-
-    $("#"+idcontainer).html(htmlcode);
->>>>>>> master
 
     FE.uiAttachInputFilterID("idKWordInput");
 
     // Request global keywords list
-<<<<<<< HEAD
     $.getJSON(ATON.PATH_RESTAPI + "keywords/", (data) => {
         let ht = "<datalist id='lkwords'>";
         for (let s in data) ht += "<option>" + s + "</option>";
         ht += "</datalist>";
 
         $("#" + idcontainer).append(ht);
-=======
-    $.getJSON( ATON.PATH_RESTAPI+"keywords/", ( data )=>{
-        let ht = "<datalist id='lkwords'>";
-        for (let s in data) ht += "<option>"+s+"</option>";
-        ht += "</datalist>";
-
-        $("#"+idcontainer).append(ht);
->>>>>>> master
     });
 
 
     let kwsObj = {};
 
-<<<<<<< HEAD
     let addKWtoBox = (kw) => {
-=======
-    let addKWtoBox = (kw)=>{
->>>>>>> master
         if (kwsObj[kw]) return; // check duplicate
 
         kw = kw.toLowerCase().trim();
@@ -1745,7 +1344,6 @@ FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword)=>{
 
         kwsObj[kw] = 1;
 
-<<<<<<< HEAD
         console.log("Added keyword " + kw);
         if (onAddKeyword) onAddKeyword(kw);
 
@@ -1757,36 +1355,15 @@ FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword)=>{
             kwsObj[kw] = undefined;
 
             console.log("Removed keyword " + kw);
-=======
-        console.log("Added keyword "+kw);
-        if (onAddKeyword) onAddKeyword(kw);
-
-        // Populate box with remove handlers
-        $("#idKWords").append("<div class='atonKeyword atonKeywordActivable' id='idkw-"+kw+"'>"+kw+"</div>");
-        $("#idkw-"+kw).click(()=>{
-            $("#idkw-"+kw).remove();
-
-            kwsObj[kw] = undefined;
-
-            console.log("Removed keyword "+kw);
->>>>>>> master
             if (onRemoveKeyword) onRemoveKeyword(kw);
         });
     };
 
-<<<<<<< HEAD
     if (kwList) {
         for (let k in kwList) addKWtoBox(kwList[k]);
     }
 
     $("#idKWordInput").keypress(function (event) {
-=======
-    if (kwList){
-        for (let k in kwList) addKWtoBox( kwList[k] );
-    }
-
-    $("#idKWordInput").keypress(function(event){
->>>>>>> master
         let keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode != '13') return;
 
@@ -1796,11 +1373,7 @@ FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword)=>{
         addKWtoBox(kw);
     });
 
-<<<<<<< HEAD
     $("#idKWadd").click(() => {
-=======
-    $("#idKWadd").click(()=>{
->>>>>>> master
         let kw = $("#idKWordInput").val().toLowerCase().trim();
         if (!kw || kw.length < 3) return;
 
@@ -1808,7 +1381,6 @@ FE.uiAddKeywordsArea = (idcontainer, kwList, onAddKeyword, onRemoveKeyword)=>{
     });
 };
 
-<<<<<<< HEAD
 FE.uiAttachCollectionItemsToInput = (idinput, type) => {
     let htmlcontent = "";
 
@@ -1824,32 +1396,10 @@ FE.uiAttachCollectionItemsToInput = (idinput, type) => {
         for (let m in data) {
             let ipath = data[m];
             htmlcontent += "<option value='" + ipath + "'>" + ipath + "</option>";
-=======
-FE.uiAttachCollectionItemsToInput = (idinput, type)=>{
-    let htmlcontent = "";
-
-    $("#"+idinput).attr("list", idinput+"-list");
-    $("#"+idinput).attr("name", idinput+"-list");
-
-    $.getJSON( ATON.PATH_RESTAPI+"c/"+type+"/", ( data )=>{
-        //let folders = {};
-        //SHU._cModelDirs = {};
-        
-        htmlcontent += "<datalist id='"+idinput+"-list'>";
-
-        for (let m in data){
-            let ipath = data[m];
-            htmlcontent += "<option value='"+ipath+"'>"+ipath+"</option>";
->>>>>>> master
 
             //let F = SHU.getBaseFolder(ipath);
             //if (SHU._cModelDirs[F] === undefined) SHU._cModelDirs[F] = [];
             //SHU._cModelDirs[F].push(ipath)
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> master
             ///if (folders[F] === undefined) folders[F] = ipath;
             ///else folders[F] += ","+ipath;
         }
@@ -1862,17 +1412,12 @@ FE.uiAttachCollectionItemsToInput = (idinput, type)=>{
 
         htmlcontent += "</datalist>";
 
-<<<<<<< HEAD
         $("#" + idinput).html(htmlcontent);
-=======
-        $("#"+idinput).html(htmlcontent);
->>>>>>> master
     });
 };
 
 
 // Get css class from vrc ID
-<<<<<<< HEAD
 FE.getVRCclassFromID = (uid) => {
     let i = (uid % 6);
     return "atonVRCu" + i;
@@ -1884,24 +1429,10 @@ FE._setupVRCevents = () => {
 
     ATON.on("VRC_IDassigned", (uid) => {
         $("#btn-vrc").addClass(FE.getVRCclassFromID(uid));
-=======
-FE.getVRCclassFromID = (uid)=>{
-    let i = (uid%6);
-    return "atonVRCu"+i;
-};
-
-// Setup VRC events
-FE._setupVRCevents = ()=>{
-    if (FE._bVRCsetup) return;
-
-    ATON.on("VRC_IDassigned", (uid)=>{
-        $("#btn-vrc").addClass( FE.getVRCclassFromID(uid) );
->>>>>>> master
 
         // Selector color
         //let col = ATON.Photon.ucolors[uid%6];
         //ATON.MatHub.materials.selector.color = ATON.Photon.ucolors[uid%6];
-<<<<<<< HEAD
         ATON.SUI.setSelectorColor(ATON.Photon.color);
         ATON.plight.color = ATON.Photon.color;
 
@@ -1931,37 +1462,6 @@ FE._setupVRCevents = ()=>{
     */
     ATON.on("VRC_Disconnected", () => {
         $("#btn-vrc").attr("class", "atonBTN");
-=======
-        ATON.SUI.setSelectorColor( ATON.Photon.color );
-        ATON.plight.color = ATON.Photon.color;
-
-        FE.checkAuth((data)=>{
-            if (data.username!==undefined /*&& ATON.Photon._username===undefined*/) ATON.Photon.setUsername(data.username);
-        });
-    });
-
-    ATON.on("VRC_SceneState", (sstate)=>{
-        let numUsers = ATON.Photon.getNumUsers();
-        if (numUsers>1) $("#idVRCnumusers").html(numUsers);
-        else $("#idVRCnumusers").html("");
-
-        console.log("Users: "+numUsers);
-    });
-/*
-    ATON.on("VRC_UserEnter", (uid)=>{
-        let numUsers = ATON.Photon.getNumUsers();
-        $("#idVRCnumusers").html(numUsers);
-        console.log("Users: "+numUsers);
-    });
-    ATON.on("VRC_UserLeave", (uid)=>{
-        let numUsers = ATON.Photon.getNumUsers();
-        $("#idVRCnumusers").html(numUsers);
-        console.log("Users: "+numUsers);
-    });
-*/
-    ATON.on("VRC_Disconnected", ()=>{
-        $("#btn-vrc").attr("class","atonBTN");
->>>>>>> master
         // Selector color
         //ATON.MatHub.materials.selector.color = ATON.MatHub.colors.green;
         ATON.SUI.setSelectorColor(ATON.MatHub.colors.defUI);
@@ -1978,15 +1478,9 @@ FE._setupVRCevents = ()=>{
 Add Photon button (to connect/disconnect from collaborative sessions)
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonVRC = (idcontainer) => {
     FE.uiAddButton(idcontainer, "vrc", () => {
         if (ATON.Photon.isConnected()) {
-=======
-FE.uiAddButtonPhoton = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "vrc", ()=>{
-        if (ATON.Photon.isConnected()){
->>>>>>> master
             FE.popupVRC();
         }
         else {
@@ -2000,54 +1494,31 @@ FE.uiAddButtonPhoton = (idcontainer)=>{
     //$("#idVRCchatPanel").append(ATON.Photon._elChat);
     FE._setupVRCevents();
 
-<<<<<<< HEAD
     if (ATON.Photon.uid !== undefined) $("#btn-vrc").addClass(FE.getVRCclassFromID(ATON.Photon.uid));
     else $("#btn-vrc").attr("class", "atonBTN");
 };
 
-=======
-    if (ATON.Photon.uid !== undefined) $("#btn-vrc").addClass( FE.getVRCclassFromID(ATON.Photon.uid) );
-    else $("#btn-vrc").attr("class","atonBTN");
-};
-
-FE.uiAddButtonVRC = FE.uiAddButtonPhoton;
-
->>>>>>> master
 /**
 Add user button (login/logout)
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonUser = (idcontainer) => {
     FE.uiAddButton(idcontainer, "user", () => {
         FE.popupUser();
     }, "User");
 
     FE.checkAuth((r) => {
-=======
-FE.uiAddButtonUser = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "user", ()=>{
-        FE.popupUser();
-    }, "User");
-
-    FE.checkAuth((r)=>{
->>>>>>> master
         if (r.username !== undefined) $("#btn-user").addClass("switchedON");
         else $("#btn-user").removeClass("switchedON");
     });
 };
 
-<<<<<<< HEAD
 FE.uiSetEditMode = (b, idcontainer) => {
-=======
-FE.uiSetEditMode = (b, idcontainer)=>{
->>>>>>> master
     ATON.SceneHub._bEdit = b;
     FE.uiSwitchButton("edit", b);
 
     let canvas = ATON._renderer.domElement;
 
-<<<<<<< HEAD
     if (b) {
         //$("body").addClass("edit");
         $("#" + idcontainer).addClass("atonToolbar-bg-edit");
@@ -2055,15 +1526,6 @@ FE.uiSetEditMode = (b, idcontainer)=>{
     else {
         //$("body").removeClass("edit");
         $("#" + idcontainer).removeClass("atonToolbar-bg-edit");
-=======
-    if (b){
-        //$("body").addClass("edit");
-        $("#"+idcontainer).addClass("atonToolbar-bg-edit");
-    }
-    else {
-        //$("body").removeClass("edit");
-        $("#"+idcontainer).removeClass("atonToolbar-bg-edit");
->>>>>>> master
     }
 };
 
@@ -2071,49 +1533,28 @@ FE.uiSetEditMode = (b, idcontainer)=>{
 Add persistent editing mode button
 @param {string} idcontainer - the id of html container (e.g.: "idTopToolbar")
 */
-<<<<<<< HEAD
 FE.uiAddButtonEditMode = (idcontainer) => {
     FE.uiAddButton(idcontainer, "edit", () => {
         FE.checkAuth((data) => {
             if (data.username !== undefined) {
                 if (ATON.SceneHub._bEdit) {
-=======
-FE.uiAddButtonEditMode = (idcontainer)=>{
-    FE.uiAddButton(idcontainer, "edit", ()=>{
-        FE.checkAuth((data)=>{
-            if (data.username !== undefined){
-                if (ATON.SceneHub._bEdit){
->>>>>>> master
                     FE.uiSetEditMode(false, idcontainer);
                 }
                 else {
                     FE.uiSetEditMode(true, idcontainer);
                 }
 
-<<<<<<< HEAD
                 console.log("Persistent Edit Mode: " + ATON.SceneHub._bEdit);
             }
 
             else {
                 FE.popupUser();
-=======
-                console.log("Persistent Edit Mode: "+ATON.SceneHub._bEdit);
-            }
-
-            else {
-                FE.popupUser();  
->>>>>>> master
             }
         });
     }, "Persistent Edit Mode");
 
-<<<<<<< HEAD
     if (ATON.SceneHub._bEdit) FE.uiSwitchButton("edit", true);
     else FE.uiSwitchButton("edit", false);
-=======
-    if (ATON.SceneHub._bEdit) FE.uiSwitchButton("edit",true);
-    else FE.uiSwitchButton("edit",false);
->>>>>>> master
 };
 
 /**
@@ -2121,11 +1562,7 @@ Add UI Profile to the front-end
 @param {string} id - profile ID
 @param {function} uiFunction - function that creates UI (HTML or SUI elements) for that profile
 */
-<<<<<<< HEAD
 FE.uiAddProfile = (id, uiFunction) => {
-=======
-FE.uiAddProfile = (id, uiFunction)=>{
->>>>>>> master
     if (typeof uiFunction !== 'function') return;
 
     FE._uiProfiles[id] = uiFunction;
@@ -2135,17 +1572,12 @@ FE.uiAddProfile = (id, uiFunction)=>{
 Load specific UI Profile for the front-end
 @param {string} id - profile ID
 */
-<<<<<<< HEAD
 FE.uiLoadProfile = (id) => {
-=======
-FE.uiLoadProfile = (id)=>{
->>>>>>> master
     let f = FE._uiProfiles[id];
     if (f === undefined) return;
 
     f();
     FE._uiCurrProfile = id;
-<<<<<<< HEAD
     console.log("Loaded UI Profile: " + FE._uiCurrProfile);
 };
 
@@ -2165,41 +1597,14 @@ FE.uiAttachInputFilterID = (inputid) => {
         let value = $("#" + inputid).val();
         let regReplace = new RegExp('[^A-Za-z0-9-_]', 'ig');
         $("#" + inputid).val(value.replace(regReplace, ''));
-=======
-    console.log("Loaded UI Profile: "+FE._uiCurrProfile);
-};
-
-FE.getCurrentUIP = ()=>{
-    return FE._uiCurrProfile;
-};
-
-FE.attachHandlerToButton = (idbutton, h)=>{
-    if (h === undefined) return;
-
-    $("#"+idbutton).click(()=>{ h(); });
-};
-
-// Attach ID validator to given input field
-FE.uiAttachInputFilterID = (inputid)=>{
-    $("#"+inputid).on('keyup change input', ()=>{
-        let value = $("#"+inputid).val();
-        let regReplace = new RegExp('[^A-Za-z0-9-_]', 'ig');
-        $("#"+inputid).val( value.replace(regReplace, '') );
->>>>>>> master
 
     });
 };
 
 // Utility to switch a node in a graph
-<<<<<<< HEAD
 FE.switchNode = (nid, value, type) => {
     let N = undefined;
 
-=======
-FE.switchNode = (nid, value, type)=>{
-    let N = undefined;
-    
->>>>>>> master
     if (type === ATON.NTYPES.SEM) N = ATON.getSemanticNode(nid);
     else N = ATON.getSceneNode(nid);
 
@@ -2207,25 +1612,16 @@ FE.switchNode = (nid, value, type)=>{
 
     N.toggle(value);
 
-<<<<<<< HEAD
     ATON.fireEvent("FE_NodeSwitch", { nid: nid, t: type, v: value });
-=======
-    ATON.fire("FE_NodeSwitch", {nid: nid, t: type, v: value});
->>>>>>> master
     //console.log("XXX");
 };
 
 // Graphs
-<<<<<<< HEAD
 FE.uiCreateGraph = (type) => {
-=======
-FE.uiCreateGraph = (type)=>{
->>>>>>> master
     let nodes = ATON.snodes;
     if (type === ATON.NTYPES.SEM) nodes = ATON.semnodes;
 
     let htmlcontent = "";
-<<<<<<< HEAD
     for (let nid in nodes) {
         let N = nodes[nid];
 
@@ -2236,18 +1632,6 @@ FE.uiCreateGraph = (type)=>{
             //TODO: gizmos
             //htmlcontent += "<div class='atonBTN atonSmallIcon' onclick=\"ATON.FE.attachGizmoToNode('"+nid+"');\"><img src='"+FE.PATH_RES_ICONS+"axes.png'></div>";
 
-=======
-    for (let nid in nodes){
-        let N = nodes[nid];
-        
-        let chk = N.visible? "checked" : "";
-        if (nid !== "."){
-            htmlcontent += "<input type='checkbox' "+chk+" onchange=\"ATON.FE.switchNode('"+nid+"',this.checked,"+type+");\">"+nid;
-            
-            //TODO: gizmos
-            //htmlcontent += "<div class='atonBTN atonSmallIcon' onclick=\"ATON.FE.attachGizmoToNode('"+nid+"');\"><img src='"+FE.PATH_RES_ICONS+"axes.png'></div>";
-            
->>>>>>> master
             htmlcontent += "<br>";
         }
 
@@ -2257,7 +1641,6 @@ FE.uiCreateGraph = (type)=>{
     return htmlcontent;
 };
 
-<<<<<<< HEAD
 FE.setupBasicUISounds = () => {
     FE.auLib = {};
 
@@ -2266,16 +1649,6 @@ FE.setupBasicUISounds = () => {
 };
 
 FE.playAudioFromSemanticNode = (semid) => {
-=======
-FE.setupBasicUISounds = ()=>{
-    FE.auLib = {};
-
-    FE.auLib.switch = new Audio(ATON.PATH_RES+"audio/switch.wav");
-    FE.auLib.switch.loop = false;
-};
-
-FE.playAudioFromSemanticNode = (semid)=>{
->>>>>>> master
     //if (FE._auSemNodePlaying) return;
     if (semid === undefined) return;
 
@@ -2285,7 +1658,6 @@ FE.playAudioFromSemanticNode = (semid)=>{
     let au = S.getAudio();
     if (au === undefined) return;
 
-<<<<<<< HEAD
     if (typeof au === "string" && !au.startsWith("data:audio")) {
         au = ATON.Utils.resolveCollectionURL(au);
     }
@@ -2296,24 +1668,11 @@ FE.playAudioFromSemanticNode = (semid)=>{
     ATON.AudioHub._loader.load(au, (buffer) => {
         FE._auSemNode.setBuffer(buffer);
         FE._auSemNode.setLoop(false);
-=======
-    if (typeof au === "string" && !au.startsWith("data:audio")){
-        au = ATON.Utils.resolveCollectionURL(au);
-    }
-
-    if (FE._auSemNode === undefined || FE._auSemNode === null) FE._auSemNode = new THREE.Audio( ATON.AudioHub._listener );
-    else FE._auSemNode.stop();
-
-    ATON.AudioHub._loader.load( au, (buffer)=>{
-        FE._auSemNode.setBuffer( buffer );
-        FE._auSemNode.setLoop( false );
->>>>>>> master
         //FE._auSemNode.setVolume( 0.5 );
         //FE._auSemNode.setPlaybackRate(0.9);
         FE._auSemNode.play();
     });
 
-<<<<<<< HEAD
     /*
         if (FE._auSemNode === undefined) FE._auSemNode = new Audio();
         
@@ -2326,20 +1685,6 @@ FE.playAudioFromSemanticNode = (semid)=>{
             FE._auSemNodePlaying = false;
         };
     */
-=======
-/*
-    if (FE._auSemNode === undefined) FE._auSemNode = new Audio();
-    
-    FE._auSemNodePlaying = true;
-    FE._auSemNode.src = au;
-    //FE._auSemNode.type = ATON.MediaFlow.auType;
-    FE._auSemNode.play();
-
-    FE._auSemNode.onended = ()=>{
-        FE._auSemNodePlaying = false;
-    };
-*/
->>>>>>> master
 };
 
 
@@ -2351,11 +1696,7 @@ Show a modal popup.
 @param {string} htmlcontent - The HTML5 content for the popup
 @param {string} cssClasses - (optional) css classes for the popup
 */
-<<<<<<< HEAD
 FE.popupShow = (htmlcontent, cssClasses) => {
-=======
-FE.popupShow = (htmlcontent, cssClasses)=>{
->>>>>>> master
     if (FE._bPopup) return false;
 
     FE._tPopup = Date.now();
@@ -2365,42 +1706,23 @@ FE.popupShow = (htmlcontent, cssClasses)=>{
     let clstr = "atonPopup ";
     if (cssClasses) clstr += cssClasses;
 
-<<<<<<< HEAD
     let htcont = "<div id='idPopupContent' class='" + clstr + "'>";
     htcont += htmlcontent + "</div>"
-=======
-    let htcont = "<div id='idPopupContent' class='"+clstr+"'>";
-    htcont += htmlcontent+"</div>"
->>>>>>> master
 
     FE._bPopup = true;
     ATON._bListenKeyboardEvents = false;
 
     $('#idPopup').html(htcont);
-<<<<<<< HEAD
     $('#idPopupContent').click((e) => { e.stopPropagation(); });
     $('#idPopup').show();
 
     if (FE.popupBlurBG > 0) {
         //ATON._renderer.setPixelRatio( FE.popupBlurBG );
         ATON._renderer.domElement.style.filter = "blur(" + FE.popupBlurBG + "px)"; //`blur(${blur * 5}px)`;
-=======
-    $('#idPopupContent').click((e)=>{ e.stopPropagation(); });
-    $('#idPopup').show();
-
-    if (FE.popupBlurBG > 0){
-        //ATON._renderer.setPixelRatio( FE.popupBlurBG );
-        ATON._renderer.domElement.style.filter = "blur("+FE.popupBlurBG+"px)"; //`blur(${blur * 5}px)`;
->>>>>>> master
         //ATON._renderer.render( ATON._mainRoot, ATON.Nav._camera );
     }
 
     ATON._bPauseQuery = true;
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> master
     //ATON.renderPause();
 
     $("#idTopToolbar").hide();
@@ -2416,11 +1738,7 @@ FE.popupShow = (htmlcontent, cssClasses)=>{
 /**
 Close current popup
 */
-<<<<<<< HEAD
 FE.popupClose = (bNoAnim) => {
-=======
-FE.popupClose = (bNoAnim)=>{
->>>>>>> master
     let dt = Date.now() - FE._tPopup;
     if (dt < FE.POPUP_DT) return; // Avoid capturing unwanted tap events
 
@@ -2430,13 +1748,8 @@ FE.popupClose = (bNoAnim)=>{
 
     //ATON.renderResume();
     ATON._bListenKeyboardEvents = true;
-<<<<<<< HEAD
 
     if (FE.popupBlurBG > 0) {
-=======
-    
-    if (FE.popupBlurBG > 0){
->>>>>>> master
         //ATON.resetPixelDensity();
         ATON._renderer.domElement.style.filter = "none";
     }
@@ -2455,35 +1768,22 @@ FE.popupClose = (bNoAnim)=>{
     ATON.focusOn3DView();
 };
 
-<<<<<<< HEAD
 FE.subPopup = (popupFunc) => {
-=======
-FE.subPopup = ( popupFunc )=>{
->>>>>>> master
     ATON.FE.popupClose();
     //setTimeout( popupFunc, FE.POPUP_DELAY);
     popupFunc();
 };
 
-<<<<<<< HEAD
 FE.popupQR = () => {
     let htmlcontent = "<div class='atonPopupTitle'>Share</div>";
     htmlcontent += "<div class='atonQRcontainer' id='idQRcode'></div><br><br>";
 
     if (!ATON.FE.popupShow(htmlcontent)) return;
-=======
-FE.popupQR = ()=>{
-    let htmlcontent = "<div class='atonPopupTitle'>Share</div>";
-    htmlcontent += "<div class='atonQRcontainer' id='idQRcode'></div><br><br>";
-
-    if ( !ATON.FE.popupShow(htmlcontent) ) return;
->>>>>>> master
 
     let url = window.location.href;
     new QRCode(document.getElementById("idQRcode"), url);
 };
 
-<<<<<<< HEAD
 FE.popupScreenShot = () => {
     let cover = ATON.Utils.takeScreenshot(256);
 
@@ -2499,23 +1799,6 @@ FE.popupScreenShot = () => {
         htmlcontent += "<div class='atonBTN atonBTN-horizontal' id='btnScreenRec'><img src='" + FE.PATH_RES_ICONS + "recscreen.png'>Record video</div>";
 
         if (r.username !== undefined) {
-=======
-FE.popupScreenShot = ()=>{
-    let cover = ATON.Utils.takeScreenshot(256);
-
-    FE.checkAuth((r)=>{
-
-        let htmlcontent = "<div class='atonPopupTitle'>Capture</div>";
-        htmlcontent += "This is a preview of what your screenshot will look like:<br><br>";
-        htmlcontent += "<img src='"+cover.src+"'><br>";
-        htmlcontent += "Resolution: <input id='isShotSize' type='number' min='100' max='4000' value='256'>px<br>";
-
-        htmlcontent += "<div class='atonBTN atonBTN-horizontal' id='btnScreenShot'><img src='"+FE.PATH_RES_ICONS+"sshot.png'>Screenshot</div>";
-
-        htmlcontent += "<div class='atonBTN atonBTN-horizontal' id='btnScreenRec'><img src='"+FE.PATH_RES_ICONS+"recscreen.png'>Record video</div>";
-
-        if (r.username !== undefined){
->>>>>>> master
             htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-horizontal' id='btnSetCover'>Set as Cover</div>";
             /*
             htmlcontent += "<div class='atonBTN' id='btnSetCover' style='width:220px; height:220px; padding:5px'>";
@@ -2524,54 +1807,31 @@ FE.popupScreenShot = ()=>{
             */
         }
 
-<<<<<<< HEAD
         if (!ATON.FE.popupShow(htmlcontent)) return;
-=======
-        if ( !ATON.FE.popupShow(htmlcontent) ) return;
->>>>>>> master
 
         if (ATON.MediaFlow._bScreenRec) $("#btnScreenRec").addClass("atonBTN-rec");
         else $("#btnScreenRec").removeClass("atonBTN-rec");
 
-<<<<<<< HEAD
         $("#btnScreenShot").click(() => {
             let s = parseInt($('#isShotSize').val());
-=======
-        $("#btnScreenShot").click(()=>{
-            let s = parseInt( $('#isShotSize').val() );
->>>>>>> master
             if (s < 100) return;
 
             ATON.FE.popupClose();
 
-<<<<<<< HEAD
             let img = ATON.Utils.takeScreenshot(s, "shot.png");
         });
 
         $("#btnScreenRec").click(() => {
-=======
-            let img = ATON.Utils.takeScreenshot(s,"shot.png");
-        });
-
-        $("#btnScreenRec").click(()=>{
->>>>>>> master
             if (!ATON.MediaFlow._bScreenRec) ATON.MediaFlow.startScreenRecording();
             //else 
 
             ATON.FE.popupClose();
         });
 
-<<<<<<< HEAD
         $("#btnSetCover").click(() => {
             ATON.FE.popupClose();
 
             ATON.Utils.postJSON(ATON.PATH_RESTAPI + "cover/scene/", { sid: ATON.SceneHub.currID, img: cover.src }, (r) => {
-=======
-        $("#btnSetCover").click(()=>{
-            ATON.FE.popupClose();
-
-            ATON.Utils.postJSON(ATON.PATH_RESTAPI+"cover/scene/", {sid: ATON.SceneHub.currID, img: cover.src }, (r)=>{
->>>>>>> master
                 console.log(r);
             });
 
@@ -2579,19 +1839,11 @@ FE.popupScreenShot = ()=>{
     });
 };
 
-<<<<<<< HEAD
 FE.popupVRC = () => {
     let htmlcontent = "";
     let numUsers = ATON.Photon.getNumUsers();
 
     if (numUsers > 1) htmlcontent += "<div class='atonPopupTitle'>Collaborative Session (" + numUsers + " users)</div>";
-=======
-FE.popupVRC = ()=>{
-    let htmlcontent = "";
-    let numUsers = ATON.Photon.getNumUsers();
-
-    if (numUsers>1) htmlcontent += "<div class='atonPopupTitle'>Collaborative Session ("+numUsers+" users)</div>";
->>>>>>> master
     else htmlcontent += "<div class='atonPopupTitle'>Collaborative Session</div>";
 
     htmlcontent += "<div id='idCollabTools' style='display:inline'></div>";
@@ -2599,18 +1851,12 @@ FE.popupVRC = ()=>{
     // Username
     //htmlcontent += "Your username in this collaborative session is:<br>";
     htmlcontent += "<input id='idVRCusername' type='text' size='10' placeholder='username...' style='display:none'>";
-<<<<<<< HEAD
     htmlcontent += "<div id='idVRCusernameBTN' class='atonBTN' style='width:150px; display:none'>" + ATON.Photon._username + "</div>";
     htmlcontent += "<div class='atonBTN atonBTN-text' id='idVRCdisconnect'><img src='" + ATON.FE.PATH_RES_ICONS + "exit.png'>LEAVE</div>";
-=======
-    htmlcontent += "<div id='idVRCusernameBTN' class='atonBTN' style='width:150px; display:none'>"+ATON.Photon._username+"</div>";
-    htmlcontent += "<div class='atonBTN atonBTN-text' id='idVRCdisconnect'><img src='"+ATON.FE.PATH_RES_ICONS+"exit.png'>LEAVE</div>";
->>>>>>> master
 
     htmlcontent += "<div id='idChatBoxPopup' style='display:block'></div>";
     htmlcontent += "<input id='idVRCmsg' style='width:90%;margin:auto' type='text' placeholder='message...'>";
 
-<<<<<<< HEAD
     if (!ATON.FE.popupShow(htmlcontent, "atonPopupLarge")) return;
 
     // Tools
@@ -2635,32 +1881,6 @@ FE.popupVRC = ()=>{
 
         }, "Share your camera with other participants");
 
-=======
-    if ( !ATON.FE.popupShow(htmlcontent, "atonPopupLarge") ) return;
-
-    // Tools
-    ATON.checkAuth((u)=>{
-        console.log(u)
-
-        if (!ATON.MediaFlow._bCamStream) ATON.FE.uiAddButton("idCollabTools", "screenshare", ()=>{
-            if (!ATON.MediaFlow._bScreenStream) $("#btn-screenshare").removeClass("atonBTN-rec");
-            else $("#btn-screenshare").addClass("atonBTN-rec");
-    
-            ATON.MediaFlow.startOrStopScreenStreaming();
-            ATON.FE.popupClose();
-    
-        }, "Share your screen with other participants");
-    
-        if (!ATON.MediaFlow._bScreenStream && ATON.MediaFlow.hasVideoInput()) ATON.FE.uiAddButton("idCollabTools", "camera", ()=>{
-            if (!ATON.MediaFlow._bCamStream) $("#btn-camera").removeClass("atonBTN-rec");
-            else $("#btn-camera").addClass("atonBTN-rec");
-    
-            ATON.MediaFlow.startOrStopCameraStreaming();
-            ATON.FE.popupClose();
-    
-        }, "Share your camera with other participants");
-    
->>>>>>> master
         if (ATON.MediaFlow._bScreenStream) $("#btn-screenshare").addClass("atonBTN-rec");
         else $("#btn-screenshare").removeClass("atonBTN-rec");
         if (ATON.MediaFlow._bCamStream) $("#btn-camera").addClass("atonBTN-rec");
@@ -2668,11 +1888,7 @@ FE.popupVRC = ()=>{
     });
 
 
-<<<<<<< HEAD
     if (ATON.Photon._username === undefined) {
-=======
-    if (ATON.Photon._username === undefined){
->>>>>>> master
         $('#idVRCusername').show();
         $('#idVRCusernameBTN').hide();
     }
@@ -2682,7 +1898,6 @@ FE.popupVRC = ()=>{
         $('#idVRCusernameBTN').show();
     }
 
-<<<<<<< HEAD
     if (ATON.Photon.uid !== undefined) $('#idVRCusernameBTN').addClass("atonVRCu" + (ATON.Photon.uid % 6));
 
     $("#idChatBoxPopup").append(ATON.Photon._elChat);
@@ -2692,63 +1907,34 @@ FE.popupVRC = ()=>{
         if (keycode == '13') {
             let str = $("#idVRCmsg").val();
             ATON.Photon.setMessage(str);
-=======
-    if (ATON.Photon.uid !== undefined) $('#idVRCusernameBTN').addClass("atonVRCu"+(ATON.Photon.uid % 6));
-
-    $("#idChatBoxPopup").append(ATON.Photon._elChat);
-
-    $("#idVRCmsg").keypress((e)=>{
-        let keycode = (e.keyCode ? e.keyCode : e.which);
-        if (keycode == '13'){
-            let str = $("#idVRCmsg").val();
-            ATON.Photon.setMessage( str );
->>>>>>> master
             $("#idVRCmsg").val("");
             //$("#idChatBox:first-child").scrollTop( $("#idChatBox:first-child").height() );
         }
     });
 
-<<<<<<< HEAD
     $("#idVRCusername").keypress((e) => {
         let keycode = (e.keyCode ? e.keyCode : e.which);
         if (keycode == '13') {
             let str = $("#idVRCusername").val();
             ATON.Photon.setUsername(str);
 
-=======
-    $("#idVRCusername").keypress((e)=>{
-        let keycode = (e.keyCode ? e.keyCode : e.which);
-        if (keycode == '13'){
-            let str = $("#idVRCusername").val();
-            ATON.Photon.setUsername( str );
-            
->>>>>>> master
             $('#idVRCusername').hide();
             $('#idVRCusernameBTN').html(ATON.Photon._username);
             $('#idVRCusernameBTN').show();
         }
     });
 
-<<<<<<< HEAD
     $("#idVRCusernameBTN").click(() => {
-=======
-    $("#idVRCusernameBTN").click(()=>{
->>>>>>> master
         $('#idVRCusername').show();
         $('#idVRCusernameBTN').hide();
     });
 
-<<<<<<< HEAD
     $("#idVRCdisconnect").click(() => {
-=======
-    $("#idVRCdisconnect").click(()=>{
->>>>>>> master
         ATON.Photon.disconnect();
         ATON.FE.popupClose();
     });
 };
 
-<<<<<<< HEAD
 // User auth
 FE.checkAuth = (onReceive) => {
     ATON.Utils.checkAuth((data) => {
@@ -2756,15 +1942,6 @@ FE.checkAuth = (onReceive) => {
         //console.log(FE._userAuth);
 
         if (data.username !== undefined) {
-=======
-// User auth (TO BE DEPRECATED)
-FE.checkAuth = (onReceive)=>{
-    ATON.Utils.checkAuth((data)=>{
-        FE._userAuth = data;
-        //console.log(FE._userAuth);
-
-        if (data.username !== undefined){
->>>>>>> master
             $("#btn-user").addClass("switchedON");
             if (ATON.Photon._username === undefined) ATON.Photon.setUsername(data.username);
         }
@@ -2806,18 +1983,13 @@ FE.checkAuth = (onReceive)=>{
 FE.logout = ( onSuccess )=>{
     $.get(ATON.PATH_RESTAPI+"logout", (r)=>{
         ATON.SceneHub.setEditMode(false);
-<<<<<<< HEAD
         ATON.fireEvent("Logout");
-=======
-        ATON.fire("Logout");
->>>>>>> master
         
         if (onSuccess) onSuccess();
     });
 };
 */
 
-<<<<<<< HEAD
 FE.popupUser = () => {
 
     FE.checkAuth((r) => {
@@ -2832,42 +2004,19 @@ FE.popupUser = () => {
 
                 for (let uip in FE._uiProfiles) {
                     htmlcontent += "<option value='" + uip + "'>" + uip + "</option>";
-=======
-FE.popupUser = ()=>{
-
-    FE.checkAuth((r)=>{
-        
-        // We are already logged
-        if (r.username !== undefined){
-            let htmlcontent = "<img src='"+FE.PATH_RES_ICONS+"user.png'><br>";
-            htmlcontent += "<b>'"+r.username+"'</b><br><br>";
-
-            if (Object.keys(FE._uiProfiles).length > 0){
-                htmlcontent += "UI Profile:<br><div class='select' style='width:150px;'><select id='idUIProfiles'>";
-
-                for (let uip in FE._uiProfiles){
-                    htmlcontent += "<option value='"+uip+"'>"+uip+"</option>";
->>>>>>> master
                 }
                 htmlcontent += "</select><div class='selectArrow'></div></div><br><br>";
             }
 
             htmlcontent += "<div class='atonBTN atonBTN-red atonBTN-text atonBTN-horizontal' id='idLogoutBTN'>LOGOUT</div>";
 
-<<<<<<< HEAD
             if (!ATON.FE.popupShow(htmlcontent)) return;
 
             if (FE._uiCurrProfile) {
-=======
-            if ( !ATON.FE.popupShow(htmlcontent) ) return;
-
-            if (FE._uiCurrProfile){
->>>>>>> master
                 console.log(FE._uiCurrProfile);
                 $("#idUIProfiles").val(FE._uiCurrProfile);
             }
 
-<<<<<<< HEAD
             $("#idLogoutBTN").click(() => {
                 $.get(ATON.PATH_RESTAPI + "logout", (r) => {
                     console.log(r);
@@ -2876,23 +2025,12 @@ FE.popupUser = ()=>{
                     FE.uiSwitchButton("edit", false);
 
                     ATON.fireEvent("Logout");
-=======
-            $("#idLogoutBTN").click(()=>{
-                $.get(ATON.PATH_RESTAPI+"logout", (r)=>{
-                    console.log(r);
-
-                    ATON.SceneHub.setEditMode(false);
-                    FE.uiSwitchButton("edit",false);
-
-                    ATON.fire("Logout");
->>>>>>> master
                     $("#btn-user").removeClass("switchedON");
                 });
 
                 ATON.FE.popupClose();
             });
 
-<<<<<<< HEAD
             $("#idSHUscenes").click(() => {
                 ATON.Utils.goToURL("/shu/scenes/");
             });
@@ -2901,16 +2039,6 @@ FE.popupUser = ()=>{
             });
 
             $("#idUIProfiles").on("change", () => {
-=======
-            $("#idSHUscenes").click(()=>{
-                ATON.Utils.goToURL("/shu/scenes/");
-            });
-            $("#idSHUuser").click(()=>{
-                ATON.Utils.goToURL("/shu/auth/");
-            });
-
-            $("#idUIProfiles").on("change", ()=>{
->>>>>>> master
                 let uip = $("#idUIProfiles").val();
                 FE.uiLoadProfile(uip);
                 ATON.FE.popupClose();
@@ -2920,32 +2048,21 @@ FE.popupUser = ()=>{
 
         // Not logged in
         else {
-<<<<<<< HEAD
             let htmlcontent = "<img src='" + FE.PATH_RES_ICONS + "user.png'><br>";
-=======
-            let htmlcontent = "<img src='"+FE.PATH_RES_ICONS+"user.png'><br>";
->>>>>>> master
             htmlcontent += "username:<input id='idUsername' type='text' maxlength='15' size='15' ><br>";
             htmlcontent += "password:<input id='idPassword' type='password' maxlength='15' size='15' ><br>";
 
             htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-text atonBTN-horizontal' id='idLoginBTN'>LOGIN</div>";
 
-<<<<<<< HEAD
             if (!ATON.FE.popupShow(htmlcontent)) return;
 
             $("#idLoginBTN").click(() => {
-=======
-            if ( !ATON.FE.popupShow(htmlcontent) ) return;
-
-            $("#idLoginBTN").click(()=>{
->>>>>>> master
                 let jstr = JSON.stringify({
                     username: $("#idUsername").val(),
                     password: $("#idPassword").val()
                 });
 
                 $.ajax({
-<<<<<<< HEAD
                     url: ATON.PATH_RESTAPI + "login",
                     type: "POST",
                     data: jstr,
@@ -2956,34 +2073,15 @@ FE.popupUser = ()=>{
                         console.log(r);
                         if (r) {
                             ATON.fireEvent("Login", r);
-=======
-                    url: ATON.PATH_RESTAPI+"login",
-                    type:"POST",
-                    data: jstr,
-                    contentType:"application/json; charset=utf-8",
-                    dataType:"json",
-
-                    success: (r)=>{
-                        console.log(r);
-                        if (r){
-                            ATON.fire("Login", r);
->>>>>>> master
                             $("#btn-user").addClass("switchedON");
                             ATON.FE.popupClose();
                         }
                     }
 
-<<<<<<< HEAD
                 }).fail((err) => {
                     //console.log(err);
                     $("#idLoginBTN").html("LOGIN FAILED");
                     $("#idLoginBTN").attr("class", "atonBTN atonBTN-red");
-=======
-                }).fail((err)=>{
-                    //console.log(err);
-                    $("#idLoginBTN").html("LOGIN FAILED");
-                    $("#idLoginBTN").attr("class","atonBTN atonBTN-red");
->>>>>>> master
                 });
             });
         }
@@ -3007,44 +2105,26 @@ FE.popupPOV = ()=>{
 };
 */
 
-<<<<<<< HEAD
 FE.popupSceneInfo = () => {
-=======
-FE.popupSceneInfo = ()=>{
->>>>>>> master
     let head = ATON.SceneHub.getTitle();
     if (head === undefined) head = ATON.SceneHub.currID;
 
     let descr = ATON.SceneHub.getDescription();
 
-<<<<<<< HEAD
     let htmlcontent = "<div class='atonPopupTitle'>" + head + "</div>";
-=======
-    let htmlcontent = "<div class='atonPopupTitle'>"+head+"</div>";
->>>>>>> master
     if (descr) htmlcontent += "<div class='atonPopupDescriptionContainer'>" + JSON.parse(descr) + "</div>";
 
     htmlcontent += "<div class='atonBTN atonBTN-green' id='btnOK' style='width:90%'>OK</div>";
 
-<<<<<<< HEAD
     if (!ATON.FE.popupShow(htmlcontent)) return;
 
     $("#btnOK").click(() => {
-=======
-    if ( !ATON.FE.popupShow(htmlcontent) ) return;
-
-    $("#btnOK").click(()=>{
->>>>>>> master
         ATON._onUserInteraction();
         ATON.FE.popupClose();
     });
 };
 
-<<<<<<< HEAD
 FE.computeSelectorRanges = () => {
-=======
-FE.computeSelectorRanges = ()=>{
->>>>>>> master
     //let sceneBS = ATON.getRootScene().getBound();
     //let r = sceneBS.radius;
     let r = ATON.bounds.radius;
@@ -3058,7 +2138,6 @@ FE.computeSelectorRanges = ()=>{
     //console.log("3D Selector ranges: "+FE._selRanges[0]+", "+FE._selRanges[1]);
 };
 
-<<<<<<< HEAD
 FE.popupSelector = () => {
     let htmlcontent = "<div class='atonPopupTitle'>3D Selector</div>";
 
@@ -3083,38 +2162,11 @@ FE.popupSelector = () => {
 };
 
 FE.popupNav = () => {
-=======
-FE.popupSelector = ()=>{
-    let htmlcontent = "<div class='atonPopupTitle'>3D Selector</div>";
-
-    let rad = ATON.SUI.getSelectorRadius();
-    let hr = ATON.Utils.getHumanReadableDistance( rad );
-
-    FE.computeSelectorRanges();
-
-    htmlcontent += "Radius (<span id='idSelRadTxt'>"+hr+"</span>):<br>";
-    htmlcontent += "<input id='idSelRad' type='range' min='"+FE._selRanges[0]+"' max='"+FE._selRanges[1]+"' step='"+FE._selRanges[0]+"' style='width:90%'>";
-
-    if ( !ATON.FE.popupShow(htmlcontent, "atonPopupLarge") ) return;
-
-    $("#idSelRad").val(rad);
-
-    $("#idSelRad").on("input change",()=>{
-        let r = parseFloat( $("#idSelRad").val() );
-
-        ATON.SUI.setSelectorRadius(r);
-        $("#idSelRadTxt").html( ATON.Utils.getHumanReadableDistance(r) );
-    });
-};
-
-FE.popupNav = ()=>{
->>>>>>> master
     let htmlcontent = "<div class='atonPopupTitle'>Navigation</div>";
 
     //htmlcontent += "<div id='idNavModes'></div>";
 
     htmlcontent += "<div style='display:block; width:90%; min-height:50px; vertical-align:top'>";
-<<<<<<< HEAD
     htmlcontent += "<div style='display:inline-block; width:60px; float:left' id='idNMfp'></div>";
     htmlcontent += "<div style='text-align:left'>Switch between first-person and orbit navigation mode</div>";
     htmlcontent += "</div>";
@@ -3129,31 +2181,11 @@ FE.popupNav = ()=>{
             htmlcontent += "<div style='display:block; width:90%; min-height:50px; vertical-align:top'>";
             htmlcontent += "<div style='display:inline-block; width:60px; float:left' id='idNMdevori'></div>";
             htmlcontent += "<div style='text-align:left'>Enable or disable device-orientation mode</div>";
-=======
-    htmlcontent +="<div style='display:inline-block; width:60px; float:left' id='idNMfp'></div>";
-    htmlcontent +="<div style='text-align:left'>Switch between first-person and orbit navigation mode</div>";
-    htmlcontent += "</div>";
-
-    if (ATON.Utils.isConnectionSecure()){
-        htmlcontent += "<div style='display:block; width:90%; min-height:50px; vertical-align:top'>";
-        htmlcontent +="<div style='display:inline-block; width:60px; float:left' id='idNMvr'></div>";
-        htmlcontent +="<div style='text-align:left'>Immersive VR mode</div>";
-        htmlcontent += "</div>";
-
-        if (ATON.Utils.isMobile()){
-            htmlcontent += "<div style='display:block; width:90%; min-height:50px; vertical-align:top'>";
-            htmlcontent +="<div style='display:inline-block; width:60px; float:left' id='idNMdevori'></div>";
-            htmlcontent +="<div style='text-align:left'>Enable or disable device-orientation mode</div>";
->>>>>>> master
             htmlcontent += "</div>";
         }
     }
 
-<<<<<<< HEAD
     if (!FE.popupShow(htmlcontent)) return;
-=======
-    if ( !FE.popupShow(htmlcontent) ) return;
->>>>>>> master
 
     FE.uiAddButtonFirstPerson("idNMfp");
     FE.uiAddButtonDeviceOrientation("idNMdevori");
@@ -3161,11 +2193,7 @@ FE.popupNav = ()=>{
 };
 
 // experimental
-<<<<<<< HEAD
 FE.popupModalToken = (msg, func) => {
-=======
-FE.popupModalToken = (msg, func)=>{
->>>>>>> master
     if (func === undefined) return;
 
     ATON.FE.popupClose(); // Close any existing popup
@@ -3176,19 +2204,11 @@ FE.popupModalToken = (msg, func)=>{
 
     htmlcontent += "<br><div class='atonBTN atonBTN-green atonBTN-horizontal atonBTN-text' id='btnTokenOK'>OK</div>";
 
-<<<<<<< HEAD
     if (!FE.popupShow(htmlcontent)) return;
 
     $("#btnTokenOK").click(() => {
         let tok = $("#idTokStr").val();
         if (tok === undefined || tok.length < 2) return;
-=======
-    if ( !FE.popupShow(htmlcontent) ) return;
-
-    $("#btnTokenOK").click(()=>{
-        let tok = $("#idTokStr").val();
-        if (tok === undefined || tok.length <2) return;
->>>>>>> master
 
         ATON.FE.popupClose();
 
@@ -3196,11 +2216,7 @@ FE.popupModalToken = (msg, func)=>{
     });
 };
 
-<<<<<<< HEAD
 FE.popupNewNode = (type) => {
-=======
-FE.popupNewNode = (type)=>{
->>>>>>> master
     if (type === undefined) type = ATON.NTYPES.SCENE;
 
     let htmlcontent = "";
@@ -3209,7 +2225,6 @@ FE.popupNewNode = (type)=>{
     if (type === ATON.NTYPES.SEM) htmlcontent = "<div class='atonPopupTitle'>New Semantic Node</div>";
 
     htmlcontent += "<strong>ID</strong>: <input id='idNID' type='text' size='20' placeholder='node-id'><br>";
-<<<<<<< HEAD
     htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-horizontal atonBTN-text' id='btnNewNID'><img src='" + ATON.FE.PATH_RES_ICONS + "add.png'>Add</div><br>";
 
     if (!FE.popupShow(htmlcontent)) return;
@@ -3217,15 +2232,6 @@ FE.popupNewNode = (type)=>{
     $("#btnNewNID").click(() => {
         let nnid = $("#idNID").val().trim();
         if (nnid === undefined || nnid.length < 3) return;
-=======
-    htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-horizontal atonBTN-text' id='btnNewNID'><img src='"+ATON.FE.PATH_RES_ICONS+"add.png'>Add</div><br>";
-
-    if ( !FE.popupShow(htmlcontent) ) return;
-
-    $("#btnNewNID").click(()=>{
-        let nnid = $("#idNID").val().trim();
-        if (nnid === undefined || nnid.length<3) return;
->>>>>>> master
 
         let N = new ATON.Node(nnid, type);
         N.attachToRoot();
