@@ -1,0 +1,77 @@
+{
+    "status": "complete",
+    "environment": { "lightprobes": { "auto": false } },
+    "scenegraph": {
+      "nodes": { "main": { "urls": ["CaveOfAnimals.glb"] } },
+      "edges": { ".": ["main"] }
+    },
+    "semanticgraph": {
+      "nodes": {
+        "TempC_ESP32_001_&_Humidity_ESP32_001": {
+          "spheres": [[5.4388, 14.755, -16.429, 0.05]]
+        },
+        "Humidity_ESP32_001": { "spheres": [[5.4977, 12.385, -15.752, 0.05]] },
+        "Lux_ESP32_001": { "spheres": [[5.1591, 11.742, -16.7, 0.05]] },
+        "Temperature_Logger_k7SzV": {
+          "spheres": [[5.1982, 12.674, -16.984, 0.05]]
+        },
+        "Temperature_Logger_r8FGV": {
+          "spheres": [[5.7703, 10.648, -17.846, 0.05]]
+        },
+        "Temperature_Logger_jC4EZ_&_Humidity_Logger_Y9KaW": {
+          "spheres": [[5.7959, 10.641, -17.996, 0.05]]
+        },
+        "Empty": {
+          "spheres": [
+            [6.0906, 10.23, -18.577, 0.05],
+            [6.1816, 10.212, -14.098, 0.05],
+            [10.774, 11.923, -25.592, 0.05],
+            [12.848, 10.242, -24.883, 0.05],
+            [12.195, 10.232, -23.934, 0.05],
+            [8.5775, 10.242, -23.651, 0.05],
+            [7.9227, 10.251, -24.75, 0.05],
+            [15.545, 12.103, -16.394, 0.05],
+            [14.865, 10.23, -14.241, 0.05],
+            [14.379, 10.224, -14.839, 0.05],
+            [14.301, 10.221, -18.177, 0.05],
+            [14.676, 10.252, -18.738, 0.05]
+          ]
+        },
+        "Soil_Humidity_ESP32_001": {
+          "spheres": [
+            [6.7718, 10.209, -17.97, 0.05],
+            [7.1008, 10.196, -14.964, 0.05]
+          ]
+        },
+        "Humidity_ESP32_002": { "spheres": [[11.41, 12.031, -25.585, 0.05]] },
+        "TempC_ESP32_002_&_Humidity_ESP32_002": {
+          "spheres": [[10.338, 14.258, -25.789, 0.05]]
+        },
+        "TempC_ESP32_003_&_Humidity_ESP32_003": {
+          "spheres": [[15.589, 13.926, -15.683, 0.05]]
+        },
+        "Humidity_ESP32_003": { "spheres": [[15.686, 12.963, -15.981, 0.05]] },
+        "Temperature_Logger_Wf9Bj_&_Humidity_Logger_5un4a": {
+          "spheres": [[5.3238, 12.696, -17.11, 0.05]]
+        }
+      },
+      "edges": {
+        ".": [
+          "TempC_ESP32_001_&_Humidity_ESP32_001",
+          "Humidity_ESP32_001",
+          "Lux_ESP32_001",
+          "Temperature_Logger_k7SzV",
+          "Temperature_Logger_r8FGV",
+          "Temperature_Logger_jC4EZ_&_Humidity_Logger_Y9KaW",
+          "Empty",
+          "Soil_Humidity_ESP32_001",
+          "Humidity_ESP32_002",
+          "TempC_ESP32_002_&_Humidity_ESP32_002",
+          "TempC_ESP32_003_&_Humidity_ESP32_003",
+          "Humidity_ESP32_003",
+          "Temperature_Logger_Wf9Bj_&_Humidity_Logger_5un4a"
+        ]
+      }
+    }
+  }
+  
