@@ -692,7 +692,11 @@ canvas:active {
     user-select: none;
 
     margin: 3px;
+<<<<<<< HEAD
     padding: 3px;
+=======
+    padding: 4px;
+>>>>>>> master
 }
 
 .atonKeywordActivable {
@@ -704,6 +708,19 @@ canvas:active {
     box-shadow: 0 0px 5px rgba(255, 255, 255, 1.0);
 }
 
+<<<<<<< HEAD
+=======
+.atonKeywordCount {
+    border-radius: 5px;
+    color: white;
+    background-color: rgba(0,0,0, 0.5);
+    padding: 4px;
+    margin: 0px;
+    font-size: x-small;
+    font-weight: bold;
+}
+
+>>>>>>> master
 .atonAuthor {
     text-shadow: 0px 0px 4px black;
     text-align: center;
@@ -1238,7 +1255,11 @@ canvas:active {
     box-shadow: 0px 0px 20px rgba(0,0,0, 1);
     
     background-color: rgba(0,0,0,0.7);
+<<<<<<< HEAD
         
+=======
+    
+>>>>>>> master
     overflow-y: auto;
     overflow-x: hidden;
     
@@ -1257,7 +1278,11 @@ canvas:active {
 }
 
 .atonPopupLarge {
+<<<<<<< HEAD
     width: 30%;
+=======
+    width: 90%;
+>>>>>>> master
 }
 @media screen and (orientation: portrait){
     /*@media screen and (max-width: 800px){*/
@@ -1342,6 +1367,7 @@ canvas:active {
     margin: 5px;
 }
 
+<<<<<<< HEAD
 /* Labels for dropdowns */
 .dropdown-label {
     display: block;
@@ -1378,6 +1404,8 @@ canvas:active {
     cursor: not-allowed;
 }
 
+=======
+>>>>>>> master
 .atonQRcontainer {
     display: inline-block;
 

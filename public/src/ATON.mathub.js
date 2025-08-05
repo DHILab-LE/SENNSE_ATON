@@ -20,6 +20,7 @@ MatHub.init = ()=>{
 
     // Uniforms
     MatHub._uSem = {
+<<<<<<< HEAD
         time: { type: 'float', value: 0.0 },
         tint: { type: 'vec4', value: new THREE.Vector4(0.79, 0.0, 1.0, 0.5) } // Adjusted alpha for stronger violet
     };
@@ -29,6 +30,12 @@ MatHub.init = ()=>{
         tint: { type: 'vec4', value: new THREE.Vector4(0.0, 1.0, 0.0, 0.5) } // Reduced alpha for balanced green
     };
     
+=======
+        time: { type:'float', value: 0.0 },
+        tint: { type:'vec4', value: new THREE.Vector4(0.2,0.2,1.0, 0.2) },
+        sel: { type:'vec4', value: new THREE.Vector4(0.0,0.0,0.0, 0.1) }
+    };
+>>>>>>> master
 
     MatHub.addDefaults();
 };
@@ -228,6 +235,7 @@ MatHub.addDefaults = ()=>{
         //opacity: 0.0,
     });
 
+<<<<<<< HEAD
     MatHub.materials.semanticShapeForDataLogger = new THREE.ShaderMaterial({
         uniforms: MatHub._uSem2,
 
@@ -260,6 +268,8 @@ MatHub.addDefaults = ()=>{
         //opacity: 0.0,
     });
 
+=======
+>>>>>>> master
     MatHub.materials.semanticShapeHL = new THREE.MeshBasicMaterial({ 
         color: MatHub.colors.sem, 
         transparent: true,
@@ -392,7 +402,11 @@ MatHub.addDefaults = ()=>{
 
         //transparent: true,
         //depthWrite: false, 
+<<<<<<< HEAD
         //opacity: 0.3,
+=======
+        //opacity: 0.5,
+>>>>>>> master
 
         size: 4.0,
         sizeAttenuation: false,
@@ -483,7 +497,15 @@ MatHub.getMaterial = (id)=>{
 
 MatHub.update = ()=>{
     MatHub._uSem.time.value += ATON._dt;
+<<<<<<< HEAD
     MatHub._uSem2.time.value += ATON._dt;
+=======
+    
+    MatHub._uSem.sel.value.x = ATON.SUI.mainSelector.position.x;
+    MatHub._uSem.sel.value.y = ATON.SUI.mainSelector.position.y;
+    MatHub._uSem.sel.value.z = ATON.SUI.mainSelector.position.z;
+    MatHub._uSem.sel.value.w = ATON.SUI._selectorRad;
+>>>>>>> master
 };
 
 export default MatHub;

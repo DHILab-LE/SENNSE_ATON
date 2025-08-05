@@ -35,7 +35,11 @@ MRes.init = ()=>{
         MRes._tsTasks.push( func );
     };
 
+<<<<<<< HEAD
     MRes._tseBase = 8.0;
+=======
+    MRes._tseBase = 16.0; //8.0;
+>>>>>>> master
     MRes.estimateTSErrorTarget();
 
     MRes._tsuSync = 0;
@@ -127,11 +131,19 @@ MRes.setBaseTSE = (tse)=>{
 MRes.estimateTSErrorTarget = ()=>{
     let tse = MRes._tseBase;
 
+<<<<<<< HEAD
     if (ATON.device.lowGPU || ATON.device.isMobile) tse += 4.0;
     if (ATON.XR._bPresenting) tse += 3.0;
 
     if (tse < 1.0)  tse = 1.0;
     if (tse > 25.0) tse = 25.0;
+=======
+    if (ATON.device.lowGPU || ATON.device.isMobile) tse *= 1.5; // += 4.0;
+    if (ATON.XR._bPresenting) tse *= 1.3; // += 3.0;
+
+    if (tse < 1.0)  tse = 1.0;
+    //if (tse > 25.0) tse = 25.0;
+>>>>>>> master
 
     console.log("Estimated TSet error target: "+tse);
     MRes.setTSetsErrorTarget(tse);
@@ -141,7 +153,16 @@ MRes.estimateTSErrorTarget = ()=>{
 MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
     if (N === undefined) return;
 
+<<<<<<< HEAD
     let ts = new TILES.TilesRenderer(tsurl);
+=======
+    let bDZI = false;
+    if (tsurl.endsWith(".dzi")) bDZI = true;
+
+    let ts = new TILES.TilesRenderer(tsurl);
+    //let ts = new TILES.EllipsoidTilesRenderer( null, TILES.LUNAR_ELLIPSOID );
+
+>>>>>>> master
     if (!ts) return;
 
     ATON._assetReqNew(tsurl);
@@ -152,6 +173,24 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
     ts.fetchOptions.mode  = 'cors';
     //ts.fetchOptions.cache = 'no-store'; //'default';
 
+<<<<<<< HEAD
+=======
+    // Plugins
+    ts.registerPlugin( new TILES.ImplicitTilingPlugin() );
+    //ts.registerPlugin( new TILES.TileCompressionPlugin() );
+
+    if (bDZI) ts.registerPlugin( new TILES.DeepZoomImagePlugin( { center: true } ) );
+    ts.registerPlugin( new TILES.UpdateOnChangePlugin() );
+
+/*
+    let FP = new TILES.TilesFadePlugin();
+    FP.fadeRootTiles = true;
+    FP.fadeDuration  = 1000;
+    
+    ts.registerPlugin( FP );
+*/
+
+>>>>>>> master
     if (cesiumReq){
         ts.fetchOptions.headers = {};
 	    ts.fetchOptions.headers.Authorization = `Bearer ${cesiumReq.accessToken}`;
@@ -165,6 +204,7 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
         };
     }
 
+<<<<<<< HEAD
     ts.errorTarget     = MRes._tsET;
     //ts.errorThreshold  = 100;
     //ts.loadSiblings    = false; // a few hops
@@ -176,13 +216,32 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
         ts.lruCache.maxSize = 500; //350;
         ts.lruCache.minSize = 150; //150;
         ts.lruCache.unloadPercent = 0.2; //0.6; // The maximum percentage of minSize to unload during a given frame
+=======
+    ts.errorTarget = MRes._tsET;
+    if (bDZI) ts.errorTarget = 2.0;
+    //ts.errorThreshold  = 100;
+    //ts.loadSiblings    = false; // a few hops
+
+    //ts.optimizeRaycast = false; // We already use BVH
+
+    // Init p-queues
+    if (MRes._pqLRU === undefined){
+        //ts.lruCache.maxSize = 500; //350;
+        //ts.lruCache.minSize = 150; //150;
+        //ts.lruCache.unloadPercent = 0.2; //0.6; // The maximum percentage of minSize to unload during a given frame
+>>>>>>> master
 
         // Download/Parse queues
         ts.downloadQueue.schedulingCallback = MRes.tsSchedCB;
         ts.parseQueue.schedulingCallback    = MRes.tsSchedCB;
 
+<<<<<<< HEAD
         ts.downloadQueue.maxJobs = 6; // 6
         ts.parseQueue.maxJobs    = 1; // 1
+=======
+        //ts.downloadQueue.maxJobs = 6; // 6
+        //ts.parseQueue.maxJobs    = 1; // 1
+>>>>>>> master
 
         MRes._pqLRU      = ts.lruCache;
         MRes._pqDownload = ts.downloadQueue;
@@ -207,32 +266,74 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
     //console.log(N)
 
     // CC extract
+<<<<<<< HEAD
     $.getJSON( tsurl, ( data )=>{
         ATON.CC.extract(data);
     });
 
     const MIN_TILES = 2; // min number of tiles for tileset to be considered loaded
     let tflip = 0;
+=======
+    if (!bDZI) ATON.REQ.get( tsurl, ( data )=>{
+        ATON.CC.extract(data);
+    });
+
+    //const MIN_TILES = 2; // min number of tiles for tileset to be considered loaded
+    //let tflip = 0;
+>>>>>>> master
 
     let bb = new THREE.Box3();
     let bs = new THREE.Sphere();
 
+<<<<<<< HEAD
     const matrix = new THREE.Matrix4();
     let position = new THREE.Vector3();
+=======
+    //const matrix = new THREE.Matrix4();
+    //let position = new THREE.Vector3();
+>>>>>>> master
 
     let bPointCloud = false;
 
     // JSON loaded
+<<<<<<< HEAD
     ts.onLoadTileSet = ()=>{
         console.log("TileSet loaded");
         //console.log(ts)
 
+=======
+    ts.addEventListener( 'load-tile-set', ()=>{
+        console.log("TileSet loaded");
+        //console.log(ts)
+
+        ATON._assetReqComplete(tsurl);
+
+>>>>>>> master
         MRes._numTSLoaded++;
 
         // Cesium ION
         if (cesiumReq || N.bUseGeoCoords){
             console.log("TileSet using GeoCoords");
 
+<<<<<<< HEAD
+=======
+            ts.getBoundingSphere( bs );
+
+            const position = bs.center.clone();
+            const distanceToEllipsoidCenter = position.length();
+    
+            const surfaceDirection = position.normalize();
+            const up = new THREE.Vector3( 0, 1, 0 );
+            const rotationToNorthPole = ATON.Utils.rotationBetweenDirections( surfaceDirection, up );
+    
+            ts.group.quaternion.x = rotationToNorthPole.x;
+            ts.group.quaternion.y = rotationToNorthPole.y;
+            ts.group.quaternion.z = rotationToNorthPole.z;
+            ts.group.quaternion.w = rotationToNorthPole.w;
+    
+            ts.group.position.y = - distanceToEllipsoidCenter;
+/*
+>>>>>>> master
             //const box    = new THREE.Box3();
             //const sphere = new THREE.Sphere();
             //const matrix = new THREE.Matrix4();
@@ -240,7 +341,11 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
 
             let distanceToEllipsoidCenter;
 
+<<<<<<< HEAD
             if ( ts.getOrientedBounds( bb, matrix ) ) {
+=======
+            if ( ts.getOrientedBoundingBox( bb, matrix ) ) {
+>>>>>>> master
 
                 position.setFromMatrixPosition( matrix );
                 distanceToEllipsoidCenter = position.length();
@@ -261,18 +366,30 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
             ts.group.quaternion.w = rotationToNorthPole.w;
 
             ts.group.position.y = -distanceToEllipsoidCenter;
+<<<<<<< HEAD
+=======
+*/
+>>>>>>> master
         }
 
         // Default URL
         else {
+<<<<<<< HEAD
             if ( ts.getBounds(bb) ){
+=======
+            if ( ts.getBoundingBox(bb) ){
+>>>>>>> master
                 bb.getBoundingSphere( bs );
 
                 if (N.autocenter){
                     bb.getCenter( ts.group.position );
                     ts.group.position.multiplyScalar( -1 );
                 }
+<<<<<<< HEAD
                 //else if (ATON.Nav.homePOV === undefined) ATON.Nav.computeDefaultHome(undefined, bs );
+=======
+                else if (ATON.Nav.homePOV === undefined) ATON.Nav.computeAndRequestDefaultHome(0.5, undefined, bs );
+>>>>>>> master
                 ///else ATON.recomputeSceneBounds( bs );
             }
             else if ( ts.getBoundingSphere(bs) ){
@@ -281,7 +398,11 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
                     ts.group.position.copy( bs.center );
                     ts.group.position.multiplyScalar( -1 );
                 }
+<<<<<<< HEAD
                 //else if (ATON.Nav.homePOV === undefined) ATON.Nav.computeDefaultHome(undefined, bs );
+=======
+                else if (ATON.Nav.homePOV === undefined) ATON.Nav.computeAndRequestDefaultHome(0.5, undefined, bs );
+>>>>>>> master
                 ///else ATON.recomputeSceneBounds( bs );
             }
 /*
@@ -307,12 +428,23 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
         
         //if (ATON.Nav.homePOV === undefined) ATON.Nav.computeAndRequestDefaultHome(0.5);
         //ATON._assetReqComplete(tsurl);
+<<<<<<< HEAD
     };
 
     // On single tile loaded
     ts.onLoadModel = ( scene )=>{
         //console.log(ts.lruCache.itemList.length);
 
+=======
+
+        ATON.Utils._visitorCP(ts.group);
+    });
+
+    // On single tile loaded
+    ts.addEventListener( 'load-model', ( data )=>{
+        //console.log(ts.lruCache.itemList.length);
+/*
+>>>>>>> master
         if (tflip < MIN_TILES) tflip++;
         else if (tflip === MIN_TILES){
             tflip++;
@@ -322,6 +454,12 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
 
             ATON._assetReqComplete(tsurl);
         }
+<<<<<<< HEAD
+=======
+*/
+        let scene = data.scene;
+        //console.log(scene);
+>>>>>>> master
 
         MRes._numTilesLoaded++;
 
@@ -360,6 +498,10 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
                 MRes._bPCs  = true;
 
                 c.layers.disable(N.type); // avoid point-clouds queries for now
+<<<<<<< HEAD
+=======
+                c.raycast = ATON.Utils.VOID_CAST;
+>>>>>>> master
 
                 c.material = ATON.MatHub.materials.point;
 /*
@@ -397,6 +539,7 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
                     tex.colorSpace  = ATON._stdEncoding;
                 }
 
+<<<<<<< HEAD
             }
         });
 
@@ -412,6 +555,29 @@ MRes.loadTileSetFromURL = (tsurl, N, cesiumReq )=>{
         //console.log(ts.group);
         //console.log("DISPOSE");
     };
+=======
+                //ATON.Utils._processMatCP( c.material );
+            }
+        });
+
+        //console.log(ATON._renderer.info.memory);
+        ATON.fire("TileLoaded", scene);
+
+        ATON.Utils._visitorCP(scene);
+    });
+
+    ts.addEventListener( 'dispose-model', (data, tile)=>{
+        ATON.Utils.cleanupVisitor( data.scene );
+
+        data = null;
+        tile = null;
+
+        //console.log(ts.group);
+        //console.log("DISPOSE");
+
+        //ATON.Utils._visitorCP(ts.group);
+    });
+>>>>>>> master
 
     if (!bPointCloud) ATON.Utils.setPicking(N, N.type, true);
 
@@ -426,6 +592,7 @@ MRes.loadCesiumIONAsset = (ionAssID, N)=>{
 
         tok = prompt("Please enter a valid Cesium ION token:");
         if (tok == null || tok == "") return;
+<<<<<<< HEAD
 /*
         ATON.FE.popupModalToken("Please enter a valid Cesium ION token:", (tok)=>{
             ATON._extAPItokens["cesium.ion"] = tok;
@@ -433,6 +600,8 @@ MRes.loadCesiumIONAsset = (ionAssID, N)=>{
             MRes.loadCesiumIONAsset(ionAssID, N);
         });
 */
+=======
+>>>>>>> master
     }
 
     let url = new URL( `https://api.cesium.com/v1/assets/${ionAssID}/endpoint` );

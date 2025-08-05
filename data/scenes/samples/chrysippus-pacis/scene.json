@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
     "status": "complete",
+=======
+    "visibility": 1,
+>>>>>>> master
     "title": "Chrysippus head",
     "environment": {
         "mainpano": {

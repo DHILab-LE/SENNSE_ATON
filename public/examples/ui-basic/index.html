@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" href="/res/aton-logo.png" sizes="512x512" type="image/png">
+
+    <!-- Add iOS meta tags and icons -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="ATON Sample">
+    <link rel="apple-touch-icon" href="/res/aton-logo.png">
+    <meta name="description" content="ATON Sample">
+    <!-- Add meta theme-color -->
+    <meta name="theme-color" content="#000000" />
+
+    <title>ATON Sample</title>
+    <link rel="stylesheet" type="text/css" href="/vendors/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/res/css/main.css">
+
+	<script type="text/javascript" src="/vendors/vendors.min.js"></script>
+    <script type="text/javascript" src="/vendors/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript" src="/dist/THREE.bundle.js"></script>
+    <script type="module" src="/src/ATON.js"></script>
+
+<script>
+window.addEventListener( 'load', ()=>{
+
+    // Realize core
+    ATON.realize();
+    ATON.UI.addBasicEvents();
+
+    ATON.App.loadScene("samples/venus", ()=>{
+        ATON.Nav.requestHome(1.0);
+
+        ATON.UI.showModal({
+            header: "Sample Modal",
+            body: ATON.UI.createTabsGroup({
+                items: [
+                    {
+                        //title: "Home",
+                        icon: "home",
+                        content: ATON.UI.createContainer({
+                            items: [
+                                ATON.UI.createButton({
+                                    variant:"primary",
+                                    text:"Open side panel",
+                                    icon: "nav",
+                                    onpress: ()=>{
+                                        ATON.UI.showSidePanel({
+                                            header: "Title",
+                                            body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                        });
+                                        ATON.UI.hideModal();
+                                    }
+                                }),
+                                ATON.UI.createSlider({
+                                    label: "Slider A",
+                                    range: [0,10],
+                                    value: 5,
+                                    //oninput: (v)=>{ console.log(v) }
+                                }),
+                                ATON.UI.createSlider({
+                                    label: "Slider B",
+                                    range: [0,20],
+                                    value: 0,
+                                    //oninput: (v)=>{ console.log(v) }
+                                })
+                            ]
+                        })
+                    },
+                    {
+                        title: "layers",
+                        icon: "layers",
+                        content: ATON.UI.createTreeGroup({
+                            items:[
+                                {
+                                    title: "Section A",
+                                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                },
+                                {
+                                    title: "Section B",
+                                    open: true,
+                                    content: ATON.UI.createTreeGroup({
+                                        items:[
+                                            {
+                                                title: "Section B.1",
+                                                content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                            },
+                                            {
+                                                title: "Section B.2",
+                                                 content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                            },
+                                            {
+                                                title: "Section B.3",
+                                                 content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                            }
+                                        ]
+                                    })
+                                },
+                                {
+                                    title: "Section C",
+                                    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero."
+                                }
+                            ]
+                        })
+                    },
+                    {
+                        title: "Transform",
+                        //icon: "settings",
+                        content: ATON.UI.createNodeTrasformControl({
+                            node: "main",
+                            position: true,
+                            scale: true,
+                            rotation: true
+                        })
+                    },
+                    {
+                        title: "Lorem",
+                        icon: "info",
+                        content: "This is a sample text for this second tab. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue viverra diam vitae maximus. Pellentesque a placerat lacus, interdum feugiat est. Proin non suscipit elit. Aliquam erat volutpat. Integer lobortis gravida venenatis. Nulla turpis eros, eleifend vel neque in, molestie pulvinar libero. Nunc sapien ex, tincidunt vel malesuada sit amet, elementum sit amet libero.Phasellus nec neque et lectus rhoncus tristique at ullamcorper justo. Maecenas venenatis elementum urna, non dignissim urna bibendum a. Nunc odio tortor, blandit in sodales vel, lacinia in augue. Aliquam quis sagittis turpis. Suspendisse eget mollis ex. Aenean lacinia laoreet viverra. In volutpat nisi sagittis, semper nisi et, fermentum lectus. Nunc vel eros nec diam pulvinar gravida. Sed quis auctor turpis. Suspendisse et nulla ipsum. Fusce non consequat diam. Mauris risus lacus, placerat sit amet dui nec, interdum consectetur turpis. Integer ut lobortis dolor, sed convallis est."
+                    }
+                ]
+                })
+            });
+         
+        ATON.UI.get("toolbar").append(
+            ATON.UI.createButtonBack(),
+            ATON.UI.createButtonHome(),
+            ATON.UI.createButtonVR(),
+            ATON.UI.createButtonAR(),
+            ATON.UI.createButtonDeviceOrientation()
+        );
+    });
+});
+</script>
+</head>
+
+<body>
+<div id="toolbar" class="aton-toolbar-top"></div>
+<!-- <div class="aton-toolbar-left aton-vscrollable"></div> -->
+</body>

@@ -1,0 +1,62 @@
+<script>
+/*
+    Shared routines across V2 backend UI
+============================================*/
+
+let SHU = {};
+window.SHU = SHU;
+
+SHU.setPageWaiting = ()=>{
+    ATON.UI.showCenteredOverlay();
+};
+
+SHU.setPageComplete = ()=>{
+    ATON.UI.hideCenteredOverlay();
+};
+
+SHU.createMainAuthDropdown = (u, section)=>{
+
+    const items = [];
+
+    //if (section!=="myscenes")     items.push({ title: "My Scenes", url: "/v2/myscenes", icon:"scene" });
+    //if (section!=="mycollection") items.push({ title: "My Collection", url: "/v2/mycollection", icon:"collection" });
+
+    items.push({ title: "Logout", url: "/v2/logout", icon: "exit" });
+
+
+    return ATON.UI.createDropdown({
+            icon: "bi-person-fill",
+            variant: "accent",
+            classes: "px-2",
+            //align: "dropdown-menu-end",
+            title: u.username,
+            items: items
+    });
+};
+
+SHU.createNavbarAuthSections = (section)=>{
+    const items = [];
+
+    items.push({ 
+        text: "My Collection",
+        onpress: ()=>{window.location.href="/v2/mycollection"},
+        classes: (section==="mycollection")? "aton-btn-section-highlight": undefined,
+        icon:"collection"
+    });
+
+    items.push({
+        text: "My Scenes",
+        onpress: ()=>{window.location.href="/v2/myscenes"},
+        classes: (section==="myscenes")? "aton-btn-section-highlight": undefined,
+        icon:"scene"
+    });
+
+    const elNavbar = ATON.UI.get("navbarItems");
+
+    for (let i in items){
+        elNavbar.append( ATON.UI.createButton( items[i] ) );
+    }
+
+};
+
+</script>

@@ -6,10 +6,15 @@
 
 ===========================================================*/
 
+<<<<<<< HEAD
 //import AppData from "./ATON.appdata.js";
 
 /**
 ATON App Hub
+=======
+/**
+ATON App
+>>>>>>> master
 @namespace App
 */
 let App = {};
@@ -21,6 +26,11 @@ App.setup  = undefined;
 App.update = undefined;
 
 App._bRunning = false;
+<<<<<<< HEAD
+=======
+App._pDeps    = [];
+App._fLoading = 0;
+>>>>>>> master
 
 
 // Send JSON patch
@@ -133,6 +143,22 @@ App.getStorage = (id)=>{
 };
 
 /**
+<<<<<<< HEAD
+=======
+Utility routine to load a config (JSON) for the App
+@param {string} jsonconf - url to JSON config
+@param {function} onLoad - routine to execute on JSON loaded
+@example
+ATON.App.loadJSONConfig("myconf.json")
+*/
+App.loadJSONConfig = (configurl, onLoad)=>{
+    ATON.Utils.getJSON(configurl, onLoad);
+
+    return App;
+};
+
+/**
+>>>>>>> master
 Register a service worker (PWA) for webapp
 @param {string} swpath - service worker path to register
 @example
@@ -154,6 +180,7 @@ App.registerServiceWorker = ( swpath )=>{
     return App;
 };
 
+<<<<<<< HEAD
 /**
 Realize the App.
 You can use "params" property to access url parameters, and "basePath" for accessing local app content (css, configs, etc.)
@@ -161,6 +188,170 @@ You can use "params" property to access url parameters, and "basePath" for acces
 @param {function} update - update (or tick) routine
 @param {string} swpath - (optional) service worker path (PWA) to register
 @returns {object} - web-app object, to be started with run() method
+=======
+/*
+App.requireFlare2 = (fid)=>{
+
+    return new Promise((resolve, reject)=>{
+        if (ATON.Flares[fid]){
+            resolve(fid);
+            return;
+        }
+
+        $.get(ATON.PATH_RESTAPI2+"flares/"+fid, (f)=>{
+            let files = f.files;
+            if (files){
+                let numscripts = files.length;
+    
+                for (let s in files){
+                    let jss = document.createElement("script");
+                    jss.src = "/flares/"+fid+"/"+files[s];
+                    jss.async = false;
+                    document.head.appendChild(jss);
+    
+                    jss.onload = ()=>{
+                        numscripts--;
+                        if (numscripts <= 0){
+                            console.log("All deps loaded for flare '"+fid+"'");
+                            ATON._deployNewFlares();
+                            
+                            resolve(fid);
+                        }
+                    }
+
+                    jss.onerror = ()=>{
+                        numscripts--;
+                        if (numscripts <= 0){
+                            console.log("All deps loaded for flare '"+fid+"'");
+                            ATON._deployNewFlares();
+                            
+                            resolve(fid);
+                        }
+                    };
+                }
+            }
+        });
+
+    });
+
+};
+
+App.requireFlareXX = (fid)=>{
+    if (ATON.Flares[fid]) return;
+
+    console.log("Require Flare ",fid);
+    App._fLoading++;
+
+    $.get(ATON.PATH_RESTAPI2+"flares/"+fid, (f)=>{
+        let files = f.files;
+        if (files){
+            let numscripts = files.length;
+
+            for (let s in files){
+                let jss = document.createElement("script");
+                jss.src = "/flares/"+fid+"/"+files[s];
+                jss.async = false;
+                document.head.appendChild(jss);
+
+                jss.onload = ()=>{
+                    numscripts--;
+                    if (numscripts <= 0){
+                        console.log("All deps loaded for flare '"+fid+"'");
+                        ATON._deployNewFlares();
+                        
+                        App._fLoading--;
+                        if (App._fLoading<=0){
+                            console.log("=====================");
+                            if (App._bRunning) App._deploy();
+                        }
+                    }
+                }
+
+                jss.onerror = ()=>{
+                    numscripts--;
+                    if (numscripts <= 0){
+                        console.log("All deps loaded for flare '"+fid+"'");
+                        ATON._deployNewFlares();
+                        
+                        App._fLoading--;
+                        if (App._fLoading<=0){
+                            console.log("=====================");
+                            if (App._bRunning) App._deploy();
+                        }
+                    }
+                };
+            }
+        }
+    });
+
+};
+*/
+
+/**
+Setup required flares (plugins) for the App, generally right after app realization.
+@param {function} list - array of flares IDs available on the server node (typically the subfolder in /config/flares/<flare-id>/)
+@example
+let A = ATON.App.realize();
+A.requireFlares(["aflare","anotherflare"]);
+
+...
+*/
+App.requireFlares = (list)=>{
+    if (!list) return;
+
+    ATON._fReqList = list;
+    console.log("Required Flares: "+ATON._fReqList);
+/*
+
+    for (let i=0; i<list.length; i++) App._pDeps.push( App.requireFlare( list[i] ) );
+    //console.log(App._pDeps)
+*/
+
+    return App;
+};
+
+
+/*
+Require all available flares on the server, to equip the App
+
+App.requireAllFlares = ()=>{
+    $.get(ATON.PATH_RESTAPI2+"flares/", (list)=>{
+        ATON._fReqList  = list;
+        ATON._fRequired = list.length;
+
+        ATON._loadFlares();
+    });
+
+    return App;
+};
+*/
+
+
+/**
+Load a scene. 
+You can use ATON.on("SceneJSONLoaded", ...) to perform additional tasks when the scene JSON is fully loaded
+@param {string} sid - the scene ID (e.g.: 'sample/venus')
+@param {function} onSuccess - (optional) routine after the scene descriptor JSON was loaded. You can alternatively use ATON.on("SceneJSONLoaded", ...)
+*/
+App.loadScene = (sid, onSuccess)=>{
+    if (sid === undefined) return;
+
+    ATON.SceneHub.load(
+        ATON.PATH_RESTAPI2+"scenes/"+sid, 
+        sid,
+        onSuccess
+    );
+};
+
+/**
+Realize the App.
+You can use "params" property to access url parameters, and "basePath" for accessing local app content (css, configs, etc.)
+You can equip dynamically this app with any flare via "ff" url parameter (e.g. ?ff=<flareA-id>,<flareB-id>)
+@param {function} setup - setup routine
+@param {function} update - update (or tick) routine
+@param {string} swpath - (optional) service worker path (PWA) to register
+@returns {object} - web-app object
+>>>>>>> master
 @example
 let A = ATON.App.realize( mySetupRoutine )
 */
@@ -174,14 +365,34 @@ App.realize = (setup, update, swpath)=>{
     
     // Base path for this App
     App.basePath = ATON.Utils.getBaseFolder( window.location.href.split('?')[0] );
+<<<<<<< HEAD
     console.log("App base path: "+App.basePath);
 
     App.registerServiceWorker( swpath );
 
+=======
+    //console.log("App base path: "+App.basePath);
+
+    App.registerServiceWorker( swpath );
+
+    // on-demand flares
+    let ff = App.params.get("ff");
+    if (ff){
+        let flist = String(ff).split(",");
+        App.requireFlares(flist);
+    }
+
+    // Automatically run the app when document ready
+    window.addEventListener('load', ()=>{
+        App.run();
+    });
+
+>>>>>>> master
     return App;
 };
 
 /**
+<<<<<<< HEAD
 Create and run the App.
 See App.realize() method
 @param {function} setup - setup routine
@@ -196,6 +407,9 @@ App.realizeAndRun = (setup, update, swpath)=>{
 
 /**
 Run the App, typically inside window.addEventListener('load', ...) 
+=======
+Run the App. This typically happens inside window.addEventListener('load', ...) 
+>>>>>>> master
 @returns {boolean} - true on success
 @example
 window.addEventListener('load',()=>{
@@ -205,6 +419,7 @@ window.addEventListener('load',()=>{
 App.run = ()=>{
     if (App._bRunning) return false;
 
+<<<<<<< HEAD
     if (App.setup) App.setup();
     else {
         ATON.FE.realize();
@@ -222,4 +437,29 @@ App.run = ()=>{
 };
 
 
+=======
+    App._bRunning = true;
+
+    //ATON.FE.realize();
+
+    // We wait for all flares deployment
+    //ATON.on("AllFlaresReady",()=>{
+        if (App.setup) App.setup();
+        else {
+            ATON.FE.realize();
+            console.log("App [Warn]: your App should define a setup() routine");
+        }
+    
+        if (App.update){
+            ATON.addUpdateRoutine( App.update );
+            console.log("App: update routine registered");
+        }
+    //});
+
+    if (ATON._fRequired <= 0) ATON.fire("AllFlaresReady");
+
+    return true;
+};
+
+>>>>>>> master
 export default App;

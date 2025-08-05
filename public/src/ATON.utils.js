@@ -13,6 +13,10 @@ ATON Utils
 let Utils = {};
 
 Utils.TSTRING_SEPARATOR = " ";
+<<<<<<< HEAD
+=======
+Utils.VOID_CAST = (rc, hitlist)=>{};
+>>>>>>> master
 
 
 Utils.init = ()=>{
@@ -85,7 +89,11 @@ Utils.showBVHbounds = (level)=>{
 Utils._addBVHbounds = (c, level)=>{
     if (c === undefined) return;
 
+<<<<<<< HEAD
     let BVHVis = new ThreeMeshBVH.MeshBVHVisualizer(c, level);
+=======
+    let BVHVis = new ThreeMeshBVH.MeshBVHHelper(c, level);
+>>>>>>> master
     BVHVis.displayParents = true;
     BVHVis.update();
 
@@ -120,7 +128,11 @@ Utils.profileDevice = ()=>{
             else   ATON.device.xrSupported['immersive-vr'] = false;
 
             console.log("WebXR VR session support: "+ATON.device.xrSupported['immersive-vr']);
+<<<<<<< HEAD
             ATON.fireEvent("XR_support", {type: 'immersive-vr', v: ATON.device.xrSupported['immersive-vr']});
+=======
+            ATON.fire("XR_support", {type: 'immersive-vr', v: ATON.device.xrSupported['immersive-vr']});
+>>>>>>> master
 		});
 
 	    navigator.xr.isSessionSupported( 'immersive-ar' ).then(( b )=>{
@@ -128,7 +140,11 @@ Utils.profileDevice = ()=>{
             else   ATON.device.xrSupported['immersive-ar'] = false;
 
             console.log("WebXR AR session support: "+ATON.device.xrSupported['immersive-ar']);
+<<<<<<< HEAD
             ATON.fireEvent("XR_support", {type: 'immersive-ar', v: ATON.device.xrSupported['immersive-ar']});
+=======
+            ATON.fire("XR_support", {type: 'immersive-ar', v: ATON.device.xrSupported['immersive-ar']});
+>>>>>>> master
 		});
     }
 };
@@ -193,6 +209,19 @@ Utils.isVideo = ( filepath )=>{
     return false;
 };
 
+<<<<<<< HEAD
+=======
+Utils.isImage = ( filepath )=>{
+    let ext = Utils.getFileExtension(filepath);
+
+    if (ext === "jpg")  return true;
+    if (ext === "png") return true;
+    if (ext === "ktx" || ext === "ktx2") return true;
+
+    return false;
+};
+
+>>>>>>> master
 Utils.getBaseFolder = ( filepath )=>{
     var index = filepath.lastIndexOf('/');
     if (index !== -1) return filepath.substring( 0, index + 1 );
@@ -291,6 +320,23 @@ Utils.postJSON = (endpoint, obj, onReceive, onFail)=>{
     });
 };
 
+<<<<<<< HEAD
+=======
+Utils.getJSON = (jsonurl, onLoad)=>{
+    fetch(jsonurl, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(response => {
+        //console.log("Loaded:");
+        console.log(response);
+
+        if (onLoad) onLoad(response);
+    });
+};
+
+>>>>>>> master
 // From https://bit.ly/2neWfJ2
 // runAsync( longRunningFunction ).then(console.log);
 Utils.runAsync = fn => {
@@ -384,6 +430,18 @@ Utils.clampValue = (num, min, max)=>{
     return Math.min( Math.max(num, min), max );
 };
 
+<<<<<<< HEAD
+=======
+// Utility to handle multiple image formats
+Utils.loadTexture = (url, onComplete)=>{
+    if (url.endsWith(".ktx2")){
+        return ATON._ktx2Loader.load(url, onComplete);
+    }
+
+    return Utils.textureLoader.load(url, onComplete);
+};
+
+>>>>>>> master
 
 // Helper visitor routine
 // Note: N (parent node) is not yet connected to model
@@ -502,7 +560,11 @@ Utils.processMaterial = (M)=>{
 */
     if (M.map === null || M.map === undefined) return;
 
+<<<<<<< HEAD
     // Force mipmapping
+=======
+    // Mipmapping
+>>>>>>> master
     M.map.generateMipmaps = true;
     
     M.map.anisotropy = ATON.device.isMobile? 0 : ATON._maxAnisotropy;
@@ -512,6 +574,24 @@ Utils.processMaterial = (M)=>{
     //M.map.needsUpdate = true;
 };
 
+<<<<<<< HEAD
+=======
+Utils._visitorCP = (N)=>{
+    if (!ATON._renderer.localClippingEnabled) return;
+    //if (ATON._clipPlanes.length < 1) return;
+
+    if (!N) N = ATON._rootVisible;
+
+    N.traverse((o)=>{
+        if (o.material){
+            o.material.clippingPlanes   = ATON._clipPlanes;
+            o.material.clipIntersection = false;
+            o.material.clipShadows      = true;
+        }
+    });
+};
+
+>>>>>>> master
 Utils.cleanupVisitor = ( object )=>{
     object.traverse( c => {
         if ( c.material ){
@@ -760,6 +840,22 @@ Utils.downloadArrayBuffer = ( buffer, filename )=>{
     Utils.downloadBlob( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
 };
 
+<<<<<<< HEAD
+=======
+Utils.downloadImageFromCanvas = (canvas, filename)=>{
+    if (!canvas) return;
+
+	let b64 = canvas.toDataURL();
+    ATON.Utils._dlink.href = b64;
+
+	//if (filename.endsWith(".png")) ATON.Utils._dlink.href = b64.replace("image/png", "image/octet-stream");
+    //if (filename.endsWith(".jpg")) ATON.Utils._dlink.href = b64.replace("image/jpg", "image/octet-stream");
+	
+    ATON.Utils._dlink.download = filename;
+	ATON.Utils._dlink.click();
+};
+
+>>>>>>> master
 /**
 Export a given ATON node.
 Currently supported formats are: gltf/glb, obj or usdz.
@@ -808,7 +904,11 @@ Utils.exportNode = (node, filename)=>{
         Utils.downloadText(output, filename);
     }
 
+<<<<<<< HEAD
     // USDZ
+=======
+    // USDZ (fixme)
+>>>>>>> master
     if (ext === "usdz"){
         if (Utils.exporterUSDZ === undefined) Utils.exporterUSDZ = new THREE.USDZExporter();
 
@@ -965,5 +1065,22 @@ Utils.createGround = (texture, dx,dz)=>{
     return N;
 };
 
+<<<<<<< HEAD
+=======
+/**
+Convert Uint8Array into hex string
+@param {Uint8Array} uint8array - Uint8Array array
+@returns {String}
+*/
+Utils.convertByteArrayToHexString = (uint8array) => uint8array.reduce((str, byte) => str + byte.toString(16).padStart(2,'0'),'');
+
+/**
+Convert hex string into Uint8Array
+@param {String} hexString - Hex string
+@returns {Uint8Array}
+*/
+Utils.convertHexStringToByteArray = (hexString) => Uint8Array.from(hexString.match(/.{1,2}/g).map((byte) => parseInt(byte,16)));
+
+>>>>>>> master
 
 export default Utils;

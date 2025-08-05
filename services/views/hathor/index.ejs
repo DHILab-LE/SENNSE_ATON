@@ -46,6 +46,7 @@
 -->
 
     <% scripts.forEach(function(js){ %>
+<<<<<<< HEAD
         <script src="<%= js %>"></script>
     <% }); %>
 
@@ -54,6 +55,24 @@
         // We init Hathor onload
         window.addEventListener( 'load', ()=>{
             HATHOR.init('<%= sid %>');
+=======
+        <script src="<%= js %>" defer ></script>
+    <% }); %>
+
+    <script type="module" src="/hathor/hathor.js"></script>
+    <script>
+        // We init Hathor onload
+        window.addEventListener( 'load', ()=>{
+            let flist = [];
+            <% flareslist.forEach((fid)=>{ %>
+                flist.push("<%= fid %>");
+            <% }); %>
+
+            HATHOR.requireFlares( flist );
+
+            HATHOR.setSceneToLoad("<%= sid %>");
+            //HATHOR.run();
+>>>>>>> master
         });
     </script>
 </head>

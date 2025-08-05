@@ -1,0 +1,595 @@
+{
+    "openapi": "3.0.0",
+
+    "supportedSubmitMethods": [],
+
+    "info": {
+        "version": "2.0.0",
+        "title": "ATON REST API v2",
+        "description": "This is the new REST API (v2) for the open-source ATON framework (CNR ISPC) offered by E-RIHS Research Infrastructure (https://www.e-rihs.it/). It allows smooth integration with external platforms, services or tools.",
+
+        "contact": {
+            "name": "Bruno Fanini (CNR ISPC)"
+        },
+    
+        "license": {
+            "name": "GPL v3"
+        }
+    },
+
+    "paths": {
+        "/api/v2/scenes/":{
+            "get":{
+                "tags":["Scenes"],
+                "summary": "List public scenes",
+                "description": "....",
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "post":{
+                "tags":["Scenes"],
+                "summary": "Create a new scene",
+                "description": "It creates a new scene (a JSON scene descriptor with assigned scene-ID). Only authenticated users.",
+
+                "requestBody":{
+                    "description": "To create the scene, request body may contain 'data' (object with initial attributes), 'vis' (visibility - 0: private, 1: public). Request body may also contain 'fromScene' (clone from another scene ID) or 'fromItem' (create a basic scene starting from a single item - e.g.: a 3D model).",
+                    "content":{
+                        "application/json":{
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "data":{
+                                        "type":"object"
+                                    },
+                                    "vis":{
+                                        "type":"number"
+                                    },
+                                    "fromScene":{
+                                        "type": "string"
+                                    },
+                                    "fromItem":{
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns scene-ID",
+                        "content":{
+                        }
+                    },
+                    "401":{
+                        "description": "Unauthorized. User not authenticated",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/scenes/{user}":{
+            "get":{
+                "tags":["Scenes"],
+                "summary": "List user scenes",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                            "application/json":{
+                                "schema":{
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401":{
+                        "description": "Unauthorized. User not authenticated",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/scenes/{user}/{usid}":{
+            "get":{
+                "tags":["Scenes"],
+                "summary": "Get JSON scene descriptor",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "usid",
+                        "in": "path",
+                        "description": "User scene-ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns JSON descriptor",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "delete":{
+                "tags":["Scenes"],
+                "summary": "Delete a scene",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "usid",
+                        "in": "path",
+                        "description": "User scene-ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns JSON descriptor",
+                        "content":{
+                        }
+                    },
+                    "401":{
+                        "description": "Unauthorized. User not authenticated or scene belongs to another user",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "patch":{
+                "tags":["Scenes"],
+                "summary": "Patch JSON scene descriptor",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "usid",
+                        "in": "path",
+                        "description": "User scene-ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns modified JSON descriptor",
+                        "content":{
+                        }
+                    },
+                    "401":{
+                        "description": "Unauthorized. User not authenticated or scene belongs to another user",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/items/{user}/models":{
+            "get":{
+                "tags":["Items"],
+                "summary": "List user 3D models",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/items/{user}/panoramas":{
+            "get":{
+                "tags":["Items"],
+                "summary": "List user panoramas",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/items/{user}/media":{
+            "get":{
+                "tags":["Items"],
+                "summary": "List user media",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/users/":{
+            "get":{
+                "tags":["Users"],
+                "summary": "List users",
+                "description": "....",
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns list",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "post":{
+                "tags":["Users"],
+                "summary": "Create a new user",
+                "description": "....",
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns true",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/users/{user}":{
+            "get":{
+                "tags":["Users"],
+                "summary": "Get user data",
+                "description": "....",
+
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns user info object",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "put":{
+                "tags":["Users"],
+                "summary": "Update user data",
+                "description": "....",
+
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns true",
+                        "content":{
+                        }
+                    }
+                }
+            },
+
+            "delete":{
+                "tags":["Users"],
+                "summary": "Remove a user",
+                "description": "....",
+
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "The user ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns true",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/apps/":{
+            "get":{
+                "tags":["Apps"],
+                "summary": "Get list of web-apps",
+                "description": "Returns the complete list of web-applications deployed on this instance. Only administrators",
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns apps list",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/apps/{appid}":{
+            "get":{
+                "tags":["Apps"],
+                "summary": "Get web-app details",
+                "description": "....",
+
+                "parameters": [
+                    {
+                        "name": "appid",
+                        "in": "path",
+                        "description": "The app ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns web-app information",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/apps/{appid}/{storid}":{
+            "get":{
+                "tags":["Apps"],
+                "summary": "Get storage data content",
+                "description": "....",
+                "parameters": [
+                    {
+                        "name": "appid",
+                        "in": "path",
+                        "description": "The App ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "storid",
+                        "in": "path",
+                        "description": "The storage ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns storage data content (JSON)",
+                        "content":{
+                        }
+                    }
+                }
+            },
+            "patch":{
+                "tags":["Apps"],
+                "summary": "Manipulate persistent app storage",
+                "description": "This allows to add, remove or update data from persistent (server-side) app storage. Multiple storages can be created per web-app (scoreboards, inventories, semantic data, etc.). See corresponding client-side documentation in ATON.App.*",
+                "parameters": [
+                    {
+                        "name": "appid",
+                        "in": "path",
+                        "description": "The App ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "storid",
+                        "in": "path",
+                        "description": "The storage ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "requestBody":{
+                    "description": "request body contains data patch (object) for partial modification of the storage ID. Mode can be 'ADD' or 'DELETE'",
+                    "content":{
+                        "application/json":{
+                            "example":{
+                                "patch": { "score": 16 },
+                                "mode": "ADD"
+                            }
+                        }
+                    }
+                },
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns modified storage (JSON)",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/flares/":{
+            "get":{
+                "tags":["Flares"],
+                "summary": "Get list of flares",
+                "description": "Returns the complete list of flares (plugins) installed on this instance. Only administrators",
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns flares list",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/v2/flares/{fid}":{
+            "get":{
+                "tags":["Flares"],
+                "summary": "Get flare details",
+                "description": "....",
+
+                "parameters": [
+                    {
+                        "name": "fid",
+                        "in": "path",
+                        "description": "The flare ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses":{
+                    "200":{
+                        "description": "Successful operation, returns flare information",
+                        "content":{
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    "components":{
+    }
+}

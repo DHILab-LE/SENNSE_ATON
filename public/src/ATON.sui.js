@@ -6,6 +6,10 @@
 ===========================================================*/
 import Button from "./ATON.sui.button.js";
 import Label from "./ATON.sui.label.js";
+<<<<<<< HEAD
+=======
+import MediaPanel from "./ATON.sui.mediapanel.js";
+>>>>>>> master
 
 /**
 ATON Spatial UI
@@ -16,8 +20,15 @@ let SUI = {};
 SUI.STD_BTN_SIZE = 0.1;
 SUI.STD_SELECTOR_TICKNESS = 1.05;
 
+<<<<<<< HEAD
 SUI.Button = Button;
 SUI.Label  = Label;
+=======
+SUI.Button     = Button;
+SUI.Label      = Label;
+SUI.MediaPanel = MediaPanel;
+
+>>>>>>> master
 
 
 //Initializes Spatial UI module
@@ -392,6 +403,7 @@ SUI.getInfoNode = ()=>{
 Set text for main info node
 @param {string} txt - the text
 */
+<<<<<<< HEAD
 // SUI.setInfoNodeText = (txt)=>{
 //     if (!SUI.bShowInfo) return;
 //     SUI.infoNodeText.set({ content: txt });
@@ -422,6 +434,13 @@ SUI.setInfoNodeText = (txt) => {
     }
 
     ThreeMeshUI.update(); // Ensure updates are reflected
+=======
+SUI.setInfoNodeText = (txt)=>{
+    if (!SUI.bShowInfo) return;
+    SUI.infoNodeText.set({ content: txt });
+    
+    ThreeMeshUI.update();  
+>>>>>>> master
 };
 
 /**
@@ -431,12 +450,20 @@ This can be arranged anywhere in the scene or attached to other UI nodes
 @param {THREE.Color} color - (optional) base color for the toolbar
 @returns {Node}
 */
+<<<<<<< HEAD
 SUI.createToolbar = (buttonlist, color, opacity)=>{
+=======
+SUI.createToolbar = (buttonlist, color, opacity, marginf=1.1)=>{
+>>>>>>> master
     let T = ATON.createUINode();
 
     let num = buttonlist.length;
     let padding = SUI.STD_BTN_SIZE * 0.3;
+<<<<<<< HEAD
     let marginf = 1.1;
+=======
+    //let marginf = margin;
+>>>>>>> master
 
     let cont = new ThreeMeshUI.Block({
         width: (SUI.STD_BTN_SIZE * num * marginf) + padding,
@@ -451,6 +478,10 @@ SUI.createToolbar = (buttonlist, color, opacity)=>{
 
         justifyContent: 'center', // could be 'center' or 'left'
         textAlign: 'center',
+<<<<<<< HEAD
+=======
+        contentDirection: 'row-reverse'
+>>>>>>> master
     });
     //cont.position.set(0,0,0);
 
@@ -460,12 +491,26 @@ SUI.createToolbar = (buttonlist, color, opacity)=>{
     for (let i=0; i<num; i++){
         let button = buttonlist[i];
         if (button){
+<<<<<<< HEAD
             button.position.set((i*SUI.STD_BTN_SIZE*marginf)-m, 0.0, 0.005);
+=======
+
+            button.position.set(
+                (i * SUI.STD_BTN_SIZE * marginf) - m, // *marginf
+                0.0,
+                0.005
+            );
+
+>>>>>>> master
             cont.add(button);
         }
     }
 
     T.add(cont);
+<<<<<<< HEAD
+=======
+    //T.traverse((o)=>{ if (o.material) o.material.depthWrite = false; });
+>>>>>>> master
 
     ThreeMeshUI.update();
     return T;
@@ -507,6 +552,31 @@ SUI.buildPanelNode = (suid, url, w,h)=>{
     return suiNode;
 };
 
+<<<<<<< HEAD
+=======
+/**
+Create a 3D layout, starting from a list (array) of SUI elements and a layout function.
+@param {string} parent - The parent SUI node (group) holding all nodes to be arranged
+@param {function} layoutfunction - the layout function, taking a SUI node and list index as arguments. It is used to transform each SUI node (location, rotation and scale) depending on some custom logic
+@returns {Node}
+*/
+SUI.createLayout = (parent, layoutfunction)=>{
+
+    let numChildren = parent.children.length;
+
+    for (let i=0; i<numChildren; i++){
+        let N = parent.children[i];
+
+        // Apply layout function
+        layoutfunction(N,i);
+    }
+
+    ThreeMeshUI.update();
+    return parent;
+};
+
+
+>>>>>>> master
 // Measurements
 SUI.addMeasurementPoint = (P)=>{
     if (P === undefined) return undefined;
@@ -777,7 +847,12 @@ SUI.update = ()=>{
         if (fp !== undefined && ATON.plight !== undefined){
             ATON.enablePointLight();
             ATON.plight.position.copy( fp );
+<<<<<<< HEAD
             ATON.plight.distance = SUI._selectorRad * 2.0;
+=======
+            ATON.plight.distance  = SUI._selectorRad * 2.0;
+            //ATON.plight.intensity = SUI._selectorRad;
+>>>>>>> master
             //fp = null;
         }
     }

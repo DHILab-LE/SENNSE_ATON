@@ -31,7 +31,11 @@ let privilegeManager = new webdav.SimplePathPrivilegeManager();
 for (let u in Core.users){
     let dbuser = Core.users[u];
     if (dbuser){
+<<<<<<< HEAD
         let uname  = dbuser.username;
+=======
+        let uname  = Core.getUID(dbuser); // dbuser.username;
+>>>>>>> master
         let bAdmin = dbuser.admin;
 
         let user = userManager.addUser(uname, dbuser.password, bAdmin);
@@ -41,15 +45,27 @@ for (let u in Core.users){
         //privilegeManager.setRights(user, "/", [ 'canRead' ]);
         //privilegeManager.setRights(user, "/"+uname+"/", [ 'canRead' ]);
 /*
+<<<<<<< HEAD
         privilegeManager.setRights(user, "/"+uname+"/", [ 'canRead' ]);
         privilegeManager.setRights(user, "/"+uname+"/collection/", [ 'all' ]);
         privilegeManager.setRights(user, "/"+uname+"/scenes/", [ 'all' ]);
 */      
+=======
+        //privilegeManager.setRights(user, "/"+uname+"/", [ 'all' ]);
+        privilegeManager.setRights(user, "/"+uname+"/collection/", [ 'all' ]);
+        privilegeManager.setRights(user, "/"+uname+"/scenes/", [ 'all' ]);
+*/
+    
+>>>>>>> master
         privilegeManager.setRights(user, "/"+uname+"-collection/", [ 'all' ]);
         privilegeManager.setRights(user, "/"+uname+"-scenes/", [ 'all' ]);
 
         if (bAdmin){
             privilegeManager.setRights(user, "/apps/", [ 'all' ]);
+<<<<<<< HEAD
+=======
+            privilegeManager.setRights(user, "/config/flares/", [ 'all' ]);
+>>>>>>> master
         }
         
         //privilegeManager.setRights(user, '/', [ 'all' ]);
@@ -84,22 +100,40 @@ const server = new webdav.WebDAVServer({
 // link physical fs
 for (let u in Core.users){
     let dbuser = Core.users[u];
+<<<<<<< HEAD
     let uname = dbuser.username;
+=======
+    let uname  = Core.getUID(dbuser); //dbuser.username;
+>>>>>>> master
 
     let upathCollection = Core.DIR_COLLECTIONS + uname + "/";
     let upathScenes     = Core.DIR_SCENES + uname + "/";
 
     if (fs.existsSync(upathCollection)){
         server.setFileSystemSync("/"+uname+"-collection", new webdav.PhysicalFileSystem(upathCollection));
+<<<<<<< HEAD
     }
     if (fs.existsSync(upathScenes)){
         server.setFileSystemSync("/"+uname+"-scenes", new webdav.PhysicalFileSystem(upathScenes));
+=======
+        //server.setFileSystemSync("/"+uname+"/collection", new webdav.PhysicalFileSystem(upathCollection));
+    }
+    if (fs.existsSync(upathScenes)){
+        server.setFileSystemSync("/"+uname+"-scenes", new webdav.PhysicalFileSystem(upathScenes));
+        //server.setFileSystemSync("/"+uname+"/scenes", new webdav.PhysicalFileSystem(upathScenes));
+>>>>>>> master
     }
 }
 
 // Access to web-apps
 server.setFileSystemSync("/apps", new webdav.PhysicalFileSystem(Core.DIR_WAPPS));
 
+<<<<<<< HEAD
+=======
+// Access to flares
+server.setFileSystemSync("/flares", new webdav.PhysicalFileSystem(Core.DIR_FLARES));
+
+>>>>>>> master
 
 //server.setFileSystemSync('/collection', new webdav.PhysicalFileSystem(Core.DIR_COLLECTIONS));
 //server.setFileSystemSync('/scenes', new webdav.PhysicalFileSystem(Core.DIR_SCENES));

@@ -1,0 +1,772 @@
+/*
+    Main cascading ATON CSS (v2) applied after Bootrap
+
+    Authors:
+    - Bruno Fanini (bruno.fanini++AT++cnr.it)
+
+====================================================================*/
+
+@font-face {
+    font-family: 'AFont';
+    font-style: normal;
+    src: url(../fonts/TitilliumWeb-Regular.ttf);
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/*=========================================
+    Variables
+=========================================*/
+:root {
+    --aton-blur-radius: 15px;
+    --aton-colors-accent: #F2CB05;
+    --aton-colors-accent-rgb: 242,203,5;
+}
+
+/*
+:root,
+[data-bs-theme=light] {
+    --bs-primary: #F00;
+    --bs-primary-rgb: 255,0,0
+}
+*/
+
+
+/*=========================================
+    Base
+=========================================*/
+
+body {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    /*font-size: 18px !important;*/
+
+    /*font-family: Tahoma, Verdana, Geneva;*/
+    /*font-family: 'Segoe UI Local', 'Segoe UI Web (West European)';*/
+    
+    font-family: "AFont" !important;
+
+    touch-action: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+/*
+    scrollbar-width: thin;
+    scrollbar-color: #FFF #333;
+*/
+}
+
+canvas {
+    display: block;
+
+    height: 100%;
+    width: 100%;
+
+    margin: 0px;
+    padding: 0px;
+
+    border: none;
+    outline: none;
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+/*
+    cursor: default;
+    cursor: -moz-default;
+    cursor: -webkit-default;
+*/
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+
+/*
+    touch-action: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+*/
+}
+
+canvas:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
+}
+
+a {
+    color: var(--bs-body-color);
+}
+
+::selection {
+    background-color: rgba(var(--aton-colors-accent-rgb), 0.3);
+}
+
+/*=========================================
+    ATON cascading classes (aton-*)
+    to be applied on top of bootstrap 5
+=========================================*/
+
+.aton-body2D {
+    overflow: auto !important;
+    
+    font-family: "AFont" !important;
+
+    touch-action: auto;
+    -webkit-user-drag: auto;
+    -webkit-tap-highlight-color: auto;
+
+    scrollbar-width: thin;
+}
+
+
+/* Spinner, labels
+========================*/
+.aton-spinner {
+    width: 3rem;
+    height: 3rem;
+}
+
+.aton-centered-container {
+    position: absolute;
+    z-index:10;
+
+    margin: auto;
+
+    top:0;
+    left:0;
+
+    width: 100%;
+    height: 100%;
+
+    display:inline-block;
+    pointer-events: none;
+}
+
+.aton-floating-label-container {
+    position: fixed;
+    z-index: 10;
+
+    text-align: center;
+
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+
+    margin: 0px;
+    padding: 0px;
+
+    pointer-events: none;
+}
+
+.aton-floating-label {
+    display: inline-block;
+
+    text-align: center;
+    /*font-size: larger;
+    vertical-align: middle;*/
+    line-height: 0px;
+
+    color: var(--bs-body-color);
+
+    background-color: rgba(var(--bs-body-bg-rgb), 0.7);
+    border-radius: 10px;
+
+    box-shadow: 0px 0px 10px rgba(0,0,0, 0.5);
+
+    /*backdrop-filter: blur(6px);*/
+
+    padding: 15px;
+    margin: 0px;
+
+    height: 30px;
+    min-width: 60px;
+    min-height: 32px;
+
+    /*transform-origin: top;*/
+}
+
+/* Navbars & toolbars
+========================*/
+.aton-navbar {
+    top: 0px;
+    width: 100%;
+    position: fixed;
+    z-index: 100;
+    
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5) !important;
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
+
+    box-shadow: 0px 0px 10px rgba(0,0,0, 0.9);
+/*
+    border-bottom: solid black 2px;
+*/
+}
+
+.aton-toolbar-top {
+    top: 0px;
+    display: inline-block;
+    position: absolute;
+    
+/*
+    background-color: rgba(var(--bs-body-bg-rgb), 0.7) !important;
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
+*/
+}
+
+.aton-toolbar-top .aton-btn {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.3) !important; 
+}
+
+.aton-toolbar-left {
+    top: 0px;
+    position: absolute;
+
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+/*
+    background-color: rgba(var(--bs-body-bg-rgb), 0.7) !important;
+*/
+}
+
+.aton-toolbar-left .aton-btn {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.3) !important; 
+}
+
+.aton-toolbar-bottom {
+    bottom: 0px;
+    display: inline-block;
+    position: absolute;
+}
+.aton-toolbar-bottom .aton-btn {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.3) !important; 
+}
+
+
+.aton-poweredby {
+    bottom: 0px;
+    left: 0px;
+    display: inline-block;
+    position: absolute;
+
+    padding: 4px;
+    font-size: x-small;
+
+    text-shadow: 0px 0px 4px var(--bs-body-bg);
+}
+.aton-poweredby img {
+    height: 20px;
+    width: auto;
+}
+
+.aton-footer {
+    bottom: 0px;
+    width: 100%;
+
+    padding: 4px;
+    font-size: 0.8em;
+
+    position: fixed;
+    z-index: 100;
+    
+    background-color: rgba(var(--bs-secondary-bg-rgb), 0.7) !important;
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
+
+    text-align: center;
+}
+
+/* BG for modals,panels...
+========================*/
+.aton-std-bg {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.7) !important;
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));  
+}
+
+.aton-sidepanel {
+    width: 35%;
+}
+
+/* Input decorators
+=======================*/
+.aton-input-x {
+    border-color: rgba(255,0,0, 0.2);
+    /*background-color: rgba(255,0,0, 0.1) !important;*/
+}
+.aton-input-y {
+    border-color: rgba(0,255,0, 0.2);
+    /*background-color: rgba(0,255,0, 0.1) !important;*/
+}
+.aton-input-z {
+    border-color: rgba(0,0,255, 0.2);
+    /*background-color: rgba(0,0,255, 0.1) !important;*/
+}
+
+/* Buttons & Icons
+=================*/
+.aton-icon {
+    margin-right: 4px;
+    width: 1em;
+    height: 1em; 
+    vertical-align: middle;
+}
+
+[data-bs-theme=light] .aton-icon {
+    filter: invert(100%);
+}
+[data-bs-theme=dark] .aton-icon {
+    filter: none;
+}
+
+.aton-icon-small {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-accent {
+    --bs-btn-bg: var(--aton-colors-accent);
+    --bs-btn-border-color: rgba(var(--aton-colors-accent-rgb), 0.0);
+    --bs-btn-color: #222;
+
+    --bs-btn-hover-bg: var(--aton-colors-accent);
+    --bs-btn-hover-border-color: rgba(var(--aton-colors-accent-rgb), 1.0);
+    --bs-btn-hover-color: #222;
+/*
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #0d6efd;
+    --bs-btn-border-color: #0d6efd;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #0b5ed7;
+    --bs-btn-hover-border-color: #0a58ca;
+    --bs-btn-focus-shadow-rgb: 49,132,253;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #0a58ca;
+    --bs-btn-active-border-color: #0a53be;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #0d6efd;
+    --bs-btn-disabled-border-color: #0d6efd;
+*/
+}
+
+.btn-default {
+    --bs-btn-bg: rgba(var(--bs-body-color-rgb), 0.1);
+    --bs-btn-border-color: rgba(var(--bs-body-color-rgb), 0.0);
+    --bs-btn-color: var(--bs-btn-color);
+
+    --bs-btn-hover-bg: rgba(var(--bs-body-color-rgb), 0.2);
+    --bs-btn-hover-border-color: rgba(var(--bs-body-color-rgb), 0.5);
+    --bs-btn-hover-color: var(--bs-btn-color);
+/*
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #0d6efd;
+    --bs-btn-border-color: #0d6efd;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #0b5ed7;
+    --bs-btn-hover-border-color: #0a58ca;
+    --bs-btn-focus-shadow-rgb: 49,132,253;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #0a58ca;
+    --bs-btn-active-border-color: #0a53be;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #0d6efd;
+    --bs-btn-disabled-border-color: #0d6efd;
+*/
+}
+
+
+.aton-btn {
+    /*background-color: var(--bs-body-bg) !important;*/
+    white-space: nowrap;
+    padding: 4px;
+/*
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+*/
+    margin: 2px;
+
+    min-width: 40px;
+    min-height: 40px;
+
+    vertical-align: middle;
+}
+
+.aton-btn-text {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.aton-btn img {
+    width: 1.5em;
+    height: 1.5em;
+    /*margin-right: 4px;*/
+    margin: 0px;
+
+    vertical-align: middle;
+}
+
+.aton-btn-primary {
+    background-color: var(--aton-colors-accent);
+/*    border-color: var(--bs-body-color-rgb);*/
+}
+
+.aton-btn-section-highlight {
+    border-bottom: var(--aton-colors-accent) solid 4px;
+    /*background-color: rgba(var(--aton-colors-accent-rgb), 0.2);*/
+}
+
+.aton-btn-section-highlight:hover {
+    border-bottom: var(--aton-colors-accent) solid 4px;
+}
+
+.aton-btn-highlight {
+/*
+    border: var(--aton-colors-accent) solid 1px;
+    background-color: rgba(var(--aton-colors-accent-rgb), 0.3);
+*/
+    --bs-btn-bg: rgba(var(--aton-colors-accent-rgb), 0.2);
+    --bs-btn-border-color: rgba(var(--bs-body-color-rgb), 0.5);
+    --bs-btn-color: var(--bs-btn-color);
+
+    --bs-btn-hover-bg: rgba(var(--aton-colors-accent-rgb), 0.2);
+    --bs-btn-hover-border-color: rgba(var(--bs-body-color-rgb), 0.9);
+    --bs-btn-hover-color: var(--bs-btn-color);
+/*
+    -webkit-box-shadow: inset 0 0px 5px var(--bs-body-color);
+    -moz-box-shadow: inset 0 0px 5px var(--bs-body-color);
+    box-shadow: inset 0 0px 5px var(--bs-body-color);
+*/
+}
+
+
+/* Dropdowns
+============*/
+.aton-dropdown-menu {
+    box-shadow: 0px 0px 10px rgba(0,0,0, 0.2);
+/*
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5) !important;
+
+    -webkit-backdrop-filter: blur(var(--aton-blur-radius));
+    backdrop-filter: blur(var(--aton-blur-radius));
+*/
+}
+
+
+.aton-dropdown-item {
+    display: inline-block;
+}
+
+.aton-dropdown-item img {
+    margin-right: 8px;
+    height: 20px;
+    width: 20px;
+}
+.aton-dropdown-item .bi {
+    margin-right: 8px;
+    height: 16px;
+    width: 16px;
+}
+
+.aton-dropdown-item:hover {
+    background-color: var(--bs-secondary-bg);
+}
+
+/* Tabs
+============*/
+.aton-tab {
+    color: var(--bs-body-color);
+}
+/*
+.aton-tab:hover {
+    border-bottom: solid var(--bs-body-color);
+}
+*/
+
+.aton-tab img {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+/* Trees
+============*/
+.aton-tree-container {
+    padding: 0px;
+}
+
+.aton-tree-item {
+    margin-left: 0px;
+    
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.aton-tree-item summary {
+    padding: 10px;
+
+    font-weight: bold;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5);
+    /*border-left: solid var(--bs-body-color) 1px;*/
+
+    border-radius: var(--bs-border-radius);
+
+    /*line-height: 20px;*/
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+.aton-tree-item summary:hover {
+    background-color: rgba(var(--bs-body-bg-rgb), 1.0);
+}
+
+.aton-tree-item summary::marker {
+    font-size: 1.2em;
+    /*color: var(--bs-primary);*/
+}
+
+.aton-tree-item-content {
+    margin-left: 14px;
+    margin-top: 5px;
+
+    padding-left: 10px;
+    border-left: dotted var(--bs-body-color) 2px;
+}
+
+/* Cards
+========================*/
+.aton-card {
+    display: inline-block;
+    position: relative;
+
+    margin: 12px;
+    width: 200px;
+
+    /*padding: 4px;*/
+
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2);
+
+    /*border: 1px solid rgba(var(--bs-body-color-rgb), 0.1);*/
+
+    text-align: left;
+    font-size: 0.8em;
+
+    transition: all .1s ease-in-out;
+
+    /*overflow: hidden;*/
+}
+
+.aton-card:hover {
+    /*transform: scale(1.1);*/
+    
+    /*border: 1px solid rgba(var(--bs-body-color-rgb), 1);*/
+    /*box-shadow: 0px 0px 10px rgba(var(--bs-body-color-rgb), 0.5);*/
+}
+
+.aton-card-cover {
+    overflow: hidden;
+}
+
+.aton-card-cover img {
+    transform-origin: 50% 50%;
+    transition: transform .5s, visibility .5s ease-in;
+}
+.aton-card-cover img:hover {
+    transform: scale(1.5);
+}
+
+.aton-card-small {
+    margin: 8px;
+    width: 150px;
+}
+
+.aton-card-large {
+    margin: 16px;
+    width: 250px;
+}
+
+.aton-card-title {
+    /*font-size: 1.2em;*/
+    font-weight: bolder;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aton-card-bg {
+    position: absolute;
+
+    left: 0;
+    top:0;
+
+    z-index: -10;
+    /*
+    display: block;
+    */
+    /*background-image: url();*/
+
+    width: 100%;
+    height: 100%;
+
+    background-position: center;
+    background-repeat: no-repeat;
+
+    background-size: cover;
+
+    /*background-color: rgba(0, 0, 0, 0.5);*/
+    opacity: 0.3;
+
+
+/*
+    background-size: contain;
+    transform: scaleY(-1) translateY(-50);
+*/
+    -webkit-filter: blur(var(--aton-blur-radius));
+    -moz-filter: blur(var(--aton-blur-radius));
+    -o-filter: blur(var(--aton-blur-radius));
+    -ms-filter: blur(var(--aton-blur-radius));
+    filter: blur(var(--aton-blur-radius));
+}
+
+.aton-card-h400 {
+    height: 400px;
+}
+
+.aton-card-accent {
+    box-shadow: 0px 0px 20px rgba(var(--aton-colors-accent-rgb), 0.5) !important;
+    /*border-color: rgba(var(--aton-colors-accent-rgb), 0.5);*/
+
+}
+
+
+.aton-hscrollable {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    white-space: nowrap;
+    padding: 20px;
+    margin: 0px;
+}
+
+.aton-keyword {
+    display: inline-block;
+    margin: 2px;
+    border-radius: 10px;
+}
+
+.aton-keyword-small {
+    font-size: x-small;
+    margin: 2px;
+    padding: 4px;
+}
+
+/* Ranges / Sliders
+========================*/
+.aton-range-container {
+    display: block;
+    width: 250px;
+    margin: 4px;
+    padding: 4px;
+
+    /*white-space: nowrap;*/
+
+    font-size: small;
+/*
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2);
+    border-radius: var(--bs-border-radius);
+*/
+}
+
+.aton-range {
+    min-width: 200px;   
+}
+
+.aton-range-label {
+    display: inline-block;
+    background-color: rgba(var(--bs-body-bg-rgb), 0.2);
+    border-radius: var(--bs-border-radius);
+
+    padding: 4px;
+    border-radius: var(--bs-border-radius);
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 100%;
+}
+  
+/* Removes default focus */
+input[type="range"]:focus {
+    outline: none;
+}
+  
+/******** Chrome, Safari, Opera and Edge Chromium styles ********/
+/* slider track */
+input[type="range"]::-webkit-slider-runnable-track {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.7);
+    border-radius: 0.5rem;
+    height: 0.5rem;
+}
+  
+  /* slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    margin-top: -8px; /* Centers thumb on the track */
+    background-color: var(--bs-body-color);
+    border-radius: 50%;
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+    outline: 3px solid var(--bs-body-bg);
+    outline-offset: 0.125rem;
+}
+  
+  /*********** Firefox styles ***********/
+/* slider track */
+input[type="range"]::-moz-range-track {
+    background-color: rgba(var(--bs-body-bg-rgb), 0.5);
+    border-radius: 0.5rem;
+    height: 0.5rem;
+}
+  
+  /* slider thumb */
+input[type="range"]::-moz-range-thumb {
+    background-color: var(--bs-body-color);
+    border: none; /*Removes extra border that FF applies*/
+    border-radius: 50%;
+    height: 1.5rem;
+    width: 1.5rem;
+}
+  
+input[type="range"]:focus::-moz-range-thumb{
+    outline: 3px solid var(--bs-body-bg);
+    outline-offset: 0.125rem;
+}
+
+

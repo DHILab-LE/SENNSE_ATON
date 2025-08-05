@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<%- include('frags/head'); %>
+
+<script>
+window.addEventListener( 'load', ()=>{
+        ATON.realize2D();
+        ATON.UI.setTheme("light");
+
+        // Navbar
+        let elNavCont  = document.getElementById("navbarSupportedContent");
+        let elNavItems = document.getElementById("navbarItems");
+
+        //elNavItems.append(ATON.UI.createElementFromHTMLString("<b>My Scenes</b>"));
+
+        let elSearch = ATON.UI.createLiveFilter({
+                filterclass: "aton-card",
+                onfocus: ()=>{
+                        //let elYears = document.querySelectorAll(".shuYearTitleContainer");
+                        //for (let y of elYears) y.classList.add('d-none');
+                },
+                onblur: ()=>{
+                        //let elYears = document.querySelectorAll(".shuYearTitleContainer");
+                        //for (let y of elYears) y.classList.remove('d-none');
+                }
+        })
+
+        elSearchInput = elSearch.getElementsByTagName('input')[0];
+        elNavCont.append(elSearch);
+
+        // My scene gallery
+        let elMyScenes = ATON.UI.get("myscenes");
+        let elKeywords = ATON.UI.get("keywords");
+        let elMainTasks = ATON.UI.get("maintasks");
+
+        elMainTasks.append(ATON.UI.createButton({
+                icon: "bi-plus-lg",
+                text: "New Scene",
+                variant: "accent",
+                //classes: "aton-btn-primary",
+                //size: "large",
+                onpress: ()=>{
+                        //
+                }
+        }));
+
+        ATON.checkAuth(
+                (u)=>{
+                        elNavCont.append( SHU.createMainAuthDropdown(u) );
+                        SHU.createNavbarAuthSections("myscenes");
+
+                        SHU.setPageWaiting();
+                        ATON.REQ.get("scenes/"+u.username, entries => {
+                                entries.sort( ATON.UI.SCENES_SORTER );               
+                                console.log(entries);
+
+                                SHU.setPageComplete();
+
+                                ATON.UI.get("numscenes").innerHTML = entries.length;
+
+                                let years = {};
+                                let kwords = {};
+                        
+                                for (let scene of entries){
+                                        cdate = new Date(scene.creationDate);
+                                        let YYYY = cdate.getUTCFullYear();
+                                        let MM   = cdate.getUTCMonth()+1;
+                                        let DD   = cdate.getUTCDate();
+                                        if (MM<10) MM = "0"+MM;
+
+                                        const elFooter = ATON.UI.createElementFromHTMLString(`
+                                                <div class="align-items-center justify-content-center">
+                                                </div>
+                                                `
+                                        );
+
+                                        // Years
+                                        if (!years[YYYY]){
+                                                years[YYYY] = 1;
+                                                elMyScenes.append(ATON.UI.createElementFromHTMLString(`
+                                                        <div class="shuYearTitleContainer" style="text-align: left;">
+                                                                <b>${YYYY}</b>
+                                                        </div>
+                                                `));
+                                        }
+                                        else years[YYYY]++;
+
+                                        // Keywords
+                                        if (scene.kwords){
+                                                for (let k in scene.kwords){
+                                                        if (!kwords[k]) kwords[k] = 1;
+                                                        else kwords[k]++;
+                                                }
+                                        }
+
+                                        elFooter.append(ATON.UI.createButton({
+                                                icon: "bi-gear-fill",
+                                                text: "Manage",
+                                                size: "small",
+                                                //variant: "secondary",
+                                                onpress: ()=>{
+                                                        sceneSettings(scene.sid);
+                                                }
+                                        }));
+                        
+                                        let card = ATON.UI.createSceneCard({
+                                                title: scene.title? scene.title : scene.sid,
+                                                sid: scene.sid,
+                                                keywords: scene.kwords,
+                                                subtitle: YYYY+"-"+MM+"-"+DD,
+                                                footer: elFooter,
+                                                useblurtint: true,
+                                                //size: ...
+                                        });
+                
+                                        elMyScenes.append(card);
+                                }
+
+                                let elKWs = ATON.UI.createContainer();
+
+                                let numKWs = Object.keys(kwords).length;
+
+                                ATON.UI.get("numkeywords").innerHTML = numKWs;
+
+                                for (let k in kwords){
+                                        // elKWs
+                                        elKeywords.append(ATON.UI.createKeyword({
+                                                term: k,
+                                                count: kwords[k],
+                                                onpress: ()=>{
+                                                        elSearchInput.value = k;
+                                                        elSearchInput.focus();
+                                                        elSearchInput.oninput();
+                                                }
+                                        }));
+                                }
+                                
+/*
+                                elKeywords.append(ATON.UI.createTreeGroup({
+                                        items:[
+                                                {
+                                                        title: "Keywords",
+                                                        content: elKWs
+                                                }
+                                        ]
+                                }));
+*/
+                        });
+                }
+        );
+
+        // Scene settings
+        let sceneSettings = (sid)=>{
+                const elBody = ATON.UI.createElementFromHTMLString(`
+                        <div>Here settings</div>
+                `);
+
+                ATON.UI.showModal({
+                        header: sid,
+                        body: elBody
+                });
+        };
+        
+});
+</script>
+</head>
+
+<body>
+        <!-- Navbar -->
+        <%- include('frags/navbar'); %>
+
+        <div id="myscenes" class="shuGalleryContainer">
+                <div class="shuSectionTitleContainer" style="text-align: left;">
+                        <div class="shuMainSectionTasks" id="maintasks"></div>
+                        <h2>My Scenes</h2>
+                        Total: <span id="numscenes">0</span>
+
+                        <div style="display: block; margin-top: 8px;">
+                                <div class="d-inline-flex gap-1">
+                                        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#keywords" aria-expanded="false" aria-controls="collapseExample">Keywords (<span id="numkeywords">0</span>)</button>
+                                </div>
+                                <div class="collapse" id="keywords"></div>
+                        </div>
+
+<!--
+                        <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKW" aria-expanded="true" aria-controls="collapseOne">Keywords</button>
+                                </h2>
+                                <div id="collapseKW" class="accordion-collapse collapse show">
+                                <div class="accordion-body" id="keywords">
+                                </div>
+                                </div>
+                        </div>
+                        </div>
+
+                        <div id="keywords" style="display: block; padding: 2px;"></div>
+-->
+                </div>
+        </div>
+
+        <div id="footer" class="aton-footer">
+                <%- include('frags/footer'); %>
+        </div>
+</body>

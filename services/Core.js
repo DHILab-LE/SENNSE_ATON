@@ -13,29 +13,51 @@ const path        = require('path');
 const jsonpatch   = require('fast-json-patch');
 const del         = require('del');
 const makeDir     = require('make-dir');
+<<<<<<< HEAD
 const nanoid      = require('nanoid');
+=======
+const { nanoid }  = require('nanoid');
+>>>>>>> master
 const fsx         = require('fs-extra');
 //const axios       = require('axios');
 //const chokidar    = require('chokidar');
 const fg          = require('fast-glob');
 const chalk       = require('chalk');
+<<<<<<< HEAD
+=======
+const sharp       = require("sharp");
+>>>>>>> master
 
 const { networkInterfaces } = require('os');
 
 // Authentication
+<<<<<<< HEAD
+=======
+/*
+>>>>>>> master
 let passport = require('passport');
 let Strategy = require('passport-local').Strategy;
 const cookieParser   = require('cookie-parser');
 const session        = require('express-session');
 const FileStore      = require('session-file-store')(session);
+<<<<<<< HEAD
 
 // Local modules
 const BaseAPI = require("./API.js");
 const Maat    = require("./maat/Maat.js");
+=======
+*/
+
+// Local modules
+const BaseAPI = require("./API/v1.js");
+const Maat    = require("./maat/Maat.js");
+const User    = require("./User.js");
+>>>>>>> master
 
 
 Core = {};
 
+<<<<<<< HEAD
 Core.DIR_DATA         = path.join(__dirname,"/../data/");
 Core.DIR_WAPPS        = path.join(__dirname,"/../wapps/");
 Core.DIR_PUBLIC       = path.join(__dirname,"/../public/");
@@ -56,6 +78,33 @@ Core.STD_SCENEFILE    = "scene.json";
 Core.STD_PUBFILE      = "pub.txt";
 Core.STD_COVERFILE    = "cover.png";
 
+=======
+Core.DIR_DATA           = path.join(__dirname,"/../data/");
+Core.DIR_WAPPS          = path.join(__dirname,"/../wapps/");
+Core.DIR_PUBLIC         = path.join(__dirname,"/../public/");
+Core.DIR_RES            = path.join(Core.DIR_PUBLIC,"res/");
+Core.DIR_PRV            = path.join(__dirname, "_prv/");
+Core.DIR_CONFIG         = path.join(__dirname, "/../config/");
+Core.DIR_CONFIGPUB      = path.join(Core.DIR_CONFIG, "public/");
+//Core.DIR_CUST_MODS    = path.join(Core.DIR_CONFIG,"modules/");
+Core.DIR_CUST_CERTS     = path.join(Core.DIR_CONFIG,"certs/");
+Core.DIR_NODE_MODULES   = path.join(__dirname, "/../node_modules");
+//Core.DIR_APIDOC       = path.join(__dirname, "/../API/");
+Core.DIR_FE             = path.join(Core.DIR_PUBLIC,"hathor/");
+Core.DIR_BE             = path.join(Core.DIR_PUBLIC,"shu/");
+Core.DIR_COLLECTIONS    = path.join(Core.DIR_DATA,"collections/"); //path.join(Core.DIR_PUBLIC,"collection/");
+Core.DIR_SCENES         = path.join(Core.DIR_DATA,"scenes/");   //path.join(Core.DIR_PUBLIC,"scenes/");
+Core.DIR_EXAMPLES       = path.join(Core.DIR_PUBLIC,"examples/");
+Core.DIR_FLARES         = path.join(Core.DIR_CONFIG,"flares/"); //path.join(Core.DIR_PUBLIC,"custom/flares/");
+Core.STD_SCENEFILE      = "scene.json";
+Core.STD_PUBFILE        = "pub.txt"; // deprecated
+Core.STD_COVERFILE_HI   = "cover.png";
+Core.STD_COVERFILE      = "cover.jpg";
+Core.STD_COVERSIZE      = 256;
+Core.STD_COVERFILE_PATH = path.join(Core.DIR_RES,"scenecover.png");
+
+// Unused
+>>>>>>> master
 Core.STATUS_COMPLETE   = "complete";
 Core.STATUS_PROCESSING = "processing";
 
@@ -70,13 +119,23 @@ Core.SCENES_GLOB_OPTS = {
 
 Core.COLLECTIONS_GLOB_OPTS = {
 	cwd: Core.DIR_COLLECTIONS,
+<<<<<<< HEAD
 	follow: true
+=======
+	follow: true,
+	//ignore: ["*/Data/*","*/tiles/*"]
+>>>>>>> master
 };
 
 // Modules setup
 Core.realizeBaseAPI = BaseAPI;
+<<<<<<< HEAD
 Core.passport       = passport; // set configured passport
 Core.maat           = Maat;
+=======
+//Core.passport       = passport; // set configured passport
+Core.Maat           = Maat;
+>>>>>>> master
 
 // LOG Utils
 Core.logGreen = (str)=>{
@@ -88,7 +147,11 @@ Core.logYellow = (str)=>{
 
 
 // Flares
+<<<<<<< HEAD
 Core.flares = [];
+=======
+Core.flares = {};
+>>>>>>> master
 
 Core.setupFlares = (app)=>{
 	if (!fs.existsSync(Core.DIR_FLARES)) return;
@@ -98,7 +161,11 @@ Core.setupFlares = (app)=>{
 	O.cwd    = Core.DIR_FLARES; //Core.DIR_PUBLIC;
 	O.follow = true;
 
+<<<<<<< HEAD
 	// Collcet all flares
+=======
+	// Collect all flares
+>>>>>>> master
 	let plugins = fg.sync("**/flare.json", O);
 	for (let f in plugins){
 		let flarename = path.dirname(plugins[f]);
@@ -110,6 +177,7 @@ Core.setupFlares = (app)=>{
 
 		let fbasepath = Core.DIR_FLARES + flarename + "/";
 
+<<<<<<< HEAD
 		Core.flares.push( flarename );
 
 		// Client (public) components
@@ -117,6 +185,16 @@ Core.setupFlares = (app)=>{
 			for (let s in P.client.files) Core.FEScripts.push( "/flares/"+ flarename +"/"+ P.client.files[s] );
 		}
 
+=======
+		//Core.flares.push( flarename );
+
+		// Client (public) components
+/*
+		if (P.client){
+			for (let s in P.client.files) Core.FEScripts.push( "/flares/"+ flarename +"/"+ P.client.files[s] );
+		}
+*/
+>>>>>>> master
 		// Server (private) components
 		if (P.server){
 			for (let m in P.server.modules){
@@ -129,6 +207,10 @@ Core.setupFlares = (app)=>{
 
 		if (P.respatterns && P.respatterns.length>2) Core.mpattern += ","+P.respatterns;
 
+<<<<<<< HEAD
+=======
+		Core.flares[flarename] = P;
+>>>>>>> master
 	}
 
 	console.log("\nFlares (plugins) found: ");
@@ -185,12 +267,28 @@ Core.CONF_MAIN = {
 */
 	},
 
+<<<<<<< HEAD
     landing: {
         gallery: true,		// Show gallery (public scenes) in the landing page
 		samples: true,		// Show samples (def true)
 		//header: "",		// Custom header HTML5 snippet
 		//redirect: "",		// Redirect to URL (e.g. specific web-app: "a/app_template")
 		//apps: []			// List of app IDs to show
+=======
+	// Soon deprecated
+    landing: {
+        gallery: true,		// Show gallery (public scenes) in the landing page
+		samples: true,		// Show samples (def true)
+		//header: "",		// Custom header (HTML partial)
+		//redirect: "",		// Redirect to URL (e.g. specific web-app: "a/app_template")
+		//apps: []			// List of app IDs to show
+    },
+
+    shu: {
+        samples: true,
+        apps: ["app_template"],	// List of apps to display
+		staffpick: {}			// List of staff picked scene-IDs
+>>>>>>> master
     }
 };
 
@@ -199,8 +297,13 @@ Core.CONF_MAIN = {
 Core.CONF_USERS = [
 	{ 
         username: "ra",
+<<<<<<< HEAD
         admin: true,
         password: "ra2020"
+=======
+        password: "ra2020",
+        admin: true
+>>>>>>> master
 	},
 	{ 
         username: "bastet",
@@ -237,19 +340,47 @@ Core.init = ()=>{
 	Core.users  = Core.loadConfigFile("users.json", Core.CONF_USERS);
 
 	// 3D models base formats
+<<<<<<< HEAD
 	Core.mpattern = "*.gltf,*.glb,*.json"; //,*.ifc";
+=======
+	Core.mpattern = "*.gltf,*.glb,*tileset.json";
+
+	// Panoramic content
+	Core.panopattern = "*.jpg,*.hdr,*.exr,*.mp4,*.webm,*.m3u8";
+
+	// Media
+	Core.mediapattern = "*.jpg,*.png,*.mp4,*.webm,*.m3u8,*.wav,*.mp3";
+>>>>>>> master
 
 	if (Core.config.data && Core.config.data.patterns && Core.config.data.patterns.models){
 		Core.mpattern = Core.config.data.patterns.models;
 		console.log("Custom models pattern: "+Core.mpattern);
 	}
+<<<<<<< HEAD
 
+=======
+/*
+	if (Core.config.landing.header){
+		let srcpath = path.join(Core.DIR_CONFIG, Core.config.landing.header);
+		fs.readFile(srcpath, 'utf8', (err, data)=>{
+			if (err) throw err;
+
+			Core.config.landing.header = data;
+			console.log(data);
+		});
+	}
+*/
+>>>>>>> master
 	Core.touchUserCollectionFolders();
 
 	//const maatport = (Core.config.services.maat)? Core.config.services.maat.PORT : 8891;
 	//Core._maatEP = "http://localhost:"+maatport+"/";
 
+<<<<<<< HEAD
 	console.log("DB users: "+Core.users.length);
+=======
+	console.log("Num. users: "+Core.users.length);
+>>>>>>> master
 
 	// Retrieve network interfaces
 	const nif  = networkInterfaces();
@@ -265,7 +396,11 @@ Core.init = ()=>{
 		}
 	}
 
+<<<<<<< HEAD
 	Core.maat.init();
+=======
+	Core.Maat.init();
+>>>>>>> master
 
 	// Directly from config
 	Core.FEScripts = [];
@@ -308,10 +443,83 @@ Core.loadConfigFile = (jsonfile, defconf)=>{
 
 };
 
+<<<<<<< HEAD
 Core.touchCollectionFolder = (user)=>{
 	if (user === undefined) return;
 
 	let dirColl = path.join( Core.DIR_COLLECTIONS, user.username );
+=======
+
+// SSL certs
+Core.getCertPath = ()=>{
+	let cpath = Core.config.services.main.pathCert;
+	
+	if (cpath && cpath.length>4) return cpath;
+	return path.join(Core.DIR_CUST_CERTS,'server.crt');
+};
+Core.getKeyPath = ()=>{
+	let cpath = Core.config.services.main.pathKey;
+
+	if (cpath && cpath.length>4) return cpath;
+	return path.join(Core.DIR_CUST_CERTS,'server.key');
+};
+
+
+// Users
+//=======================================
+Core.getUID = (U)=>{
+	if (!U) return undefined;
+	return U.username;
+};
+
+Core.createNewUser = (entry)=>{
+	if (entry === undefined) return false;
+
+	// Add new entry into users json
+	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
+	Core.users.push(entry);
+	
+	let uconfig = path.join(Core.DIR_CONFIG,"users.json");
+	fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
+
+	Core.touchCollectionFolder(entry);
+
+	console.log("Created new user: "+entry);
+
+	return true;
+};
+
+//TODO:
+Core.deleteUser = (uid)=>{
+	if (uid === undefined) return false;
+
+	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
+	let num = Core.users.length;
+
+	for (let u=0; u<num; u++){
+		let U = Core.users[u];
+		if (Core.getUID(U) === uid){
+			Core.users.splice(u,1);
+
+			let uconfig = path.join(Core.DIR_CONFIG,"users.json");
+			fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
+
+			return true;
+		}
+	}
+
+	return false;
+};
+
+Core.getUserCollectionFolder = (uid)=>{
+	return path.join( Core.DIR_COLLECTIONS, uid );
+};
+
+Core.touchCollectionFolder = (uid)=>{
+	if (uid === undefined) return;
+
+	let dirColl = Core.getUserCollectionFolder(uid);
+>>>>>>> master
 
 	if (!fs.existsSync(dirColl)){
 		try {
@@ -336,6 +544,7 @@ Core.touchUserCollectionFolders = ()=>{
 	for (let i = 0; i < len; i++){
 		let U = Core.users[i];
 
+<<<<<<< HEAD
 		Core.touchCollectionFolder( U );
 	}
 };
@@ -391,6 +600,60 @@ Core.deleteUser = (username)=>{
 
 			return true;
 		}
+=======
+		Core.touchCollectionFolder( Core.getUID(U) );
+	}
+};
+
+// Utils
+//=======================================
+Core.generateTodayString = ()=>{
+    let today = new Date();
+
+    let dd   = String( today.getDate() );
+    let mm   = String( today.getMonth()+1 ); 
+    let yyyy = String( today.getFullYear() );
+    
+	if(dd<10) dd = '0'+dd;
+    if(mm<10) mm = '0'+mm;
+
+	return yyyy+mm+dd;
+};
+
+// Readapted from: https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+Core.hashCodeFromString = (str)=>{
+	let hash = 0, chr;
+	let len = str.length;
+
+	if (len === 0) return hash;
+
+	for (let i = 0; i < len; i++) {
+		chr = str.charCodeAt(i);
+		hash = ((hash << 5) - hash) + chr;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash.toString(16);
+};
+
+Core.hashCodeFromString2 = (str)=>{
+	str = str.replaceAll(":","");
+	str = str.replaceAll("/","");
+	str = str.replaceAll(".","");
+
+	str.replace(/[aeiouAEIOU]/g, '');
+	console.log(str);
+	return str;
+};
+
+// TODO: improve
+Core.isURL3Dmodel = (itempath)=>{
+	let mp = Core.mpattern;
+	mp = mp.replaceAll("*","");
+
+	let exts = mp.split(",");
+	for (let e=0; e<exts.length; e++){
+		if (itempath.endsWith( exts[e] )) return true;
+>>>>>>> master
 	}
 
 	return false;
@@ -406,6 +669,11 @@ Core.getSceneJSONPath = (sid)=>{
 	let jsonfile = path.join( Core.getSceneFolder(sid), Core.STD_SCENEFILE);
 	return jsonfile;
 };
+<<<<<<< HEAD
+=======
+
+// Deprecated
+>>>>>>> master
 Core.getPubFilePath = (sid)=>{
 	let pubfile = path.join( Core.getSceneFolder(sid), Core.STD_PUBFILE);
 	return pubfile;
@@ -419,6 +687,7 @@ Core.existsScene = (sid)=>{;
 
 // Generate timestamped user SID
 Core.generateUserSID = ()=>{
+<<<<<<< HEAD
     let today = new Date();
     let dd   = String( today.getDate() );
     let mm   = String( today.getMonth()+1 ); 
@@ -427,13 +696,20 @@ Core.generateUserSID = ()=>{
     if(mm<10) mm = '0'+mm;
 
     let sid = yyyy+mm+dd + '-' + Math.random().toString(36).substr(2,9);
+=======
+	let sid = Core.generateTodayString() + '-' + nanoid(10);
+>>>>>>> master
 	return sid;
 };
 
 Core.createBasicScene = ()=>{
 	let sobj = {};
 
+<<<<<<< HEAD
 	sobj.status = Core.STATUS_COMPLETE;
+=======
+	//sobj.status = Core.STATUS_COMPLETE;
+>>>>>>> master
 
 	sobj.scenegraph = {};
 	sobj.scenegraph.nodes = {};
@@ -448,6 +724,25 @@ Core.createBasicScene = ()=>{
 	return sobj;
 };
 
+<<<<<<< HEAD
+=======
+Core.createBasicSceneFromModel = (user, mpath)=>{
+	console.log(user,mpath)
+
+	let sid = Core.hashCodeFromString(mpath);
+	sid = sid.replace("-","m");
+	sid = user + "/" + sid;
+
+	if (Core.existsScene(sid)) return sid;
+
+	let S = Core.createBasicScene();
+	S.scenegraph.nodes.main.urls.push( mpath );
+
+	Core.writeSceneJSON(sid, S);
+	return sid;
+};
+
+>>>>>>> master
 // Create sub-folder structure on disk
 Core.touchSceneFolder = (sid)=>{
 	let D = Core.getSceneFolder(sid);
@@ -547,7 +842,11 @@ Core.applySceneEdit = (sid, patch, mode)=>{
 	let sjpath = Core.getSceneJSONPath(sid);
 	let S = Core.readSceneJSON(sid);
 
+<<<<<<< HEAD
 	if (S === undefined) return; // scene does not exist
+=======
+	if (!S) return undefined; // scene does not exist or malformed
+>>>>>>> master
 
 	//jsonpatch.applyPatch(S, patch);
 
@@ -634,6 +933,7 @@ Core.cleanScene = (sobj)=>{
 	return sobj;
 };
 
+<<<<<<< HEAD
 Core.writeSceneJSON = (sid, data, pub) => {
     if (sid === undefined) return false;
     if (data === undefined) return false;
@@ -669,6 +969,28 @@ Core.writeSceneJSON = (sid, data, pub) => {
 };
 
 
+=======
+// Write scene JSON from sid and data
+Core.writeSceneJSON = (sid, data, vis)=>{
+	if (sid === undefined) return false;
+	if (data === undefined) return false;
+
+	Core.touchSceneFolder(sid);
+
+	let sjpath = Core.getSceneJSONPath(sid);
+
+	if (vis) data.visibility = vis;
+	fs.writeFileSync(sjpath, JSON.stringify(data, null, 4));
+/*
+	if (pub){
+		let pubfile = Core.getPubFilePath(sid);
+		fs.writeFileSync(pubfile, "");
+	}
+*/
+	return true;
+};
+
+>>>>>>> master
 // Web-Apps
 //=======================================
 Core.getAppDataFolder = (wappid)=>{
@@ -734,6 +1056,10 @@ Core.initUsers = (configfile)=>{
 };
 */
 
+<<<<<<< HEAD
+=======
+/*
+>>>>>>> master
 Core.findByUsername = (username, cb)=>{
 	process.nextTick( function(){
 		// Load
@@ -811,6 +1137,10 @@ Core.realizeAuth = (app)=>{
     app.use(passport.initialize());
     app.use(passport.session());
 };
+<<<<<<< HEAD
+=======
+*/
+>>>>>>> master
 
 // DATA
 //================================================
@@ -843,4 +1173,41 @@ Core.setupDataRoute = (app)=>{
 	});
 };
 
+<<<<<<< HEAD
+=======
+// IMG
+Core.generateCoverForScene = (sid, b64img, onComplete)=>{
+	if (!sid) return;
+
+	let scenefolder  = Core.getSceneFolder(sid);
+	let coverfile    = path.join(scenefolder, Core.STD_COVERFILE_HI);
+	let coverfileOpt = path.join(scenefolder, Core.STD_COVERFILE);
+
+	fs.writeFile(coverfile, b64img, 'base64', (err)=>{
+		//if (fs.existsSync(coverfileOpt)) fs.unlinkSync(coverfileOpt);
+
+		// Optimize PNG size
+		sharp(coverfile)
+			.resize({
+				width: Core.STD_COVERSIZE, 
+				height: Core.STD_COVERSIZE
+			})
+			.withMetadata()
+/*
+			.png({
+				quality: 90, // 0-100
+				//compression: 6, // this doesn't need to be set
+			})
+*/
+			.jpeg({
+				quality: 60
+			})
+			.toFile(coverfileOpt, (err)=>{
+				if (err) console.log(err);
+				else if (onComplete) onComplete();
+		});
+	});
+};
+
+>>>>>>> master
 module.exports = Core;
