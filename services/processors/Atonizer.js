@@ -1,13 +1,3 @@
-/*!
-    @preserve
-
-    Processor Atonizer
-    Converts and optimize input obj assets folder into gltf or glb
-
- 	@author Bruno Fanini
-	VHLab, CNR ISPC
-
-==================================================================================*/
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 

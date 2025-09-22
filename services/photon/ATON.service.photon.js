@@ -4,7 +4,7 @@ const app = require('express')();
 const socketio = require('socket.io');
 
 const Core = require('./../Core');
-const Photon = require('./Photon.js');
+const VRoadcast = require('./Photon.js');
 
 // Loads config
 let aConfig = Core.loadConfigFile("main.json", Core.CONF_MAIN);

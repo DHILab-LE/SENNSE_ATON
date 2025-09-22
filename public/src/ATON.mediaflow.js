@@ -130,7 +130,7 @@ MediaFlow._setupFR = ()=>{
         let b64 = MediaFlow._frAR.result;
         //b64 = b64.split(',')[1];
 
-        ATON.fire("AudioRecordCompleted", b64);
+        ATON.fireEvent("AudioRecordCompleted", b64);
         MediaFlow._bAudioRecording = false;
     };
 
@@ -343,8 +343,6 @@ MediaFlow.startAudioStreaming = ()=>{
         MediaFlow._aurec.start( MediaFlow.auStreamSegmentInterval );
         console.log("Start audio streaming");
 
-        ATON.fire("MediaFlow_AudioStream", true);
-
         MediaFlow._aurec.onstart = (e) => {
             MediaFlow._bAudioStreaming = true;
             MediaFlow._bAudioRecording = true;
@@ -389,7 +387,6 @@ MediaFlow.stopAudioStreaming = ()=>{
     MediaFlow._bAudioStreaming = false;
     MediaFlow._bAudioRecording = false;
 
-    ATON.fire("MediaFlow_AudioStream", false);
     ATON.Photon.socket.emit("UAUDIOSTOP", { uid: ATON.Photon.uid });
 };
 
@@ -433,7 +430,6 @@ MediaFlow.startScreenRecording = ()=>{
         MediaFlow._vrec.start(200);
 
         MediaFlow._bScreenRec = true;
-        ATON.fire("MediaFlow_ScreenRec", true);
     })
     .catch((e)=>{
         console.log(e);
@@ -448,7 +444,6 @@ MediaFlow.stopScreenRecording = ()=>{
     MediaFlow._bScreenStream = false;
 
     console.log("Stop screen recording");
-    ATON.fire("MediaFlow_ScreenRec", false);
 };
 
 MediaFlow.startScreenStreaming = ()=>{
@@ -460,7 +455,6 @@ MediaFlow.startScreenStreaming = ()=>{
 
         MediaFlow._vrec.start(MediaFlow.vidStreamSegmentInterval);
         console.log("Start screen streaming");
-        ATON.fire("MediaFlow_ScreenStream", true);
 
         MediaFlow._vrec.onstart = (e) => {
             MediaFlow._bVideoStream  = true;
@@ -510,7 +504,6 @@ MediaFlow.stopScreenStreaming = ()=>{
 
         ATON.Photon.socket.emit("UVIDEOSTOP", { uid: ATON.Photon.uid });
     }
-    ATON.fire("MediaFlow_ScreenStream", false);
 };
 
 MediaFlow.startOrStopScreenStreaming = ()=>{
@@ -532,7 +525,6 @@ MediaFlow.startCameraStreaming = ()=>{
 
         MediaFlow._vrec.start( MediaFlow.vidStreamSegmentInterval );
         console.log("Start camera streaming");
-        ATON.fire("MediaFlow_CamStream", true);
 
         MediaFlow._vrec.onstart = (e) => {
             MediaFlow._bVideoStream = true;
@@ -582,8 +574,6 @@ MediaFlow.stopCameraStreaming = ()=>{
 
         ATON.Photon.socket.emit("UVIDEOSTOP", { uid: ATON.Photon.uid });
     }
-
-    ATON.fire("MediaFlow_CamStream", false);
 };
 
 MediaFlow.startOrStopCameraStreaming = ()=>{
@@ -645,7 +635,7 @@ MediaFlow.getOrCreateVideoStream = (id, sourceurl, bUser)=>{
             MediaFlow._vStreams[id].uid = id;
         }
 
-        let htvid = "<video id='"+elid+"' autoplay crossorigin='anonymous' style='display:none' ></video>";
+        let htvid = "<video id='"+elid+"' autoplay crossorigin='anonymous' ></video>";
         $(htvid).appendTo('body');
 
         MediaFlow._vStreams[id].el = document.getElementById(elid);
@@ -704,22 +694,6 @@ MediaFlow.getOrCreateVideoStream = (id, sourceurl, bUser)=>{
 
 MediaFlow.getVideoStream = (id)=>{
     return MediaFlow._vStreams[id];
-};
-
-MediaFlow.downloadVideoSnapshot = (videoel, filename, scale)=>{
-    if (!scale) scale = 1;
-
-    let w = videoel.videoWidth * scale;
-    let h = videoel.videoHeight * scale;
-
-    let canvas = document.createElement('canvas');
-    canvas.width  = w;
-    canvas.height = h;
-    
-    let ctx = canvas.getContext('2d');
-    ctx.drawImage(videoel, 0, 0, w, h);
-
-    ATON.Utils.downloadImageFromCanvas(canvas, filename);
 };
 
 export default MediaFlow;

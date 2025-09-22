@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENNSE Interfacing</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/cytoscape@3.21.0/dist/cytoscape.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="bg-gray-200 flex items-center justify-center min-h-screen">
+    <div id="auth-card" class="bg-white p-6 rounded-lg shadow-md w-96 text-center">
+        <h2 class="text-xl font-bold mb-4">Login</h2>
+        <input type="email" id="email" class="w-full p-2 border rounded mb-2" placeholder="Email">
+        <input type="password" id="password" class="w-full p-2 border rounded mb-2" placeholder="Password">
+        <button onclick="login()" class="w-full bg-blue-500 text-white p-2 rounded">Login</button>
+        <p id="error-message" class="text-red-500 text-sm mt-2 hidden">Invalid email or password</p>
+    </div>
+
+    <div id="main-content" class="hidden container mx-auto grid grid-cols-2 gap-4 justify-center mt-10">
+        <div id="board-container" class="bg-white p-6 max-w-xl rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">New Design</h3>
+            <input type="text" id="wsnName" class="w-full p-2 border rounded text-sm mb-2" placeholder="Enter WSN Name">
+            <div id="boards"></div>
+            <button onclick="addNewBoard()" class="text-blue-500 text-sm">Add New Device</button>
+            <div class="flex justify-end mt-4">
+                <button onclick="createCytoscapeGraph()" class="px-4 py-2 bg-white border rounded text-sm">
+                    Visualize Graph
+                </button>
+                <button onclick="generateJsonFile()" class="px-4 py-2 bg-green-500 text-white rounded text-sm ml-2">
+                    SENNSE Injection
+                </button>
+
+            </div>
+
+        </div>
+        <div class="bg-white p-6 max-w-md w-full rounded-lg shadow-md relative">
+            <!-- Fullscreen Button -->
+            <button onclick="toggleFullScreen()"
+                class="absolute top-1 right-2 bg-gray-300 text-gray-700 px-2 py-1 text-sm rounded">
+                Full Screen🔲
+            </button>
+
+            <div id="cy" class="h-64"></div>
+        </div>
+
+    </div>
+
+    <script>
+        let availableDevices = [];
+        let selectedDevices = [];
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkAuthToken();
+            // Read the savePath from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            window.savePath = urlParams.get("savePath") || ''; // Store globally
+
+            console.log("Save Path:", window.savePath);
+        });
+
+        function saveToken(token) {
+            localStorage.setItem("authToken", token);
+        }
+
+        function getToken() {
+            return localStorage.getItem("authToken");
+        }
+
+        function encrypt(text) {
+            return btoa(text); // Base64 encryption (not highly secure, consider AES for production)
+        }
+
+        function decrypt(text) {
+            return atob(text);
+        }
+
+        function decodeToken(token) {
+            try {
+                const payload = token.split('.')[1]; // Extract payload
+                const decodedPayload = atob(payload); // Decode Base64
+                return JSON.parse(decodedPayload); // Convert to JSON
+            } catch (error) {
+                console.error("Error decoding token:", error);
+                return null;
+            }
+        }
+
+        function checkAuthToken() {
+            const token = getToken();
+            if (token) {
+                const decoded = decodeToken(token);
+                if (decoded && decoded.exp * 1000 > Date.now()) {
+                    document.getElementById("auth-card").classList.add("hidden");
+                    document.getElementById("main-content").classList.remove("hidden");
+                    setDefaultWSNName();
+                    fetchDevices();
+                    return;
+                }
+            }
+
+            // Show login if token is missing or expired
+            localStorage.removeItem("authToken");
+            document.getElementById("auth-card").classList.remove("hidden");
+            document.getElementById("main-content").classList.add("hidden");
+        }
+
+        function setDefaultWSNName() {
+            const token = getToken();
+            if (!token) return;
+
+            const decoded = decodeToken(token);
+            if (decoded && decoded.scopes.length > 0) {
+                document.getElementById("wsnName").value = decoded.scopes.join(", ");
+                document.getElementById("wsnName").disabled = true;
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("https://sennse.ispc.cnr.it/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: email, password: password }),
+                });
+
+                if (!response.ok) throw new Error("Login failed");
+
+                const data = await response.json();
+                if (data.token) {
+                    localStorage.setItem("authToken", data.token);
+                    localStorage.setItem("username", email);
+                    localStorage.setItem("password", encrypt(password));
+
+                    document.getElementById("auth-card").classList.add("hidden");
+                    document.getElementById("main-content").classList.remove("hidden");
+
+                    // Fetch devices immediately after login
+                    fetchDevices();
+
+                    // Set WSN Name immediately
+                    setDefaultWSNName();
+                } else {
+                    throw new Error("Invalid email or password");
+                }
+            } catch (error) {
+                document.getElementById("error-message").textContent = error.message;
+                document.getElementById("error-message").classList.remove("hidden");
+            }
+        }
+
+
+        async function fetchDevices() {
+            const token = getToken();
+            if (!token) {
+                console.error("No token available.");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://sennse.ispc.cnr.it/api/tenant/devices?pageSize=30&page=0", {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch devices");
+
+                const data = await response.json();
+                if (!data.data) throw new Error("No devices found");
+
+                availableDevices = data.data.map(device => ({ id: device.id.id, name: device.name }));
+            } catch (error) {
+                console.error(error.message);
+                localStorage.removeItem("authToken");
+                location.reload();
+            }
+        }
+
+        async function fetchTelemetryKeys(deviceId) {
+            const token = getToken();
+            if (!token) {
+                console.error("No token available.");
+                return [];
+            }
+
+            try {
+                const response = await fetch(`https://sennse.ispc.cnr.it/api/plugins/telemetry/DEVICE/${deviceId}/keys/timeseries`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch telemetry keys");
+
+                const telemetryKeys = await response.json();
+                return telemetryKeys;  // Return the telemetry keys
+            } catch (error) {
+                console.error(error.message);
+                return [];
+            }
+        }
+
+        function addSensor(sensorContainer, deviceId, predefinedSensor = null) {
+            const sensorDiv = document.createElement("div");
+            sensorDiv.className = "flex justify-between items-center mt-2 p-2 bg-white border rounded";
+
+            const sensorDropdown = document.createElement("select");
+            sensorDropdown.className = "w-full p-2 border rounded";
+
+            fetchTelemetryKeys(deviceId).then(telemetryKeys => {
+                sensorDropdown.innerHTML = '<option value="">Select a sensor</option>';
+
+                // Get already selected sensors
+                const selectedDevice = selectedDevices.find(device => device.id === deviceId);
+                const selectedSensors = selectedDevice ? selectedDevice.sensors : [];
+
+                // Filter out already selected sensors from dropdown
+                telemetryKeys
+                    .filter(key => !selectedSensors.includes(key))
+                    .forEach(key => {
+                        const option = document.createElement("option");
+                        option.value = key;
+                        option.textContent = key;
+                        sensorDropdown.appendChild(option);
+                    });
+
+                // Auto-select predefined sensor
+                if (predefinedSensor) {
+                    sensorDropdown.value = predefinedSensor;
+                    sensorDropdown.dispatchEvent(new Event("change"));
+                }
+
+                sensorDropdown.telemetryKeys = telemetryKeys;
+            });
+
+            sensorDropdown.onchange = function () {
+                const selectedDevice = selectedDevices.find(device => device.id === deviceId);
+                if (!selectedDevice) return;
+
+                const sensorValue = sensorDropdown.value;
+                if (!sensorValue || selectedDevice.sensors.includes(sensorValue)) return;
+
+                selectedDevice.sensors.push(sensorValue);
+
+                // Find and add the paired sensor(s)
+                const pairedSensors = findPairedSensors(sensorValue, sensorDropdown.telemetryKeys);
+                pairedSensors.forEach(pairedSensor => {
+                    if (pairedSensor && !selectedDevice.sensors.includes(pairedSensor)) {
+                        addSensor(sensorContainer, deviceId, pairedSensor);
+                    }
+                });
+            };
+
+            const deleteSensorButton = document.createElement("button");
+            deleteSensorButton.textContent = "❌";
+            deleteSensorButton.className = "ml-2 text-red-500 text-sm";
+
+            deleteSensorButton.onclick = function () {
+                const selectedDevice = selectedDevices.find(device => device.id === deviceId);
+                if (!selectedDevice) return;
+
+                const sensorValue = sensorDropdown.value;
+                selectedDevice.sensors = selectedDevice.sensors.filter(sensor => sensor !== sensorValue);
+
+                // Remove paired sensors as well
+                const pairedSensors = findPairedSensors(sensorValue, sensorDropdown.telemetryKeys);
+                pairedSensors.forEach(pairedSensor => {
+                    selectedDevice.sensors = selectedDevice.sensors.filter(sensor => sensor !== pairedSensor);
+
+                    // Remove paired sensor dropdown
+                    const pairedSensorDiv = [...sensorContainer.children].find(child =>
+                        child.querySelector("select")?.value === pairedSensor
+                    );
+                    if (pairedSensorDiv) pairedSensorDiv.remove();
+                });
+
+                sensorDiv.remove();
+            };
+
+            sensorDiv.appendChild(sensorDropdown);
+            sensorDiv.appendChild(deleteSensorButton);
+            sensorContainer.appendChild(sensorDiv);
+        }
+
+        function findPairedSensors(sensorValue, telemetryKeys) {
+            let pairedSensors = [];
+
+            // Ensure telemetryKeys is always an array
+            if (!Array.isArray(telemetryKeys)) return pairedSensors;
+
+            // Handle Temperature_* → Humidity_* pairing (e.g., Temperature_Lion's Tub → Humidity_Lion's Tub)
+            let match = sensorValue.match(/^Temperature_(.+)$/);
+            if (match) {
+                let humidityPair = `Humidity_${match[1]}`;
+                if (telemetryKeys.includes(humidityPair)) pairedSensors.push(humidityPair);
+            }
+
+            // Handle Humidity_* → Temperature_* pairing (e.g., Humidity_Lion's Tub → Temperature_Lion's Tub)
+            match = sensorValue.match(/^Humidity_(.+)$/);
+            if (match) {
+                let temperaturePair = `Temperature_${match[1]}`;
+                if (telemetryKeys.includes(temperaturePair)) pairedSensors.push(temperaturePair);
+            }
+
+            // Handle TempC_* → Humidity_* pairing and reverse pairing (Humidity_* → TempC_*)
+            match = sensorValue.match(/^TempC_(.+)$/);
+            if (match) {
+                let humidityPair = `Humidity_${match[1]}`;
+                if (telemetryKeys.includes(humidityPair)) pairedSensors.push(humidityPair);
+            }
+
+            match = sensorValue.match(/^Humidity_(.+)$/);
+            if (match) {
+                let tempCPair = `TempC_${match[1]}`;
+                if (telemetryKeys.includes(tempCPair)) pairedSensors.push(tempCPair);
+            }
+
+            // Handle 5-character identifier pairing (Temperature_xxxxx ↔ Humidity_xxxxx, but only when both exist)
+            if (sensorValue.match(/^Temperature_[A-Za-z0-9]{5}$/)) {
+                let possiblePairs = telemetryKeys.filter(key => key.match(/^Humidity_[A-Za-z0-9]{5}$/));
+                if (possiblePairs.length > 0) {
+                    pairedSensors.push(possiblePairs[0]); // Only add if a real match exists
+                }
+            }
+
+            if (sensorValue.match(/^Humidity_[A-Za-z0-9]{5}$/)) {
+                let possiblePairs = telemetryKeys.filter(key => key.match(/^Temperature_[A-Za-z0-9]{5}$/));
+                if (possiblePairs.length > 0) {
+                    pairedSensors.push(possiblePairs[0]); // Only add if a real match exists
+                }
+            }
+
+            // Handle standard temperature → humidity pairing
+            if (sensorValue === "temperature" && telemetryKeys.includes("humidity")) pairedSensors.push("humidity");
+            if (sensorValue === "humidity" && telemetryKeys.includes("temperature")) pairedSensors.push("temperature");
+
+            return pairedSensors;
+        }
+
+
+        function addNewBoard() {
+            const boardContainer = document.getElementById("boards");
+            const boardDiv = document.createElement("div");
+            boardDiv.className = "bg-gray-100 p-4 mt-4 rounded-lg border";
+
+            const select = document.createElement("select");
+            select.className = "w-full p-2 border rounded mb-2";
+            select.innerHTML = '<option value="">Select a device</option>' +
+                availableDevices.map(device => `<option value="${device.id}">${device.name}</option>`).join("");
+
+            const sensorContainer = document.createElement("div");
+            sensorContainer.className = "mt-2 w-full hidden";
+
+            const buttonContainer = document.createElement("div");
+            buttonContainer.className = "flex justify-between items-center mt-2";
+
+            const addSensorButton = document.createElement("button");
+            addSensorButton.textContent = "Add Sensor";
+            addSensorButton.className = "text-blue-500 text-sm hidden";
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete Device";
+            deleteButton.className = "text-red-500 text-sm";
+
+            select.onchange = function () {
+                if (select.value) {
+                    addSensorButton.classList.remove("hidden");
+                    sensorContainer.classList.remove("hidden");
+
+                    const selectedDevice = availableDevices.find(device => device.id === select.value);
+                    if (!selectedDevices.find(dev => dev.id === selectedDevice.id)) {
+                        selectedDevices.push({ id: selectedDevice.id, name: selectedDevice.name, sensors: [] });
+
+                        // Remove selected device from dropdowns
+                        availableDevices = availableDevices.filter(device => device.id !== selectedDevice.id);
+                        updateDeviceDropdowns();
+                    }
+
+                    select.disabled = true; // Lock the selection after choosing
+                } else {
+                    addSensorButton.classList.add("hidden");
+                    sensorContainer.classList.add("hidden");
+                }
+            };
+
+            addSensorButton.onclick = function () {
+                addSensor(sensorContainer, select.value);
+            };
+
+            deleteButton.onclick = function () {
+                // Remove device from selected list
+                selectedDevices = selectedDevices.filter(device => device.id !== select.value);
+
+                // Return device to available list
+                const removedDevice = { id: select.value, name: select.options[select.selectedIndex].text };
+                availableDevices.push(removedDevice);
+                updateDeviceDropdowns();
+
+                boardDiv.remove();
+            };
+
+            buttonContainer.appendChild(addSensorButton);
+            buttonContainer.appendChild(deleteButton);
+
+            boardDiv.appendChild(select);
+            boardDiv.appendChild(buttonContainer);
+            boardDiv.appendChild(sensorContainer);
+            boardContainer.appendChild(boardDiv);
+        }
+
+        function updateDeviceDropdowns() {
+            document.querySelectorAll("select").forEach(select => {
+                if (select.classList.contains("device-dropdown")) {
+                    const selectedValue = select.value;
+                    select.innerHTML = '<option value="">Select a device</option>' +
+                        availableDevices.map(device => `<option value="${device.id}">${device.name}</option>`).join("");
+
+                    // Keep the previously selected device
+                    select.value = selectedValue;
+                }
+            });
+        }
+
+
+        function createCytoscapeGraph() {
+            const wsnName = document.getElementById("wsnName").value || "WSN";
+            const elements = [{ data: { id: "wsn", label: wsnName } }];
+
+            selectedDevices.forEach(device => {
+                // Add Device Node
+                elements.push({ data: { id: device.id, label: device.name } });
+                // Connect Device to WSN
+                elements.push({ data: { source: "wsn", target: device.id } });
+
+                device.sensors.forEach(sensor => {
+                    const sensorId = `${device.id}-${sensor}`;
+
+                    // Ensure Sensor Node is created before adding edges
+                    elements.push({ data: { id: sensorId, label: sensor } });
+                    elements.push({ data: { source: device.id, target: sensorId } });
+                });
+            });
+
+            cytoscape({
+                container: document.getElementById("cy"),
+                elements,
+                style: [
+                    {
+                        selector: "node",
+                        style: {
+                            content: "data(label)",
+                            "background-color": "#6FA3EF",
+                            color: "black",
+                            "border-width": 2,
+                            "border-color": "#1F3C72",
+                        },
+                    },
+                    {
+                        selector: "edge",
+                        style: {
+                            width: 2,
+                            "line-color": "#ccc",
+                        },
+                    },
+                ],
+                layout: { name: "breadthfirst", directed: true, padding: 10 },
+            });
+            localStorage.setItem("selectedDevices", JSON.stringify(selectedDevices));
+        }
+
+
+        function toggleFullScreen() {
+            const cyContainer = document.getElementById("cy");
+
+            if (!document.fullscreenElement) {
+                cyContainer.style.backgroundColor = "#ffffff"; // Ensure white background
+                cyContainer.requestFullscreen().catch(err => {
+                    console.error("Error attempting full-screen mode:", err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        async function generateJsonFile() {
+            const username = localStorage.getItem("username") || "";
+            const password = localStorage.getItem("password") ? decrypt(localStorage.getItem("password")) : "";
+
+            const jsonData = {
+                sennseURL: "https://sennse.ispc.cnr.it",
+                username: username,
+                password: password,
+                deviceIds: selectedDevices.map(device => {
+                    let sensorMap = {};
+                    let sematicMap = {};
+                    let pairedSensors = new Set();
+                    let waterLevelCount = 1; // Counter for Water Level naming
+                    let tempHumPairCount = 1; // Counter for Temperature & Humidity N° naming
+
+                    device.sensors.forEach(sensor => {
+                        console.log("The sensors details");
+                        console.log(sensor);
+
+                        let tempMatch = sensor.match(/^Temperature_(.+)$/);
+                        let tempCMatch = sensor.match(/^TempC_(.+)$/);
+                        let humMatch = sensor.match(/^Humidity_(.+)$/);
+
+                        //
+                        let lightIntensityMatch = sensor.match(/^LightIntensity_(.+)$/);
+
+                        // Check for generic "temperature" and "humidity" sensors (without an identifier)
+                        let hasGenericTemperature = device.sensors.includes("temperature");
+                        let hasGenericHumidity = device.sensors.includes("humidity");
+
+                        if (tempMatch || tempCMatch || humMatch || lightIntensityMatch || hasGenericTemperature || hasGenericHumidity) {
+                            let tempIdentifier = null;
+                            let humIdentifier = null;
+                            let baseName = null;
+                            let tempOriginal = null;
+
+                            //
+                            let lightIntensityIdentifier = null;
+
+                            // Find sensors with the same identifier
+                            let tempSensor = device.sensors.find(s => s.match(/^Temperature_(.+)$/));
+                            let tempCSensor = device.sensors.find(s => s.match(/^TempC_(.+)$/));
+                            let humSensor = device.sensors.find(s => s.match(/^Humidity_(.+)$/));
+
+                            //
+                            let lightIntensitySensor = device.sensors.find(s => s.match(/^LightIntensity_(.+)$/));
+
+                            // If Temperature_XYZ doesn't exist, use TempC_XYZ as-is
+                            if (tempSensor) {
+                                tempIdentifier = tempSensor.match(/^Temperature_(.+)$/)[1];
+                                tempOriginal = tempSensor;
+                                baseName = tempIdentifier;
+                            } else if (tempCSensor) {
+                                tempIdentifier = tempCSensor.match(/^TempC_(.+)$/)[1];
+                                tempOriginal = tempCSensor;
+                                baseName = tempIdentifier;
+                            }
+
+                            if (humSensor) {
+                                humIdentifier = humSensor.match(/^Humidity_(.+)$/)[1];
+                            }
+
+                            if(lightIntensitySensor){
+                                lightIntensityIdentifier = lightIntensitySensor.match(/^LightIntensity_(.+)$/)[1];
+
+                            }
+
+                            // Case 1: Temperature_XYZ or TempC_XYZ and Humidity_XYZ exist with the same identifier
+                            if (tempIdentifier && humIdentifier && tempIdentifier === humIdentifier) {
+                                let customPairKey = `Temp & Hum ${baseName}`;
+                                let customPairValue = `${tempOriginal}_&_Humidity_${baseName}`;
+
+                                sensorMap[customPairKey] = customPairValue;
+                                sematicMap[customPairKey] = customPairValue;
+                                pairedSensors.add(tempOriginal);
+                                pairedSensors.add(humSensor);
+                            }
+
+                            // Case 2: Handle Temperature_XYZ and Humidity_YYYYY (different identifiers)
+                            else if (tempIdentifier && humIdentifier && tempIdentifier !== humIdentifier) {
+                                let deviceIdPart = device.name.match(/TGP-(\w{4})$/);
+                                let deviceId = deviceIdPart ? deviceIdPart[1] : "XXXX";
+                                let customPairKey = `Temperature & Humidity ${device.name}`;
+                                let customPairValue = `Temperature_Logger_${tempIdentifier}_&_Humidity_Logger_${humIdentifier}`;
+
+                                sensorMap[customPairKey] = customPairValue;
+                                sematicMap[customPairKey] = customPairValue;
+                                pairedSensors.add(tempOriginal);
+                                pairedSensors.add(humSensor);
+                            }
+
+                            // Case 3: Only Temperature_XYZ or TempC_XYZ exists
+                            else if (tempIdentifier) {
+                                console.log("The Temperature Identifier !!!!!");
+                                console.log(tempIdentifier);
+
+                                let customKey = `Temperature ${device.name}`;
+                                let customValue = `Temperature_Logger_${tempIdentifier}`;
+
+                                sensorMap[customKey] = customValue;
+                                sematicMap[customKey] = customValue;
+                            }
+
+                            // Case 4: Only Humidity_XYZ exists
+                            else if (humIdentifier) {                                
+                                let customKey = `Humidity Logger ${humIdentifier}`;
+                                let customValue = `Humidity_Logger_${humIdentifier}`;
+
+                                sensorMap[customKey] = customValue;
+                                sematicMap[customKey] = customValue;
+                            }
+
+                            if(lightIntensityIdentifier){
+                                console.log("Light Intensity Identifier !!!!!");
+                                console.log(lightIntensityIdentifier);
+                                
+                                let customKey = `Light Intensity ${device.name}`;
+                                let customValue = `LightIntensity_Logger_${lightIntensityIdentifier}`;
+
+                                sensorMap[customKey] = customValue;
+                                sematicMap[customKey] = customValue;
+                            }
+
+                            // Case 5: Generic "temperature" and "humidity" (no identifier)
+                            if (hasGenericTemperature && hasGenericHumidity) {
+                                let customPairKey = `Temperature & Humidity ${device.name}`;
+                                let customPairValue = `temperature_&_humidity`;
+
+                                sensorMap[customPairKey] = customPairValue;
+                                sematicMap[customPairKey] = customPairValue;
+
+                                pairedSensors.add("temperature");
+                                pairedSensors.add("humidity");
+                            }
+
+                            //✅ Add Other Sensors (Lux, Soil_Humidity, and any others)
+                            device.sensors.forEach(sensor => {
+                                let match = sensor.match(/^(.+?)_(.+)$/); // Match prefix and identifier
+                                if (!match) return;
+
+                                let sensorType = match[1]; // Extract prefix (Lux, Soil_Humidity, etc.)
+                                let sensorId = match[2];   // Extract identifier
+
+                                // Skip sensors already handled (temperature & humidity)
+                                if (sensor.startsWith("Temperature_") || sensor.startsWith("TempC_") 
+                                || sensor.startsWith("Humidity_") || sensor.startsWith("LightIntensity_")) {
+                                    return;
+                                }
+
+                                let customKey = "";
+                                let customValue = sensor;
+
+                                // Special naming rules
+                                if (sensor.startsWith("Lux_")) {
+                                    customKey = `Illuminance ${sensorId}`;
+                                } else if (sensor.startsWith("Soil_Humidity_")) {
+                                    customKey = `Water Level ${sensorId}`;
+                                } else {
+                                    customKey = `${sensorType} ${sensorId}`; // Default format for other sensors
+                                }
+
+                                sensorMap[customKey] = customValue;
+                                sematicMap[customKey] = customValue;
+                            });
+                        }
+                    });
+
+                    return {
+                        nodeId: device.id,
+                        nodeName: device.name,
+                        sematicIDs: [sematicMap],
+                        sensors: [sensorMap]
+                    };
+                })
+            };
+
+            if (!window.savePath) {
+                console.error("Save path not found!");
+                Swal.fire("Error", "Invalid save path.", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch("/save-json", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ path: window.savePath, data: jsonData }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to save JSON file.");
+                }
+
+                // Show SweetAlert Success Message
+                Swal.fire({
+                    icon: "success",
+                    title: "SENNSE Integration made successfully!",
+                    text: "Your configuration file has been saved.",
+                    confirmButtonColor: "#3085d6",
+                    confirmButtonText: "OK",
+                });
+
+            } catch (error) {
+                console.error("Error saving JSON file:", error);
+
+                // Show SweetAlert Error Message
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "Failed to save JSON file. Please try again.",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "OK",
+                });
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

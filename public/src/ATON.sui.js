@@ -6,7 +6,6 @@
 ===========================================================*/
 import Button from "./ATON.sui.button.js";
 import Label from "./ATON.sui.label.js";
-import MediaPanel from "./ATON.sui.mediapanel.js";
 
 /**
 ATON Spatial UI
@@ -17,10 +16,8 @@ let SUI = {};
 SUI.STD_BTN_SIZE = 0.1;
 SUI.STD_SELECTOR_TICKNESS = 1.05;
 
-SUI.Button     = Button;
-SUI.Label      = Label;
-SUI.MediaPanel = MediaPanel;
-
+SUI.Button = Button;
+SUI.Label  = Label;
 
 
 //Initializes Spatial UI module
@@ -395,11 +392,36 @@ SUI.getInfoNode = ()=>{
 Set text for main info node
 @param {string} txt - the text
 */
-SUI.setInfoNodeText = (txt)=>{
-    if (!SUI.bShowInfo) return;
-    SUI.infoNodeText.set({ content: txt });
+// SUI.setInfoNodeText = (txt)=>{
+//     if (!SUI.bShowInfo) return;
+//     SUI.infoNodeText.set({ content: txt });
     
-    ThreeMeshUI.update();  
+//     ThreeMeshUI.update();  
+// };
+SUI.setInfoNodeText = (txt) => {
+    if (!SUI.bShowInfo) return;
+
+    // Check if the input is an image URL
+    if (txt.startsWith("https") && (txt.endsWith(".jpg") || txt.endsWith(".png") || txt.endsWith(".svg") || txt.endsWith(".jpeg") || txt.endsWith(".gif"))) {
+        // Remove any existing text content
+        SUI.infoContainer.remove(SUI.infoNodeText);
+
+        // Create a new Three.js PlaneGeometry for the image
+        let imgPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.2, 0.2), // Adjust width and height as needed
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(txt), transparent: true })
+        );
+
+        // Add the image plane to the info container
+        SUI.infoContainer.add(imgPlane);
+    } else {
+        // Restore text behavior if not an image URL
+        SUI.infoContainer.remove(SUI.infoNodeText); // Remove old image if any
+        SUI.infoNodeText.set({ content: txt });
+        SUI.infoContainer.add(SUI.infoNodeText);
+    }
+
+    ThreeMeshUI.update(); // Ensure updates are reflected
 };
 
 /**
@@ -409,12 +431,12 @@ This can be arranged anywhere in the scene or attached to other UI nodes
 @param {THREE.Color} color - (optional) base color for the toolbar
 @returns {Node}
 */
-SUI.createToolbar = (buttonlist, color, opacity, marginf=1.1)=>{
+SUI.createToolbar = (buttonlist, color, opacity)=>{
     let T = ATON.createUINode();
 
     let num = buttonlist.length;
     let padding = SUI.STD_BTN_SIZE * 0.3;
-    //let marginf = margin;
+    let marginf = 1.1;
 
     let cont = new ThreeMeshUI.Block({
         width: (SUI.STD_BTN_SIZE * num * marginf) + padding,
@@ -429,7 +451,6 @@ SUI.createToolbar = (buttonlist, color, opacity, marginf=1.1)=>{
 
         justifyContent: 'center', // could be 'center' or 'left'
         textAlign: 'center',
-        contentDirection: 'row-reverse'
     });
     //cont.position.set(0,0,0);
 
@@ -439,19 +460,12 @@ SUI.createToolbar = (buttonlist, color, opacity, marginf=1.1)=>{
     for (let i=0; i<num; i++){
         let button = buttonlist[i];
         if (button){
-
-            button.position.set(
-                (i * SUI.STD_BTN_SIZE * marginf) - m, // *marginf
-                0.0,
-                0.005
-            );
-
+            button.position.set((i*SUI.STD_BTN_SIZE*marginf)-m, 0.0, 0.005);
             cont.add(button);
         }
     }
 
     T.add(cont);
-    //T.traverse((o)=>{ if (o.material) o.material.depthWrite = false; });
 
     ThreeMeshUI.update();
     return T;
@@ -492,28 +506,6 @@ SUI.buildPanelNode = (suid, url, w,h)=>{
 
     return suiNode;
 };
-
-/**
-Create a 3D layout, starting from a list (array) of SUI elements and a layout function.
-@param {string} parent - The parent SUI node (group) holding all nodes to be arranged
-@param {function} layoutfunction - the layout function, taking a SUI node and list index as arguments. It is used to transform each SUI node (location, rotation and scale) depending on some custom logic
-@returns {Node}
-*/
-SUI.createLayout = (parent, layoutfunction)=>{
-
-    let numChildren = parent.children.length;
-
-    for (let i=0; i<numChildren; i++){
-        let N = parent.children[i];
-
-        // Apply layout function
-        layoutfunction(N,i);
-    }
-
-    ThreeMeshUI.update();
-    return parent;
-};
-
 
 // Measurements
 SUI.addMeasurementPoint = (P)=>{
@@ -785,8 +777,7 @@ SUI.update = ()=>{
         if (fp !== undefined && ATON.plight !== undefined){
             ATON.enablePointLight();
             ATON.plight.position.copy( fp );
-            ATON.plight.distance  = SUI._selectorRad * 2.0;
-            //ATON.plight.intensity = SUI._selectorRad;
+            ATON.plight.distance = SUI._selectorRad * 2.0;
             //fp = null;
         }
     }

@@ -33,11 +33,6 @@ constructor(res, near, far){
     }
 }
 
-clear(){
-    if (this._envtex) this._envtex.dispose();
-    if (this._CCtarget) this._CCtarget.dispose();
-}
-
 /**
 Set LP position
 @example
@@ -103,8 +98,8 @@ update(){
     }
 */
 
-    // CC approach (seems with special extensions cubecam faces are still messed up)
-/*
+    // CC approach (in some rare cases cubecam faces are still messed up)
+
     if (this._CC === undefined){
         this._createCCtarget();
 
@@ -128,7 +123,6 @@ update(){
 
     // FIXME: this is an old hack workaround wrong (mirrored) CubeCamera capture
     //ATON._mainRoot.scale.x = -1;
-    if (ATON._mMainPano) ATON._mMainPano.position.copy(this.pos);
     this._CC.update( ATON._renderer, ATON._mainRoot );
     //ATON._mainRoot.scale.x = 1;
 
@@ -143,35 +137,25 @@ update(){
     //cctx.flipY = false;
     //cctx.needsUpdate = true;
     //console.log(cctx)
+    
 
     this._envtex = ATON._pmremGenerator.fromCubemap(cctx).texture;
 
     if (ATON._renderer.shadowMap.enabled && ATON._dMainL) ATON._dMainL.shadow.needsUpdate = true;
-*/
+
     
     // fromScene method (robust but requires hack to temp. move scene before capture)
-
-    //ATON._rootVisibleGlobal.position.set(-this.pos.x, -this.pos.y, -this.pos.z);
+/*
+    ATON._rootVisibleGlobal.position.set(-this.pos.x, -this.pos.y, -this.pos.z);
     //ATON._mainRoot.position.set(-this.pos.x,-this.pos.y,-this.pos.z);
-    //ATON._render();
-    
-    this._envtex = ATON._pmremGenerator.fromScene(
-        ATON._mainRoot,
-        0, 
-        this._near, 
-        this._far,
-        {
-            position: this.pos, 
-            size: this._res
-        }
-    ).texture;
-    
-    ///ATON._mainRoot.position.set(0,0,0);
-    //ATON._rootVisibleGlobal.position.set(0,0,0);
+    ATON._render();
+    this._envtex = ATON._pmremGenerator.fromScene(ATON._mainRoot, 0, this._near, this._far).texture;
+    //ATON._mainRoot.position.set(0,0,0);
+    ATON._rootVisibleGlobal.position.set(0,0,0);
 
     if (ATON._renderer.shadowMap.enabled && ATON._dMainL) ATON._dMainL.shadow.needsUpdate = true;
     //console.log(ATON._rootVisibleGlobal)
-
+*/
     return this;
 }
 

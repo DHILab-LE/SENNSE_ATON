@@ -19,7 +19,6 @@ FX.PASS_SSR   = "p_ssr";
 FX.PASS_BLOOM = "p_bloom";
 FX.PASS_DOF   = "p_dof";
 FX.PASS_GAMMA = "p_gamma";
-FX.PASS_SOBEL = "p_sobel";
 
 
 // Initialization (main renderer must be initialized already)
@@ -56,7 +55,7 @@ FX.init = ()=>{
 
     // SSR - TODO: check for variable rou implementation
 /*
-    FX.passes[FX.PASS_SSR] = new THREE.SSRPass({
+    FX.passes[ATON.FXPASS_SSR] = new THREE.SSRPass({
         renderer: ATON._renderer,
         scene: ATON._mainRoot, 
         camera: ATON.Nav._camera,
@@ -65,27 +64,18 @@ FX.init = ()=>{
         //encoding: THREE.sRGBEncoding
     });
 
-    FX.passes[FX.PASS_SSR].thickness = 0.018;
-    FX.passes[FX.PASS_SSR].infiniteThick = false; //true;
-    FX.passes[FX.PASS_SSR].maxDistance = 0.1; //0.1;
-    console.log(FX.passes[FX.PASS_SSR]);
+    FX.passes[ATON.FXPASS_SSR].thickness = 0.018;
+    FX.passes[ATON.FXPASS_SSR].infiniteThick = false; //true;
+    FX.passes[ATON.FXPASS_SSR].maxDistance = 0.1; //0.1;
+    console.log(FX.passes[ATON.FXPASS_SSR]);
 */
+
 
     // Ambient Occlusion
-    FX.passes[FX.PASS_AO] = new THREE.SAOPass( ATON._mainRoot, ATON.Nav._camera, CW,CH );
-    
+    FX.passes[FX.PASS_AO] = new THREE.SAOPass( ATON._mainRoot, ATON.Nav._camera, false, true );
     FX.passes[FX.PASS_AO].params.saoBias  = 1.0;
-    FX.passes[FX.PASS_AO].params.saoScale = 100; //100
+    FX.passes[FX.PASS_AO].params.saoScale = 100;
     FX.passes[FX.PASS_AO].params.saoIntensity = 0.2; //0.2 //0.005;
-    //FX.passes[FX.PASS_AO].params.saoMaxDistance = 0.001;
-
-
-/*
-    FX.passes[FX.PASS_AO].params.saoBias  = 1.0;
-    FX.passes[FX.PASS_AO].params.saoScale = 1500; //100
-    FX.passes[FX.PASS_AO].params.saoIntensity = 0.2; //0.2 //0.005;
-*/
-    //FX.passes[FX.PASS_AO].params.saoMinDistance = 0.01;
     //FX.passes[FX.PASS_AO].params.saoBlurRadius = 5;
     
     //FX.passes[FX.PASS_AO].params.saoKernelRadius = 200;
@@ -93,20 +83,14 @@ FX.init = ()=>{
     //FX.passes[FX.PASS_AO].params.saoBlurStdDev = 10.0;
     //FX.passes[FX.PASS_AO].params.saoBlurDepthCutoff = 10.0; //0.2;
     //FX.passes[FX.PASS_AO].params.saoMinResolution = 0.01;
-    //FX.passes[FX.PASS_AO].accumulate = false;
 
     //console.log(FX.passes[FX.PASS_AO]);
 
-/*
-    // GTAO
-    FX.passes[FX.PASS_AO] = new THREE.GTAOPass( ATON._mainRoot, ATON.Nav._camera, CW,CH );
-    FX.passes[FX.PASS_AO].output = THREE.GTAOPass.OUTPUT.Denoise;
-*/
-
     // Sobel
-    //FX.passes[FX.PASS_SOBEL] = new THREE.ShaderPass( THREE.SobelOperatorShader );
-    //FX.passes[FX.PASS_SOBEL].uniforms.resolution.value.set(CW,CH);
-
+/*
+    const effectSobel = new THREE.ShaderPass( THREE.SobelOperatorShader );
+    effectSobel.uniforms[ 'resolution' ].value.set(CW,CH);
+*/
     // Bloom
     FX.passes[FX.PASS_BLOOM] = new THREE.UnrealBloomPass( new THREE.Vector2( CW,CH ), 1.5, 0.4, 0.85 );
     FX.passes[FX.PASS_BLOOM].threshold = 0.9
@@ -158,7 +142,8 @@ FX.init = ()=>{
     //FX.composer.addPass( FX.passes[FX.PASS_AA] );
 
     FX.composer.addPass( FX.passes[FX.PASS_AO] );
-    //FX.composer.addPass( FX.passes[FX.PASS_SSR] );
+    FX.composer.addPass( FX.passes[FX.PASS_BLOOM] );
+    //FX.composer.addPass( FX.passes[ATON.FXPASS_SSR] );
 
     // tone-mapping passes here (if any)
     
@@ -167,26 +152,17 @@ FX.init = ()=>{
     
     FX.composer.addPass( FX.passes[FX.PASS_DOF] );
 
-    FX.composer.addPass( FX.passes[FX.PASS_BLOOM] );
-
     //FX.composer.addPass( FX.passes[FX.PASS_AA] );
 
-    //FX.composer.addPass( FX.passes[FX.PASS_SOBEL] );
-
-    //FX.composer.addPass( FX.passes[FX.PASS_GAMMA] ); // - CHECK
+    //FX.composer.addPass( effectSobel );
 
     // Defaults
-    FX.reset();
-
-    //for (let p in FX.passes) FX.passes[p].renderToScreen = true;
-    //console.log(FX.composer);
-};
-
-FX.reset = ()=>{
     FX.togglePass(FX.PASS_AO, false);
     FX.togglePass(FX.PASS_BLOOM, false);
     FX.togglePass(FX.PASS_DOF, false);
-    //FX.togglePass(FX.PASS_SOBEL, false);
+
+    //for (let p in FX.passes) FX.passes[p].renderToScreen = true;
+    console.log(FX.composer);
 };
 
 /**

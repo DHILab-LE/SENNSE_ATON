@@ -66,12 +66,6 @@ let search = ()=>{
     else $("#btn-go").hide();
 };
 
-let searchClear = ()=>{
-    $("#sid").val("");
-    showAllScenes();
-    $("#idTCtools").hide();
-};
-
 let searchByTerm = (searchTerm)=>{
     if (searchTerm === undefined) return;
 
@@ -100,7 +94,7 @@ let onLandingData = (data)=>{
     }
 
     if (query){
-        if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'><img class='atonDefIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>"+query+"</div><br>";
+        if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'>"+query+"</div><br>";
         htmlcontent += "<div id='idPubGallery'></div>";
 
         htmlcontent += "<br><br>";
@@ -121,17 +115,22 @@ let onLandingData = (data)=>{
         return;
     }
 
+    if (data.header){
+        htmlcontent += "<div class='atonHeader'>";
+        htmlcontent += data.header;
+        htmlcontent += "</div>";
+    }
+    else htmlcontent += "<img src='/res/aton-logo.png' style='width:100px; height:auto;'><br>";
+
     if (data.gallery){
-        htmlcontent += "<br><a href='shu/scenes/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/user.png'></a>";
+        htmlcontent += "<a href='shu/scenes/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/user.png'></a>";
         htmlcontent += "<div id='idScenes' style='display:inline-block; width:50%; max-width:500px; margin-right:15px'></div>";
         htmlcontent += "<div id='btn-go' class='atonBTN atonBTN-green' style='display:inline-block;'><img src='"+ATON.PATH_RES+"icons/play.png'></div>";
         if (data.samples === undefined || data.samples === true) htmlcontent += "<a href='examples/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/samples.png'></a>";
-        htmlcontent += "<br>";
+        htmlcontent += "<br><br>";
 
         //htmlcontent += "<div class='atonBlockTitle'>Public Scenes</div><br>";
 
-        htmlcontent += "<div id='idTagCloud' class='scrollableX' style='margin:10px; height:50px'></div>";
-        htmlcontent += "<div id='idTCtools'></div>";
         htmlcontent += "<div id='idPubGallery'></div>";
     }
 
@@ -139,59 +138,26 @@ let onLandingData = (data)=>{
 
     $("#idMainContent").html(htmlcontent);
 
-    if (data.header){
-        ATON.UI.loadPartial("/common/"+data.header, "idMainContent", true);
-    }
-    //else htmlcontent += "<img src='/res/aton-logo.png' style='width:100px; height:auto;'><br>";
-    else document.getElementById("idMainContent").prepend( ATON.UI.createElementFromHTMLString("<img src='/res/aton-logo.png' style='width:100px; height:auto;'>") );
-
     if (data.gallery){
         SHU.createScenesInputList("idScenes", openSID, search, (scenes)=>{
             $("#sid").attr("placeholder", "search by term, user or paste a scene-ID...");
+/*
+            $.getJSON( ATON.PATH_RESTAPI+"keywords/", ( kwds )=>{
+                for (let k in kwds) $("#sidlist").append("<option>"+k+"</option>");
+            });
+*/
+            
         });
 
         $("#btn-go").click( openSID );
 
-        SHU.createPubScenesGallery("idPubGallery", data.samples, ()=>{
-            let akws = Object.entries(SHU.pubScenesKwords).sort((a,b)=>b[1]-a[1]).map(el=>el[0]);
-            //console.log(akws);
-
-            for (let i in akws){
-                let k = akws[i];
-                let w = SHU.pubScenesKwords[k];
-                let f = w - 1;
-                f = 0.8 + (f * 0.1);
-                if (f > 1.5) f = 1.5;
-
-                //if (i<20){
-                    $("#idTagCloud").append("<div id='idTC-"+k+"' class='atonKeyword atonKeywordActivable'>"+k+" <span class='atonKeywordCount'>"+w+"</span></div>");
-
-                    $("#idTC-"+k).click(()=>{
-                        $("#sid").val(k);
-                        search();
-                        $("#idTCtools").show();
-
-                        $("#idKeyGallery").attr("href", "/?q="+k); 
-                        $("#idKeyGallery").html("<img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>'"+k+"' Gallery");
-                    });
-                //}
-            }
-
-            let htTCtools = "";
-            htTCtools += "<div class='atonBTN atonBTN-text atonBTN-red' onclick='searchClear()'><img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/cancel.png'>Clear</div>";
-            htTCtools += "<a class='atonBTN atonBTN-text' id='idKeyGallery'><img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>Gallery</a>";
-
-            $("#idTCtools").append(htTCtools);
-            $("#idTCtools").hide();
-        });
+        SHU.createPubScenesGallery("idPubGallery", data.samples);
     }
 
     $("#btn-go").hide();
 };
 
 window.addEventListener( 'load', ()=>{
-    //ATON.realize2D();
-
     $.getJSON( ATON.PATH_RESTAPI+"landing", onLandingData );
 });
 

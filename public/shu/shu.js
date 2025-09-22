@@ -15,19 +15,13 @@ let SHU = {};
 SHU.urlATONwebsite = "http://osiris.itabc.cnr.it/aton/";
 SHU.urlATONgit     = "https://github.com/phoenixbf/aton";
 
-SHU.sidCompare = (entryA, entryB)=>{
-	let a = entryA.sid; //entryA.creationDate;
-	let b = entryB.sid; //entryB.creationDate;
-
-/*
-	let a = entryA.sid.split("/")[1];
-	let b = entryB.sid.split("/")[1];
-*/
-	if (!a || !b ) return 0;
-
-    if (a > b) return -1;
-    if (b > a) return 1;
-
+SHU.sidCompare = (a,b)=>{
+    if (a.sid > b.sid) {
+        return -1;
+    }
+    if (b.sid > a.sid) {
+        return 1;
+    }
     return 0;
 };
 
@@ -128,7 +122,7 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
     let htmlcontent = "";
 
     let coversizex = 250;
-    let coversizey = 330;
+    let coversizey = 320;
 
     if (bSamples === undefined) bSamples = true;
 
@@ -137,8 +131,6 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
         viewparams = "";
         for (let p in opts.view) viewparams += p +"="+ opts.view[p]+"&";
     }
-
-    SHU.pubScenesKwords = {};
 
     $.getJSON( ATON.PATH_RESTAPI+"scenes/", ( data )=>{
         data.sort( SHU.sidCompare );
@@ -149,7 +141,7 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
             let user  = SHU.getUserFromSID(sid);
 
             if ( bSamples || user !== "samples" ){
-                let urlCover = ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover"; // (scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
+                let urlCover = (scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
                 let title = (scene.title)? scene.title : sid;
 
                 let terms = title.trim().toLowerCase();
@@ -161,9 +153,6 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
                         let kk = k.toLowerCase();
                         htskw += "<span class='atonKeyword'>"+kk+"</span>";
                         terms += " "+kk;
-
-                        if (!SHU.pubScenesKwords[kk]) SHU.pubScenesKwords[kk] = 1;
-                        else SHU.pubScenesKwords[kk]++;
                     }
                 }
 

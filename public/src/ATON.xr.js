@@ -47,10 +47,7 @@ XR.init = ()=>{
     XR._fromPos = new THREE.Vector3();
     XR._reqPos  = new THREE.Vector3();
 
-    //XR.gControllers = undefined;
-    XR.gControllers = ATON.createUINode();
-    XR.gControllers.disablePicking();
-    XR.rig.add( XR.gControllers );
+    XR.gControllers = undefined;
 
     XR.controller0 = undefined;
     XR.controller1 = undefined;
@@ -68,34 +65,6 @@ XR.init = ()=>{
 
     XR.gpad0 = undefined;
     XR.gpad1 = undefined;
-
-    // AR light-estimation
-/*
-    XR._arEstLight = new THREE.XREstimatedLight( ATON._renderer );
-    XR._arEstLP = undefined;
-
-    XR._arEstLight.addEventListener( 'estimationstart' , () => {
-        ATON._rootVisible.add( XR._arEstLight );
-
-        if ( XR._arEstLight.environment ) {
-            //ATON._rootVisible.environment = xrLight.environment;
-            ATON._rootVisible.setEnvMap( XR._arEstLight.environment );
-
-            if (ATON._dMainL && ATON._dMainL.visible) ATON._dMainL.visible = false;
-
-            XR._arEstLP = window.setInterval(()=>{
-                ATON.updateLightProbes();
-            }, 1000);
-        }
-    });
-    
-    XR._arEstLight.addEventListener( 'estimationend', () => {
-        ATON._rootVisible.remove( XR._arEstLight );
-        //ATON._rootVisible.environment = null;
-        if (ATON._dMainL && ATON._dMainL.visible) ATON._dMainL.visible = true;
-        window.clearInterval( XR._arEstLP );
-    } );
-*/
 
     XR._urlHand = ATON.PATH_RES+"models/hand/hand.glb";
 
@@ -217,23 +186,23 @@ XR._setupControllerR = (C, bAddRep)=>{
     C.addEventListener( 'selectstart', ()=>{
         //if (XR._handleUISelection()) return;
 
-        ATON.fire("XRselectStart", XR.HAND_R);
+        ATON.fireEvent("XRselectStart", XR.HAND_R);
     });
     C.addEventListener( 'selectend', ()=>{ 
-        ATON.fire("XRselectEnd", XR.HAND_R);
+        ATON.fireEvent("XRselectEnd", XR.HAND_R);
     });
 
     // Squeeze
     C.addEventListener( 'squeezestart', ()=>{
-        ATON.fire("XRsqueezeStart", XR.HAND_R);
+        ATON.fireEvent("XRsqueezeStart", XR.HAND_R);
     });
     C.addEventListener( 'squeezeend', ()=>{
-        ATON.fire("XRsqueezeEnd", XR.HAND_R);
+        ATON.fireEvent("XRsqueezeEnd", XR.HAND_R);
     });
 
     XR.setupControllerUI(XR.HAND_R, bAddRep);
 
-    ATON.fire("XRcontrollerConnected", XR.HAND_R);
+    ATON.fireEvent("XRcontrollerConnected", XR.HAND_R);
 };
 
 // Left
@@ -246,23 +215,23 @@ XR._setupControllerL = (C, bAddRep)=>{
     // Main trigger
     C.addEventListener( 'selectstart',  ()=>{
         //if (XR._handleUISelection()) return;
-        ATON.fire("XRselectStart", XR.HAND_L);
+        ATON.fireEvent("XRselectStart", XR.HAND_L);
     });
     C.addEventListener( 'selectend',  ()=>{ 
-        ATON.fire("XRselectEnd", XR.HAND_L);
+        ATON.fireEvent("XRselectEnd", XR.HAND_L);
     });
 
     // Squeeze
     C.addEventListener( 'squeezestart', ()=>{
-        ATON.fire("XRsqueezeStart", XR.HAND_L);
+        ATON.fireEvent("XRsqueezeStart", XR.HAND_L);
     });
     C.addEventListener( 'squeezeend', ()=>{
-        ATON.fire("XRsqueezeEnd", XR.HAND_L);
+        ATON.fireEvent("XRsqueezeEnd", XR.HAND_L);
     });
 
     XR.setupControllerUI(XR.HAND_L, bAddRep);
     
-    ATON.fire("XRcontrollerConnected", XR.HAND_L);
+    ATON.fireEvent("XRcontrollerConnected", XR.HAND_L);
 };
 
 XR.setupSceneForAR = ()=>{
@@ -291,7 +260,7 @@ XR.resetSceneOffsets = ()=>{
 
 // On XR session started
 XR.onSessionStarted = ( session )=>{
-    if (XR.currSession) return; // Session is already active
+    if (XR.currSession) return; // Already running
     XR._bReqPresenting = false;
 
 	session.addEventListener( 'end', XR.onSessionEnded );
@@ -313,77 +282,30 @@ XR.onSessionStarted = ( session )=>{
         XR.currSession = session;
         console.log(XR.currSession);
 
-        for (let c = 0; c < 2; c++){
-            const C = ATON._renderer.xr.getController(c);
-
-            if (C && !C.userData.bXRconfig){
-                //console.log(C);
-
-                C.visible = false;
-                C.userData.bXRconfig = true;
-
-                C.addEventListener( 'connected', (e) => {
-                    //console.log( e.data.handedness );
-                    let hand = e.data.handedness;
-                    C.gm = e.data.gamepad;
-
-                    C.visible = true;
-                    
-                    //console.log(e.data);
-                    console.log("Hand "+hand);
-                    console.log("GamePad "+C.gm);
-
-                    if (hand === "left")  XR._setupControllerL(C, true);
-                    else {
-                        if (hand === "right") XR._setupControllerR(C, true);
-                        else { // FIXME:
-
-                            //XR._setupControllerR(C, false);
-                            
-                            C.addEventListener('selectstart', ()=>{
-                                //if (XR._handleUISelection()) return;
-                                ATON.fire("XRselectStart", XR.HAND_R);
-                                
-                                console.log("Head-aligned select");
-                            });
-                            C.addEventListener('selectend', ()=>{ 
-                                ATON.fire("XRselectEnd", XR.HAND_R);
-                            });
-
-                            ATON.fire("XRcontrollerConnected", XR.HAND_R);
-                        }
-                    }
-                });
-            }
-        }
-
         // AR sessions
         if (XR._sessionType === "immersive-ar"){
-
             ATON._mainRoot.background = null;
             if (ATON._mMainPano) ATON._mMainPano.visible = false;
 
             //XR.setupSceneForAR();
 
             // Mobile AR
-/*
             let c0 = ATON._renderer.xr.getController(0);
             if (c0 && ATON.device.isMobile){
                 XR.controller0 = ATON._renderer.xr.getController(0);
 
                 XR.controller0.addEventListener('selectstart', ()=>{
                     //if (XR._handleUISelection()) return;
-                    ATON.fire("XRselectStart", XR.HAND_R);
+                    ATON.fireEvent("XRselectStart", XR.HAND_R);
                     
                     console.log("Head-aligned select");
                 });
                 XR.controller0.addEventListener('selectend', ()=>{ 
-                    ATON.fire("XRselectEnd", XR.HAND_R);
+                    ATON.fireEvent("XRselectEnd", XR.HAND_R);
                 });
 
                 XR.gControllers.add( XR.controller0 );
             }
-*/
 
 /*
             XR._bPresenting = true;
@@ -391,7 +313,7 @@ XR.onSessionStarted = ( session )=>{
     
             console.log("AR now presenting");
     
-            ATON.fire("XRmode", true);
+            ATON.fireEvent("XRmode", true);
             return;
 */
         }
@@ -404,7 +326,6 @@ XR.onSessionStarted = ( session )=>{
         */
 
         else {
-/*
             for (let c = 0; c < 2; c++){
                 const C = ATON._renderer.xr.getController(c);
 
@@ -432,21 +353,20 @@ XR.onSessionStarted = ( session )=>{
                                 
                                 C.addEventListener('selectstart', ()=>{
                                     //if (XR._handleUISelection()) return;
-                                    ATON.fire("XRselectStart", XR.HAND_R);
+                                    ATON.fireEvent("XRselectStart", XR.HAND_R);
                                     
                                     console.log("Head-aligned select");
                                 });
                                 C.addEventListener('selectend', ()=>{ 
-                                    ATON.fire("XRselectEnd", XR.HAND_R);
+                                    ATON.fireEvent("XRselectEnd", XR.HAND_R);
                                 });
 
-                                ATON.fire("XRcontrollerConnected", XR.HAND_R);
+                                ATON.fireEvent("XRcontrollerConnected", XR.HAND_R);
                             }
                         }
                     });
                 }
             }
-*/
 
             // reparent current camera to the XR rig
             XR.rig.add( ATON.Nav._camera );
@@ -465,9 +385,7 @@ XR.onSessionStarted = ( session )=>{
 
         //XR.setupControllersUI();
 
-        ATON.fire("XRmode", true);
-
-        ATON.rewindAllPlayingMedia();
+        ATON.fireEvent("XRmode", true);
 
         ATON.toggleShadows(false); // disable shadows for XR sessions
 
@@ -510,7 +428,7 @@ XR.onSessionEnded = ( /*event*/ )=>{
     //XR.rig.position.set(0.0,0.0,0.0);
     XR.setRefSpaceLocation( new THREE.Vector3(0,0,0) );
 
-    ATON.fire("XRmode", false);
+    ATON.fireEvent("XRmode", false);
 
     ATON._qSyncInt = 1; // Query interval (unused)
 
@@ -586,14 +504,12 @@ XR.setupControllerUI = (h, bAddRep)=>{
     let lhand = undefined;
 
     //console.log("Setup controller "+h);
-/*
     if (XR.gControllers === undefined){
         XR.gControllers = ATON.createUINode();
 
         XR.gControllers.disablePicking();
         XR.rig.add(XR.gControllers);
     }
-*/
     // Left
     if (h === XR.HAND_L){
         XR.gControllers.add( XR.controller1 );
@@ -749,19 +665,6 @@ XR.getControllerWorldDirection = (i)=>{
     else return XR.controller0dir;
 };
 
-/**
-Get controller world orientation
-@param {number} i - the controller ID (0 or 1)
-@returns {THREE.Quaternion}
-*/
-XR.getControllerWorldOrientation = (i)=>{
-    let Q = new THREE.Quaternion();
-    if (i === 1) XR.controller1.getWorldQuaternion(Q);
-    else XR.controller0.getWorldQuaternion(Q);
-
-    return Q;
-};
-
 XR._deltaMotionController = (C)=>{
     if (C === XR.HAND_L && XR._lastPosL === undefined) return;
     if (C === XR.HAND_R && XR._lastPosR === undefined) return;
@@ -809,15 +712,15 @@ XR.update = ()=>{
 
 /*
     if (XR.gpad0 && XR.gpad0.buttons){
-        //if (XR.gpad0.buttons[1] && XR.gpad0.buttons[1].pressed) ATON.fire("XRsqueezePressed", 0);
-        if (XR.gpad0.buttons[4] && XR.gpad0.buttons[4].pressed) ATON.fire("XRbuttonAPressed");
-        if (XR.gpad0.buttons[5] && XR.gpad0.buttons[5].pressed) ATON.fire("XRbuttonBPressed");
+        //if (XR.gpad0.buttons[1] && XR.gpad0.buttons[1].pressed) ATON.fireEvent("XRsqueezePressed", 0);
+        if (XR.gpad0.buttons[4] && XR.gpad0.buttons[4].pressed) ATON.fireEvent("XRbuttonAPressed");
+        if (XR.gpad0.buttons[5] && XR.gpad0.buttons[5].pressed) ATON.fireEvent("XRbuttonBPressed");
     }
 
     if (XR.gpad1 && XR.gpad1.buttons){
-        //if (XR.gpad1.buttons[1] && XR.gpad1.buttons[1].pressed) ATON.fire("XRsqueezePressed", 1);
-        if (XR.gpad1.buttons[4] && XR.gpad1.buttons[4].pressed) ATON.fire("XRbuttonXPressed");
-        if (XR.gpad1.buttons[5] && XR.gpad1.buttons[5].pressed) ATON.fire("XRbuttonYPressed");
+        //if (XR.gpad1.buttons[1] && XR.gpad1.buttons[1].pressed) ATON.fireEvent("XRsqueezePressed", 1);
+        if (XR.gpad1.buttons[4] && XR.gpad1.buttons[4].pressed) ATON.fireEvent("XRbuttonXPressed");
+        if (XR.gpad1.buttons[5] && XR.gpad1.buttons[5].pressed) ATON.fireEvent("XRbuttonYPressed");
     }
 */
 };

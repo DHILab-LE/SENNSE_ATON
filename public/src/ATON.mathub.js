@@ -20,10 +20,15 @@ MatHub.init = ()=>{
 
     // Uniforms
     MatHub._uSem = {
-        time: { type:'float', value: 0.0 },
-        tint: { type:'vec4', value: new THREE.Vector4(0.2,0.2,1.0, 0.2) },
-        sel: { type:'vec4', value: new THREE.Vector4(0.0,0.0,0.0, 0.1) }
+        time: { type: 'float', value: 0.0 },
+        tint: { type: 'vec4', value: new THREE.Vector4(0.79, 0.0, 1.0, 0.5) } // Adjusted alpha for stronger violet
     };
+    
+    MatHub._uSem2 = {
+        time: { type: 'float', value: 0.0 },
+        tint: { type: 'vec4', value: new THREE.Vector4(0.0, 1.0, 0.0, 0.5) } // Reduced alpha for balanced green
+    };
+    
 
     MatHub.addDefaults();
 };
@@ -223,6 +228,38 @@ MatHub.addDefaults = ()=>{
         //opacity: 0.0,
     });
 
+    MatHub.materials.semanticShapeForDataLogger = new THREE.ShaderMaterial({
+        uniforms: MatHub._uSem2,
+
+        vertexShader: MatHub.getDefVertexShader(),
+        fragmentShader:`
+            varying vec3 vPositionW;
+		    varying vec3 vNormalW;
+            varying vec3 vNormalV;
+
+            uniform float time;
+            uniform vec4 tint;
+
+		    void main(){
+		        //vec3 viewDirectionW = normalize(cameraPosition - vPositionW);
+
+                //float ff = dot(vNormalV, vec3(0,0,1));
+		        //ff = clamp(1.0-ff, 0.0, 1.0);
+
+                float f = (1.0 * cos(time*2.0)); // - 0.5;
+                //f = cos(time + (vPositionW.y*10.0));
+                f = clamp(f, 0.0,1.0);
+
+		        gl_FragColor = vec4(tint.rgb, tint.a * f);
+                //gl_FragColor = vec4(tint.rgb, ff);
+		    }
+        `,
+        transparent: true,
+        depthWrite: false,
+        //flatShading: false
+        //opacity: 0.0,
+    });
+
     MatHub.materials.semanticShapeHL = new THREE.MeshBasicMaterial({ 
         color: MatHub.colors.sem, 
         transparent: true,
@@ -355,7 +392,7 @@ MatHub.addDefaults = ()=>{
 
         //transparent: true,
         //depthWrite: false, 
-        //opacity: 0.5,
+        //opacity: 0.3,
 
         size: 4.0,
         sizeAttenuation: false,
@@ -446,11 +483,7 @@ MatHub.getMaterial = (id)=>{
 
 MatHub.update = ()=>{
     MatHub._uSem.time.value += ATON._dt;
-    
-    MatHub._uSem.sel.value.x = ATON.SUI.mainSelector.position.x;
-    MatHub._uSem.sel.value.y = ATON.SUI.mainSelector.position.y;
-    MatHub._uSem.sel.value.z = ATON.SUI.mainSelector.position.z;
-    MatHub._uSem.sel.value.w = ATON.SUI._selectorRad;
+    MatHub._uSem2.time.value += ATON._dt;
 };
 
 export default MatHub;

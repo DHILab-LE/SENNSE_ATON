@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:18
 
 RUN npm install -g npm
 
@@ -14,7 +14,7 @@ RUN npm install pm2 -g
 # Bundle app source
 COPY . .
 
-#EXPOSE 8080
+EXPOSE 8083
 
 # Single
 #CMD [ "node", "services/ATON.service.main.js" ]

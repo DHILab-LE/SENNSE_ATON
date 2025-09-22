@@ -206,13 +206,13 @@ XPFNetwork.update = ()=>{
         //XPFNetwork._preloadBaseLayer(inext);
         ////XPFNetwork._list[inext]._lnode.toggleSUI(true);
 
-        if (inext !== XPFNetwork._iNext) ATON.fire("NextXPF", inext);
+        if (inext !== XPFNetwork._iNext) ATON.fireEvent("NextXPF", inext);
         XPFNetwork._iNext = inext;
     }
 */
     if (inext !== XPFNetwork._iNext){
         XPFNetwork.toggleSUI(inext, true);
-        ATON.fire("NextXPF", inext);
+        ATON.fireEvent("NextXPF", inext);
     }
 
     XPFNetwork._iNext = inext;
@@ -228,7 +228,7 @@ XPFNetwork.update = ()=>{
 
     //XPFNetwork._clearTexCache(); // Clear cached textures
 
-    //ATON.fire("CurrentXPF", iclosest);
+    //ATON.fireEvent("CurrentXPF", iclosest);
 };
 
 
@@ -502,8 +502,8 @@ XPFNetwork.setCurrentXPF = (i, onComplete)=>{
 
     XPFNetwork.updateCurrentXPFbaseLayer( onComplete );
 
-    ATON.fire("CurrentXPF", i);
-    ATON.fire("NextXPF", undefined);
+    ATON.fireEvent("CurrentXPF", i);
+    ATON.fireEvent("NextXPF", undefined);
 
 /*
     // hit
@@ -555,7 +555,7 @@ XPFNetwork.loadSemanticMasksIfAny = (i)=>{
             XPFNetwork._semCanvas.width  = 2048;
             XPFNetwork._semCanvas.height = 2048;
 
-            XPFNetwork._semCTX = XPFNetwork._semCanvas.getContext('2d', { willReadFrequently: true });
+            XPFNetwork._semCTX = XPFNetwork._semCanvas.getContext('2d');
         }
 
         let semimgurl = xpf._semMasksURLs[s];
@@ -854,7 +854,7 @@ XPFNetwork.querySemanticMasks = ()=>{
 
     // No mask queried
     if (ss === undefined){
-        if (XPFNetwork._semCurr !== undefined) ATON.fire("SemanticMaskLeave", XPFNetwork._semCurr);
+        if (XPFNetwork._semCurr !== undefined) ATON.fireEvent("SemanticMaskLeave", XPFNetwork._semCurr);
         XPFNetwork._semCurr = undefined;
 
         XPFNetwork._uniforms.tSem.value = 0;
@@ -872,11 +872,11 @@ XPFNetwork.querySemanticMasks = ()=>{
         XPFNetwork._uniforms.tSem.value = ATON.Utils.textureLoader.load( semurl );
         XPFNetwork._mat.needsUpdate = true;
 
-        ATON.fire("SemanticMaskHover", ss);
+        ATON.fireEvent("SemanticMaskHover", ss);
 
         XPFNetwork._uniforms.shColor.value.w = 0.0;
 
-        if (XPFNetwork._semCurr !== undefined) ATON.fire("SemanticMaskLeave", XPFNetwork._semCurr);
+        if (XPFNetwork._semCurr !== undefined) ATON.fireEvent("SemanticMaskLeave", XPFNetwork._semCurr);
     }
 */
     XPFNetwork._semCurr = ss;
@@ -889,7 +889,7 @@ You should disable ATON queries via ATON.toggleQueries(false) to use this routin
 */
 XPFNetwork.highlightSemanticMaskInCurrentXPF = (semid)=>{
     if (semid === undefined){
-        if (XPFNetwork._semCurr !== undefined) ATON.fire("SemanticMaskLeave", XPFNetwork._semCurr);
+        if (XPFNetwork._semCurr !== undefined) ATON.fireEvent("SemanticMaskLeave", XPFNetwork._semCurr);
 
         XPFNetwork._semCurr = undefined;
 
@@ -906,11 +906,11 @@ XPFNetwork.highlightSemanticMaskInCurrentXPF = (semid)=>{
     XPFNetwork._uniforms.tSem.value = ATON.Utils.textureLoader.load( semurl );
     XPFNetwork._mat.needsUpdate = true;
 
-    ATON.fire("SemanticMaskHover", semid);
+    ATON.fireEvent("SemanticMaskHover", semid);
 
     XPFNetwork._uniforms.shColor.value.w = 0.0;
 
-    if (XPFNetwork._semCurr !== undefined) ATON.fire("SemanticMaskLeave", XPFNetwork._semCurr);
+    if (XPFNetwork._semCurr !== undefined) ATON.fireEvent("SemanticMaskLeave", XPFNetwork._semCurr);
 };
 
 // TODO: Sphera, OPK

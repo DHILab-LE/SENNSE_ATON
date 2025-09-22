@@ -13,58 +13,49 @@ const path        = require('path');
 const jsonpatch   = require('fast-json-patch');
 const del         = require('del');
 const makeDir     = require('make-dir');
-const { nanoid }  = require('nanoid');
+const nanoid      = require('nanoid');
 const fsx         = require('fs-extra');
 //const axios       = require('axios');
 //const chokidar    = require('chokidar');
 const fg          = require('fast-glob');
 const chalk       = require('chalk');
-const sharp       = require("sharp");
 
 const { networkInterfaces } = require('os');
 
 // Authentication
-/*
 let passport = require('passport');
 let Strategy = require('passport-local').Strategy;
 const cookieParser   = require('cookie-parser');
 const session        = require('express-session');
 const FileStore      = require('session-file-store')(session);
-*/
 
 // Local modules
-const BaseAPI = require("./API/v1.js");
+const BaseAPI = require("./API.js");
 const Maat    = require("./maat/Maat.js");
-const User    = require("./User.js");
 
 
 Core = {};
 
-Core.DIR_DATA           = path.join(__dirname,"/../data/");
-Core.DIR_WAPPS          = path.join(__dirname,"/../wapps/");
-Core.DIR_PUBLIC         = path.join(__dirname,"/../public/");
-Core.DIR_RES            = path.join(Core.DIR_PUBLIC,"res/");
-Core.DIR_PRV            = path.join(__dirname, "_prv/");
-Core.DIR_CONFIG         = path.join(__dirname, "/../config/");
-Core.DIR_CONFIGPUB      = path.join(Core.DIR_CONFIG, "public/");
+Core.DIR_DATA         = path.join(__dirname,"/../data/");
+Core.DIR_WAPPS        = path.join(__dirname,"/../wapps/");
+Core.DIR_PUBLIC       = path.join(__dirname,"/../public/");
+Core.DIR_RES          = path.join(Core.DIR_PUBLIC,"res/");
+Core.DIR_PRV          = path.join(__dirname, "_prv/");
+Core.DIR_CONFIG       = path.join(__dirname, "/../config/");
 //Core.DIR_CUST_MODS    = path.join(Core.DIR_CONFIG,"modules/");
-Core.DIR_CUST_CERTS     = path.join(Core.DIR_CONFIG,"certs/");
-Core.DIR_NODE_MODULES   = path.join(__dirname, "/../node_modules");
+Core.DIR_CUST_CERTS   = path.join(Core.DIR_CONFIG,"certs/");
+Core.DIR_NODE_MODULES = path.join(__dirname, "/../node_modules");
 //Core.DIR_APIDOC       = path.join(__dirname, "/../API/");
-Core.DIR_FE             = path.join(Core.DIR_PUBLIC,"hathor/");
-Core.DIR_BE             = path.join(Core.DIR_PUBLIC,"shu/");
-Core.DIR_COLLECTIONS    = path.join(Core.DIR_DATA,"collections/"); //path.join(Core.DIR_PUBLIC,"collection/");
-Core.DIR_SCENES         = path.join(Core.DIR_DATA,"scenes/");   //path.join(Core.DIR_PUBLIC,"scenes/");
-Core.DIR_EXAMPLES       = path.join(Core.DIR_PUBLIC,"examples/");
-Core.DIR_FLARES         = path.join(Core.DIR_CONFIG,"flares/"); //path.join(Core.DIR_PUBLIC,"custom/flares/");
-Core.STD_SCENEFILE      = "scene.json";
-Core.STD_PUBFILE        = "pub.txt"; // deprecated
-Core.STD_COVERFILE_HI   = "cover.png";
-Core.STD_COVERFILE      = "cover.jpg";
-Core.STD_COVERSIZE      = 256;
-Core.STD_COVERFILE_PATH = path.join(Core.DIR_RES,"scenecover.png");
+Core.DIR_FE           = path.join(Core.DIR_PUBLIC,"hathor/");
+Core.DIR_BE           = path.join(Core.DIR_PUBLIC,"shu/");
+Core.DIR_COLLECTIONS  = path.join(Core.DIR_DATA,"collections/"); //path.join(Core.DIR_PUBLIC,"collection/");
+Core.DIR_SCENES       = path.join(Core.DIR_DATA,"scenes/");   //path.join(Core.DIR_PUBLIC,"scenes/");
+Core.DIR_EXAMPLES     = path.join(Core.DIR_PUBLIC,"examples/");
+Core.DIR_FLARES       = path.join(Core.DIR_CONFIG,"flares/"); //path.join(Core.DIR_PUBLIC,"custom/flares/");
+Core.STD_SCENEFILE    = "scene.json";
+Core.STD_PUBFILE      = "pub.txt";
+Core.STD_COVERFILE    = "cover.png";
 
-// Unused
 Core.STATUS_COMPLETE   = "complete";
 Core.STATUS_PROCESSING = "processing";
 
@@ -79,14 +70,13 @@ Core.SCENES_GLOB_OPTS = {
 
 Core.COLLECTIONS_GLOB_OPTS = {
 	cwd: Core.DIR_COLLECTIONS,
-	follow: true,
-	//ignore: ["*/Data/*","*/tiles/*"]
+	follow: true
 };
 
 // Modules setup
 Core.realizeBaseAPI = BaseAPI;
-//Core.passport       = passport; // set configured passport
-Core.Maat           = Maat;
+Core.passport       = passport; // set configured passport
+Core.maat           = Maat;
 
 // LOG Utils
 Core.logGreen = (str)=>{
@@ -98,7 +88,7 @@ Core.logYellow = (str)=>{
 
 
 // Flares
-Core.flares = {};
+Core.flares = [];
 
 Core.setupFlares = (app)=>{
 	if (!fs.existsSync(Core.DIR_FLARES)) return;
@@ -108,7 +98,7 @@ Core.setupFlares = (app)=>{
 	O.cwd    = Core.DIR_FLARES; //Core.DIR_PUBLIC;
 	O.follow = true;
 
-	// Collect all flares
+	// Collcet all flares
 	let plugins = fg.sync("**/flare.json", O);
 	for (let f in plugins){
 		let flarename = path.dirname(plugins[f]);
@@ -120,14 +110,13 @@ Core.setupFlares = (app)=>{
 
 		let fbasepath = Core.DIR_FLARES + flarename + "/";
 
-		//Core.flares.push( flarename );
+		Core.flares.push( flarename );
 
 		// Client (public) components
-/*
 		if (P.client){
 			for (let s in P.client.files) Core.FEScripts.push( "/flares/"+ flarename +"/"+ P.client.files[s] );
 		}
-*/
+
 		// Server (private) components
 		if (P.server){
 			for (let m in P.server.modules){
@@ -140,7 +129,6 @@ Core.setupFlares = (app)=>{
 
 		if (P.respatterns && P.respatterns.length>2) Core.mpattern += ","+P.respatterns;
 
-		Core.flares[flarename] = P;
 	}
 
 	console.log("\nFlares (plugins) found: ");
@@ -197,19 +185,12 @@ Core.CONF_MAIN = {
 */
 	},
 
-	// Soon deprecated
     landing: {
         gallery: true,		// Show gallery (public scenes) in the landing page
 		samples: true,		// Show samples (def true)
-		//header: "",		// Custom header (HTML partial)
+		//header: "",		// Custom header HTML5 snippet
 		//redirect: "",		// Redirect to URL (e.g. specific web-app: "a/app_template")
 		//apps: []			// List of app IDs to show
-    },
-
-    shu: {
-        samples: true,
-        apps: ["app_template"],	// List of apps to display
-		staffpick: {}			// List of staff picked scene-IDs
     }
 };
 
@@ -218,8 +199,8 @@ Core.CONF_MAIN = {
 Core.CONF_USERS = [
 	{ 
         username: "ra",
-        password: "ra2020",
-        admin: true
+        admin: true,
+        password: "ra2020"
 	},
 	{ 
         username: "bastet",
@@ -256,35 +237,18 @@ Core.init = ()=>{
 	Core.users  = Core.loadConfigFile("users.json", Core.CONF_USERS);
 
 	// 3D models base formats
-	Core.mpattern = "*.gltf,*.glb,*tileset.json";
-
-	// Panoramic content
-	Core.panopattern = "*.jpg,*.hdr,*.exr,*.mp4,*.webm,*.m3u8";
-
-	// Media
-	Core.mediapattern = "*.jpg,*.png,*.mp4,*.webm,*.m3u8,*.wav,*.mp3";
+	Core.mpattern = "*.gltf,*.glb,*.json"; //,*.ifc";
 
 	if (Core.config.data && Core.config.data.patterns && Core.config.data.patterns.models){
 		Core.mpattern = Core.config.data.patterns.models;
 		console.log("Custom models pattern: "+Core.mpattern);
 	}
-/*
-	if (Core.config.landing.header){
-		let srcpath = path.join(Core.DIR_CONFIG, Core.config.landing.header);
-		fs.readFile(srcpath, 'utf8', (err, data)=>{
-			if (err) throw err;
-
-			Core.config.landing.header = data;
-			console.log(data);
-		});
-	}
-*/
 	Core.touchUserCollectionFolders();
 
 	//const maatport = (Core.config.services.maat)? Core.config.services.maat.PORT : 8891;
 	//Core._maatEP = "http://localhost:"+maatport+"/";
 
-	console.log("Num. users: "+Core.users.length);
+	console.log("DB users: "+Core.users.length);
 
 	// Retrieve network interfaces
 	const nif  = networkInterfaces();
@@ -300,7 +264,7 @@ Core.init = ()=>{
 		}
 	}
 
-	Core.Maat.init();
+	Core.maat.init();
 
 	// Directly from config
 	Core.FEScripts = [];
@@ -343,76 +307,10 @@ Core.loadConfigFile = (jsonfile, defconf)=>{
 
 };
 
+Core.touchCollectionFolder = (user)=>{
+	if (user === undefined) return;
 
-// SSL certs
-Core.getCertPath = ()=>{
-	let cpath = Core.config.services.main.pathCert;
-	
-	if (cpath && cpath.length>4) return cpath;
-	return path.join(Core.DIR_CUST_CERTS,'server.crt');
-};
-Core.getKeyPath = ()=>{
-	let cpath = Core.config.services.main.pathKey;
-
-	if (cpath && cpath.length>4) return cpath;
-	return path.join(Core.DIR_CUST_CERTS,'server.key');
-};
-
-
-// Users
-//=======================================
-Core.getUID = (U)=>{
-	if (!U) return undefined;
-	return U.username;
-};
-
-Core.createNewUser = (entry)=>{
-	if (entry === undefined) return false;
-
-	// Add new entry into users json
-	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
-	Core.users.push(entry);
-	
-	let uconfig = path.join(Core.DIR_CONFIG,"users.json");
-	fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
-
-	Core.touchCollectionFolder(entry);
-
-	console.log("Created new user: "+entry);
-
-	return true;
-};
-
-//TODO:
-Core.deleteUser = (uid)=>{
-	if (uid === undefined) return false;
-
-	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
-	let num = Core.users.length;
-
-	for (let u=0; u<num; u++){
-		let U = Core.users[u];
-		if (Core.getUID(U) === uid){
-			Core.users.splice(u,1);
-
-			let uconfig = path.join(Core.DIR_CONFIG,"users.json");
-			fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
-
-			return true;
-		}
-	}
-
-	return false;
-};
-
-Core.getUserCollectionFolder = (uid)=>{
-	return path.join( Core.DIR_COLLECTIONS, uid );
-};
-
-Core.touchCollectionFolder = (uid)=>{
-	if (uid === undefined) return;
-
-	let dirColl = Core.getUserCollectionFolder(uid);
+	let dirColl = path.join( Core.DIR_COLLECTIONS, user.username );
 
 	if (!fs.existsSync(dirColl)){
 		try {
@@ -437,58 +335,61 @@ Core.touchUserCollectionFolders = ()=>{
 	for (let i = 0; i < len; i++){
 		let U = Core.users[i];
 
-		Core.touchCollectionFolder( Core.getUID(U) );
+		Core.touchCollectionFolder( U );
 	}
 };
 
-// Utils
+
+// SSL certs
+Core.getCertPath = ()=>{
+	let cpath = Core.config.services.main.pathCert;
+	
+	if (cpath && cpath.length>4) return cpath;
+	return path.join(Core.DIR_CUST_CERTS,'server.crt');
+};
+Core.getKeyPath = ()=>{
+	let cpath = Core.config.services.main.pathKey;
+
+	if (cpath && cpath.length>4) return cpath;
+	return path.join(Core.DIR_CUST_CERTS,'server.key');
+};
+
+
+// Users
 //=======================================
-Core.generateTodayString = ()=>{
-    let today = new Date();
+Core.createNewUser = (entry)=>{
+	if (entry === undefined) return false;
 
-    let dd   = String( today.getDate() );
-    let mm   = String( today.getMonth()+1 ); 
-    let yyyy = String( today.getFullYear() );
-    
-	if(dd<10) dd = '0'+dd;
-    if(mm<10) mm = '0'+mm;
+	// Add new entry into users json
+	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
+	Core.users.push(entry);
+	
+	let uconfig = path.join(Core.DIR_CONFIG,"users.json");
+	fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
 
-	return yyyy+mm+dd;
+	Core.touchCollectionFolder(entry);
+
+	console.log("Created new user: "+entry);
+
+	return true;
 };
 
-// Readapted from: https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
-Core.hashCodeFromString = (str)=>{
-	let hash = 0, chr;
-	let len = str.length;
+//TODO:
+Core.deleteUser = (username)=>{
+	if (username === undefined) return false;
 
-	if (len === 0) return hash;
+	Core.users = Core.loadConfigFile("users.json", Core.CONF_USERS);
+	let num = Core.users.length;
 
-	for (let i = 0; i < len; i++) {
-		chr = str.charCodeAt(i);
-		hash = ((hash << 5) - hash) + chr;
-		hash = hash & hash; // Convert to 32bit integer
-	}
-	return hash.toString(16);
-};
+	for (let u=0; u<num; u++){
+		if (Core.users[u].username === username){
+			Core.users.splice(u,1);
 
-Core.hashCodeFromString2 = (str)=>{
-	str = str.replaceAll(":","");
-	str = str.replaceAll("/","");
-	str = str.replaceAll(".","");
+			let uconfig = path.join(Core.DIR_CONFIG,"users.json");
+			fs.writeFileSync(uconfig, JSON.stringify(Core.users, null, 4));
 
-	str.replace(/[aeiouAEIOU]/g, '');
-	console.log(str);
-	return str;
-};
-
-// TODO: improve
-Core.isURL3Dmodel = (itempath)=>{
-	let mp = Core.mpattern;
-	mp = mp.replaceAll("*","");
-
-	let exts = mp.split(",");
-	for (let e=0; e<exts.length; e++){
-		if (itempath.endsWith( exts[e] )) return true;
+			return true;
+		}
 	}
 
 	return false;
@@ -504,8 +405,6 @@ Core.getSceneJSONPath = (sid)=>{
 	let jsonfile = path.join( Core.getSceneFolder(sid), Core.STD_SCENEFILE);
 	return jsonfile;
 };
-
-// Deprecated
 Core.getPubFilePath = (sid)=>{
 	let pubfile = path.join( Core.getSceneFolder(sid), Core.STD_PUBFILE);
 	return pubfile;
@@ -519,14 +418,21 @@ Core.existsScene = (sid)=>{;
 
 // Generate timestamped user SID
 Core.generateUserSID = ()=>{
-	let sid = Core.generateTodayString() + '-' + nanoid(10);
+    let today = new Date();
+    let dd   = String( today.getDate() );
+    let mm   = String( today.getMonth()+1 ); 
+    let yyyy = String( today.getFullYear() );
+    if(dd<10) dd = '0'+dd;
+    if(mm<10) mm = '0'+mm;
+
+    let sid = yyyy+mm+dd + '-' + Math.random().toString(36).substr(2,9);
 	return sid;
 };
 
 Core.createBasicScene = ()=>{
 	let sobj = {};
 
-	//sobj.status = Core.STATUS_COMPLETE;
+	sobj.status = Core.STATUS_COMPLETE;
 
 	sobj.scenegraph = {};
 	sobj.scenegraph.nodes = {};
@@ -539,22 +445,6 @@ Core.createBasicScene = ()=>{
 	console.log(sobj);
 
 	return sobj;
-};
-
-Core.createBasicSceneFromModel = (user, mpath)=>{
-	console.log(user,mpath)
-
-	let sid = Core.hashCodeFromString(mpath);
-	sid = sid.replace("-","m");
-	sid = user + "/" + sid;
-
-	if (Core.existsScene(sid)) return sid;
-
-	let S = Core.createBasicScene();
-	S.scenegraph.nodes.main.urls.push( mpath );
-
-	Core.writeSceneJSON(sid, S);
-	return sid;
 };
 
 // Create sub-folder structure on disk
@@ -656,7 +546,7 @@ Core.applySceneEdit = (sid, patch, mode)=>{
 	let sjpath = Core.getSceneJSONPath(sid);
 	let S = Core.readSceneJSON(sid);
 
-	if (!S) return undefined; // scene does not exist or malformed
+	if (S === undefined) return; // scene does not exist
 
 	//jsonpatch.applyPatch(S, patch);
 
@@ -743,25 +633,40 @@ Core.cleanScene = (sobj)=>{
 	return sobj;
 };
 
-// Write scene JSON from sid and data
-Core.writeSceneJSON = (sid, data, vis)=>{
-	if (sid === undefined) return false;
-	if (data === undefined) return false;
+Core.writeSceneJSON = (sid, data, pub) => {
+    if (sid === undefined) return false;
+    if (data === undefined) return false;
 
-	Core.touchSceneFolder(sid);
+    // Ensure the scene folder exists
+    Core.touchSceneFolder(sid);
 
-	let sjpath = Core.getSceneJSONPath(sid);
+    // Get the JSON file path for scene data
+    let sjpath = Core.getSceneJSONPath(sid);
+    
+    // Extract the folder path
+    let sceneFolder = path.dirname(sjpath);
 
-	if (vis) data.visibility = vis;
-	fs.writeFileSync(sjpath, JSON.stringify(data, null, 4));
-/*
-	if (pub){
-		let pubfile = Core.getPubFilePath(sid);
-		fs.writeFileSync(pubfile, "");
-	}
-*/
-	return true;
+    // Get the folder name
+    let folderName = path.basename(sceneFolder);
+
+    // Define the additional empty JSON file path
+    let emptyJsonPath = `${sceneFolder}/sennse.json`;
+
+    // Write JSON file with scene data
+    fs.writeFileSync(sjpath, JSON.stringify(data, null, 4));
+
+    // Create an empty JSON file named after the folder
+    fs.writeFileSync(emptyJsonPath, JSON.stringify({}));
+
+    // Handle publishing
+    if (pub) {
+        let pubfile = Core.getPubFilePath(sid);
+        fs.writeFileSync(pubfile, "");
+    }
+
+    return true;
 };
+
 
 // Web-Apps
 //=======================================
@@ -828,7 +733,6 @@ Core.initUsers = (configfile)=>{
 };
 */
 
-/*
 Core.findByUsername = (username, cb)=>{
 	process.nextTick( function(){
 		// Load
@@ -906,7 +810,6 @@ Core.realizeAuth = (app)=>{
     app.use(passport.initialize());
     app.use(passport.session());
 };
-*/
 
 // DATA
 //================================================
@@ -936,40 +839,6 @@ Core.setupDataRoute = (app)=>{
 
 		res.sendFile(Core.DIR_SCENES + path);
 		//next();
-	});
-};
-
-// IMG
-Core.generateCoverForScene = (sid, b64img, onComplete)=>{
-	if (!sid) return;
-
-	let scenefolder  = Core.getSceneFolder(sid);
-	let coverfile    = path.join(scenefolder, Core.STD_COVERFILE_HI);
-	let coverfileOpt = path.join(scenefolder, Core.STD_COVERFILE);
-
-	fs.writeFile(coverfile, b64img, 'base64', (err)=>{
-		//if (fs.existsSync(coverfileOpt)) fs.unlinkSync(coverfileOpt);
-
-		// Optimize PNG size
-		sharp(coverfile)
-			.resize({
-				width: Core.STD_COVERSIZE, 
-				height: Core.STD_COVERSIZE
-			})
-			.withMetadata()
-/*
-			.png({
-				quality: 90, // 0-100
-				//compression: 6, // this doesn't need to be set
-			})
-*/
-			.jpeg({
-				quality: 60
-			})
-			.toFile(coverfileOpt, (err)=>{
-				if (err) console.log(err);
-				else if (onComplete) onComplete();
-		});
 	});
 };
 

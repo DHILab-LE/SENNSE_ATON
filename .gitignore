@@ -91,8 +91,13 @@ _prv
 /data/collections/*
 !/data/collections/samples/
 
+data/collections/samples/models/CaveOfAnimals.glb
+data/collections/samples/models/CaveOfAnimalsBetaVersion.glb
+
 # Apps
 /wapps/*
 !/wapps/README.txt
 !/wapps/app_template/
-/wapps/app_template/data/
+/wapps/app_template/data/data/collections/samples/models/CaveOfAnimals.glb
+/wapps/app_template/data/data/collections/samples/models/CaveOfAnimalsBetaVersion.glb
+

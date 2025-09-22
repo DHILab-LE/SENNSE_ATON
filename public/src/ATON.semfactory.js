@@ -14,13 +14,13 @@ let SemFactory = {};
 
 SemFactory.FLOAT_PREC = 5;
 
-SemFactory.init = ()=>{
-    SemFactory.bConvexBuilding  = false;
-    SemFactory.convexPoints    = [];
+SemFactory.init = () => {
+    SemFactory.bConvexBuilding = false;
+    SemFactory.convexPoints = [];
     //SemFactory.convexMeshes  = [];
-    SemFactory.convexNode      = undefined; // keeps track of current convex semnode
-    SemFactory.currConvexMesh  = undefined;
-    
+    SemFactory.convexNode = undefined; // keeps track of current convex semnode
+    SemFactory.currConvexMesh = undefined;
+
     // Temp sem node to hold developing convex mesh
     SemFactory.currSemNode = ATON.createSemanticNode();
     SemFactory.currSemNode.disablePicking();
@@ -33,11 +33,11 @@ SemFactory.init = ()=>{
 
 
 // Current material
-SemFactory.resetMaterial = ()=>{
+SemFactory.resetMaterial = () => {
     SemFactory.currMaterial = ATON.MatHub.getMaterial("semanticShapeHL"); // current sem material we are using. Was "semanticShape"
 };
 
-SemFactory.setMaterial = (m)=>{
+SemFactory.setMaterial = (m) => {
     if (m === undefined) return;
     SemFactory.currMaterial = m;
 };
@@ -49,11 +49,11 @@ A minimum of 4 points are required. Return true if point was successfully added
 @param {THREE.Vector3} p - the point
 @returns {boolean}
 */
-SemFactory.addConvexPoint = (/*semid,*/ p)=>{
+SemFactory.addConvexPoint = (/*semid,*/ p) => {
     if (p === undefined) return false;
 
-    if (SemFactory.convexPoints.length>0){
-        let pp = SemFactory.convexPoints[SemFactory.convexPoints.length-1];
+    if (SemFactory.convexPoints.length > 0) {
+        let pp = SemFactory.convexPoints[SemFactory.convexPoints.length - 1];
         if (p.equals(pp)) return false;
     }
 
@@ -66,37 +66,37 @@ SemFactory.addConvexPoint = (/*semid,*/ p)=>{
     //M.scale.set(0.001,0.001,0.001);
     //ATON.SUI.gPoints.add( M );
 
-    let iconP = new THREE.Sprite( ATON.SUI.getOrCreateSpritePointEdit() );
+    let iconP = new THREE.Sprite(ATON.SUI.getOrCreateSpritePointEdit());
     let ss = ATON.getSceneQueriedDistance() * 0.02;
     if (ss === undefined) ss = 0.02;
     iconP.position.copy(p);
-    iconP.scale.set(ss,ss,ss);
+    iconP.scale.set(ss, ss, ss);
     ATON.SUI.gPoints.add(iconP);
 
     if (numPoints < 4) return false;
 
     // lets build convex shape
-    let geom   = new THREE.ConvexGeometry( SemFactory.convexPoints ); // new THREE.ConvexBufferGeometry( SemFactory.convexPoints );
-    let semesh = new THREE.Mesh( geom, ATON.MatHub.getMaterial("semanticShapeEdit") );
+    let geom = new THREE.ConvexGeometry(SemFactory.convexPoints); // new THREE.ConvexBufferGeometry( SemFactory.convexPoints );
+    let semesh = new THREE.Mesh(geom, ATON.MatHub.getMaterial("semanticShapeEdit"));
 
     //let numMeshes = SemFactory.convexMeshes.length;
 
     // First time: create semnode and add it to current sem group
-    if (!SemFactory.bConvexBuilding){
+    if (!SemFactory.bConvexBuilding) {
         //if (semid === undefined) semid = "sem"+SemFactory._numShapes;
 
         //SemFactory.convexNode = ATON.getSemanticNode(semid) || ATON.createSemanticNode(semid);
         //SemFactory.convexNode = ATON.createSemanticNode();
         //SemFactory.convexNode.add(semesh);
         SemFactory.currSemNode.add(semesh);
-        
+
         // Store
         semesh.userData._convexPoints = [];
-        for (let i=0; i<numPoints; i++){
+        for (let i = 0; i < numPoints; i++) {
             //semesh.userData._convexPoints.push( ATON.Utils.setVectorPrecision(SemFactory.convexPoints[i],3) );
 
             ATON.Utils.setVectorPrecision(SemFactory.convexPoints[i], SemFactory.FLOAT_PREC);
-            
+
             semesh.userData._convexPoints.push(SemFactory.convexPoints[i].x);
             semesh.userData._convexPoints.push(SemFactory.convexPoints[i].y);
             semesh.userData._convexPoints.push(SemFactory.convexPoints[i].z);
@@ -114,16 +114,16 @@ SemFactory.addConvexPoint = (/*semid,*/ p)=>{
 
         //currSemesh.userData._convexPoints.push( ATON.Utils.setVectorPrecision(p,3) );
 
-        ATON.Utils.setVectorPrecision(p,4);
-        currSemesh.userData._convexPoints.push( p.x );
-        currSemesh.userData._convexPoints.push( p.y );
-        currSemesh.userData._convexPoints.push( p.z );
+        ATON.Utils.setVectorPrecision(p, 4);
+        currSemesh.userData._convexPoints.push(p.x);
+        currSemesh.userData._convexPoints.push(p.y);
+        currSemesh.userData._convexPoints.push(p.z);
     }
 
     return true;
 };
 
-SemFactory.undoConvexPoint = ()=>{
+SemFactory.undoConvexPoint = () => {
     let numPoints = SemFactory.convexPoints.length;
     if (numPoints === 0) return;
 
@@ -131,7 +131,7 @@ SemFactory.undoConvexPoint = ()=>{
 
     SemFactory.convexPoints.pop();
 
-    if (SemFactory.currConvexMesh){
+    if (SemFactory.currConvexMesh) {
         let udMesh = SemFactory.currConvexMesh.userData;
         if (udMesh._convexPoints) udMesh._convexPoints.pop();
     }
@@ -140,7 +140,7 @@ SemFactory.undoConvexPoint = ()=>{
 /**
 Cancel current convex semantic shape, if building one
 */
-SemFactory.stopCurrentConvex = ()=>{
+SemFactory.stopCurrentConvex = () => {
     if (!SemFactory.bConvexBuilding) return;
 
     SemFactory.convexPoints = [];
@@ -154,7 +154,7 @@ SemFactory.stopCurrentConvex = ()=>{
 Get current convex semantic shape
 @returns {Node}
 */
-SemFactory.getCurrentConvexShape = ()=>{
+SemFactory.getCurrentConvexShape = () => {
     return SemFactory.currSemNode;
 };
 
@@ -162,8 +162,8 @@ SemFactory.getCurrentConvexShape = ()=>{
 Return true if currently building a convex semantic shape
 @returns {boolean}
 */
-SemFactory.isBuildingShape = ()=>{
-    if (SemFactory.convexPoints.length>0) return true;
+SemFactory.isBuildingShape = () => {
+    if (SemFactory.convexPoints.length > 0) return true;
 
     return false;
 };
@@ -176,7 +176,9 @@ NOTE: if semid exists, add mesh under the same semantic id
 @example
 let S = ATON.SemFactory.completeConvexShape("face")
 */
-SemFactory.completeConvexShape = (semid)=>{
+SemFactory.completeConvexShape = (semid) => {
+    console.log("***************************************************");
+
     SemFactory.convexPoints = [];
     SemFactory.bConvexBuilding = false;
 
@@ -184,29 +186,29 @@ SemFactory.completeConvexShape = (semid)=>{
     //if (SemFactory.currConvexMesh === undefined) return undefined;
     if (SemFactory.currSemNode === undefined) return;
 
-    if (semid === undefined) semid = "sem"+SemFactory._numShapes;
+    if (semid === undefined) semid = "sem" + SemFactory._numShapes;
 
     let S = ATON.getSemanticNode(semid) || ATON.createSemanticNode(semid);
-    
+
     let meshape = SemFactory.currSemNode.children[0];
-    
+
     ATON.SUI.addSemIcon(semid, meshape);
 
-    S.add( meshape );
+    S.add(meshape);
     S.setMaterial( /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape);
     S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ ATON.MatHub.materials.semanticShape, /*ATON.MatHub.materials.semanticShapeHL*/SemFactory.currMaterial);
     S.enablePicking();
 
     SemFactory.currSemNode.removeChildren();
 
-/*
-    SemFactory.convexNode = ATON.getSemanticNode(semid) || ATON.createSemanticNode(semid);
-    SemFactory.convexNode.add(SemFactory.currConvexMesh);
-
-    SemFactory.convexNode.setMaterial( SemFactory.currMaterial );
-    SemFactory.convexNode.setDefaultMaterial(SemFactory.currMaterial);
-    SemFactory.convexNode.enablePicking();
-*/
+    /*
+        SemFactory.convexNode = ATON.getSemanticNode(semid) || ATON.createSemanticNode(semid);
+        SemFactory.convexNode.add(SemFactory.currConvexMesh);
+    
+        SemFactory.convexNode.setMaterial( SemFactory.currMaterial );
+        SemFactory.convexNode.setDefaultMaterial(SemFactory.currMaterial);
+        SemFactory.convexNode.enablePicking();
+    */
     SemFactory._numShapes++;
 
     //console.log(SemFactory.convexNode);
@@ -229,30 +231,60 @@ NOTE: if semid exists, add mesh under the same semantic id
 @example
 let S = ATON.SemFactory.createConvexShape("face", points)
 */
-SemFactory.createConvexShape = (semid, points)=>{
-    let geom   = new THREE.ConvexGeometry( points ); // CHECK: it was THREE.ConvexBufferGeometry( points );
-    let semesh = new THREE.Mesh( geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape );
+SemFactory.createConvexShape = (semid, points) => {
+    console.log("Here we gooooooo!");
+    console.log(semid);
 
-    semesh.userData._convexPoints = [];
-    for (let i=0; i<points.length; i++){
-        let p = points[i];
-        ATON.Utils.setVectorPrecision(p,4);
+    if (semid.includes("Logger")) {
+        let geom = new THREE.ConvexGeometry(points); // CHECK: it was THREE.ConvexBufferGeometry( points );
+        let semesh = new THREE.Mesh(geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-        semesh.userData._convexPoints.push( p.x );
-        semesh.userData._convexPoints.push( p.y );
-        semesh.userData._convexPoints.push( p.z );
+        semesh.userData._convexPoints = [];
+        for (let i = 0; i < points.length; i++) {
+            let p = points[i];
+            ATON.Utils.setVectorPrecision(p, 4);
+
+            semesh.userData._convexPoints.push(p.x);
+            semesh.userData._convexPoints.push(p.y);
+            semesh.userData._convexPoints.push(p.z);
+        }
+
+        ATON.SUI.addSemIcon(semid, semesh);
+
+        let S = ATON.getOrCreateSemanticNode(semid);
+        S.add(semesh);
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+
+        S.enablePicking();
+        ATON._bqSem = true;
+
+        return S;
     }
+    else {
+        let geom = new THREE.ConvexGeometry(points); // CHECK: it was THREE.ConvexBufferGeometry( points );
+        let semesh = new THREE.Mesh(geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-    ATON.SUI.addSemIcon(semid, semesh);
+        semesh.userData._convexPoints = [];
+        for (let i = 0; i < points.length; i++) {
+            let p = points[i];
+            ATON.Utils.setVectorPrecision(p, 4);
 
-    let S = ATON.getOrCreateSemanticNode(semid);
-    S.add(semesh);
-    S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+            semesh.userData._convexPoints.push(p.x);
+            semesh.userData._convexPoints.push(p.y);
+            semesh.userData._convexPoints.push(p.z);
+        }
 
-    S.enablePicking();
-    ATON._bqSem = true;
+        ATON.SUI.addSemIcon(semid, semesh);
 
-    return S;
+        let S = ATON.getOrCreateSemanticNode(semid);
+        S.add(semesh);
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+
+        S.enablePicking();
+        ATON._bqSem = true;
+
+        return S;
+    }
 };
 
 /**
@@ -261,19 +293,19 @@ A minimum of 4 points are required. Return location
 @param {Number} offset - (optional) the offset as percentage on distance between surface and camera (default: 0.02)
 @returns {THREE.Vector3}
 */
-SemFactory.addSurfaceConvexPoint = (/*semid,*/ offset)=>{
+SemFactory.addSurfaceConvexPoint = (/*semid,*/ offset) => {
     if (ATON._queryDataScene === undefined) return false;
 
     if (offset === undefined) offset = 0.02;
 
-    let p   = ATON._queryDataScene.p;
+    let p = ATON._queryDataScene.p;
     let eye = ATON.Nav.getCurrentEyeLocation();
-/*
-    let n = ATON._queryDataScene.n;
-    p.x += (n.x * offset);
-    p.y += (n.y * offset);
-    p.z += (n.z * offset);
-*/
+    /*
+        let n = ATON._queryDataScene.n;
+        p.x += (n.x * offset);
+        p.y += (n.y * offset);
+        p.z += (n.z * offset);
+    */
     p.lerpVectors(p, eye, offset);
 
     SemFactory.addConvexPoint(p);
@@ -292,44 +324,81 @@ NOTE: if semid exists, add mesh under the same semantic id
 @example
 let S = ATON.SemFactory.createSphere("face", THREE.Vector3(0,0,0), 1.5)
 */
-SemFactory.createSphere = (semid, location, radius)=>{
+SemFactory.createSphere = (semid, location, radius) => {
+
+    console.log("Check over heeeeeeeeeeeeeeeeeeeeeer !");
+
     if (location === undefined) return undefined;
     if (radius === undefined) return undefined;
 
-/*
-    if (ATON.getSemanticNode(semid)){
-        console.log("ERROR SemFactory: semantic node "+semid+" already exists.");
-        return false;
-    }
-*/
-    if (semid === undefined) semid = "sem"+SemFactory._numShapes;
+    /*
+        if (ATON.getSemanticNode(semid)){
+            console.log("ERROR SemFactory: semantic node "+semid+" already exists.");
+            return false;
+        }
+    */
+    if (semid === undefined) semid = "sem" + SemFactory._numShapes;
 
     let S = ATON.getOrCreateSemanticNode(semid);
 
-    //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
-    let M = new THREE.Mesh( ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape );
-    
-    // Note: we add multiple spheres to the same <semid> node
-    let sphere = new THREE.Object3D();
-    sphere.position.copy(location);
-    sphere.scale.set(radius, radius, radius);
-    sphere.add(M);
+    console.log("ATON Sematic Factory ***************************!!");
+    console.log(semid);
 
-    // XPF test
-    //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
+    const regex = /_[a-zA-Z0-9]{5}$/; // Matches "_XXXXX" at the end of the string
+    if (semid.includes("Temperature_r8FGV")) {
+        console.log("There is string contains !!!");
+    }
+    if (regex.test(semid)) {
+        //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
+        let M = new THREE.Mesh(ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-    ATON.SUI.addSemIcon(semid, sphere);
+        // Note: we add multiple spheres to the same <semid> node
+        let sphere = new THREE.Object3D();
+        sphere.position.copy(location);
+        sphere.scale.set(radius, radius, radius);
+        sphere.add(M);
 
-    S.add( sphere );
-    S.enablePicking();
-    S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
+        // XPF test
+        //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
 
-    //SemFactory.currParent.add( S );
+        ATON.SUI.addSemIcon(semid, sphere);
 
-    SemFactory._numShapes++;
-    ATON._bqSem = true;
+        S.add(sphere);
+        S.enablePicking();
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
 
-    return S;
+        //SemFactory.currParent.add( S );
+
+        SemFactory._numShapes++;
+        ATON._bqSem = true;
+
+        return S;
+    } else {
+        //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
+        let M = new THREE.Mesh(ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape);
+
+        // Note: we add multiple spheres to the same <semid> node
+        let sphere = new THREE.Object3D();
+        sphere.position.copy(location);
+        sphere.scale.set(radius, radius, radius);
+        sphere.add(M);
+
+        // XPF test
+        //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
+
+        ATON.SUI.addSemIcon(semid, sphere);
+
+        S.add(sphere);
+        S.enablePicking();
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
+
+        //SemFactory.currParent.add( S );
+
+        SemFactory._numShapes++;
+        ATON._bqSem = true;
+
+        return S;
+    }
 };
 
 /**
@@ -342,13 +411,13 @@ NOTE: if semid exists, add mesh under the same semantic id
 @example
 let S = ATON.SemFactory.createSurfaceSphere("face")
 */
-SemFactory.createSurfaceSphere = (semid)=>{
+SemFactory.createSurfaceSphere = (semid) => {
     if (!ATON._queryDataScene) return undefined;
 
     let p = ATON._queryDataScene.p;
     let r = ATON.SUI.getSelectorRadius();
 
-    return SemFactory.createSphere(semid, p,r);
+    return SemFactory.createSphere(semid, p, r);
 };
 
 /**
@@ -360,7 +429,7 @@ Return true on success, otherwise false (e.g. the semantic node does not exist)
 @example
 ATON.SemFactory.deleteSemanticNode("face")
 */
-SemFactory.deleteSemanticNode = (semid)=>{
+SemFactory.deleteSemanticNode = (semid) => {
     let S = ATON.getSemanticNode(semid);
 
     if (S === undefined) return false;
@@ -368,7 +437,7 @@ SemFactory.deleteSemanticNode = (semid)=>{
 
     if (ATON.SUI.gSemIcons === undefined) return true;
 
-    for (let s in ATON.SUI.gSemIcons.children){
+    for (let s in ATON.SUI.gSemIcons.children) {
         let C = ATON.SUI.gSemIcons.children[s];
         if (C && C.name === semid) ATON.SUI.gSemIcons.removeChild(C);
     }

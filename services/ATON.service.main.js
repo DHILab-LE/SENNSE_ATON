@@ -23,9 +23,7 @@ const nanoid = require("nanoid");
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const Core = require('./Core');
-const Auth = require('./Auth');
-const Render = require('./Render');
-const API  = require("./API/v2"); // v2
+const bodyParser = require("body-parser");
 
 
 // Initialize & load config files
@@ -95,6 +93,34 @@ app.use((req, res, next)=>{
 */
 app.use(express.json({ limit: '50mb' }));
 
+// Serve static files from the "public" folder
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
+app.use(bodyParser.json()); // Middleware to parse JSON requests
+
+
+// EJS
+//TODO: move into proper ejs setup routine
+app.set('view engine', 'ejs');
+app.set('views', __dirname+"/views/");
+
+app.get(/^\/s\/(.*)$/, (req,res,next)=>{
+	let d = {};
+	d.sid   = req.params[0];
+	d.title = d.sid;
+	d.appicon = "/hathor/appicon.png";
+	d.scripts = Core.FEScripts;
+
+	let S = Core.readSceneJSON(d.sid);
+	if (S){
+		if (S.title) d.title = S.title;
+		d.appicon = "/api/cover/"+d.sid;
+	}
+
+	res.render("hathor/index", d);
+});
+
+
 // Scenes redirect /s/<sid>
 /*
 app.get(/^\/s\/(.*)$/, function(req,res,next){
@@ -120,12 +146,10 @@ const CACHING_OPT = {
 };
 
 app.use('/', express.static(Core.DIR_PUBLIC, CACHING_OPT ));
+//app.use('/mods', express.static(Core.DIR_NODE_MODULES, /*CACHING_OPT*/));
 
 // Official front-end (Hathor)
-//app.use('/fe', express.static(Core.DIR_FE));
-
-// Common public resources (config/public/)
-if (fs.existsSync(Core.DIR_CONFIGPUB)) app.use('/common', express.static(Core.DIR_CONFIGPUB));
+app.use('/fe', express.static(Core.DIR_FE));
 
 // Web-apps
 app.use('/a', express.static(Core.DIR_WAPPS));
@@ -133,18 +157,12 @@ app.use('/a', express.static(Core.DIR_WAPPS));
 // Data (static)
 app.use('/', express.static(Core.DIR_DATA, CACHING_OPT));
 
-// Setup authentication
-Auth.init(app);
 
+Core.setupPassport();
+Core.realizeAuth(app);
 
 // REST API
-Core.realizeBaseAPI(app); 	// v1 (for backward compatibility)
-API.init( app );			// v2
-
-
-// Rendering
-Core.Render.setup(app);
-
+Core.realizeBaseAPI(app);
 
 // Micro-services proxies
 //=================================================
@@ -164,6 +182,18 @@ app.use('/svrc', createProxyMiddleware({
 	changeOrigin: true 
 }));
 
+
+// Proxy route
+app.use('/api', (req, res) => {
+    const url = 'https://sennse.ispc.cnr.it' + req.url; // replace with your API URL
+    req.pipe(request(url)).pipe(res);
+});
+
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "upgrade-insecure-requests");
+    next();
+});
+
 // WebDav
 /*
 app.use('/dav', createProxyMiddleware({ 
@@ -182,10 +212,12 @@ app.use('/dav', createProxyMiddleware({
 //==================================
 Core.setupFlares(app);
 
-for (let fid in Core.flares){
-	//let fid = Core.flares[f];
-	app.use('/flares/'+fid, express.static(Core.DIR_FLARES+fid+"/public/"));
+for (let f in Core.flares){
+	let flarename = Core.flares[f];
+	app.use('/flares/'+flarename, express.static(Core.DIR_FLARES+flarename+"/public/"));
 }
+
+app.use(express.static(path.join(__dirname, '../public/hathor'))); // Serve static files
 
 // START
 //==================================

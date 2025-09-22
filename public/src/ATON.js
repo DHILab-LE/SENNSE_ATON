@@ -8,7 +8,7 @@
 
 ==================================================================================*/
 
-//'use strict';
+'use strict';
 
 /**
 @namespace ATON
@@ -43,8 +43,7 @@ import FX from "./ATON.fx.js";
 import XPFNetwork from "./ATON.xpfnetwork.js";
 import CC from "./ATON.cc.js";
 import MRes from "./ATON.mres.js";
-import ASCII from "./ATON.ascii.js";
-import REQ from "./ATON.req.js";
+//import NX from "./_prv/ATON.nx.js";
 
 // Classes
 ATON.Node       = Node;
@@ -74,8 +73,7 @@ ATON.App        = App;
 ATON.FX         = FX;
 ATON.XPFNetwork = XPFNetwork;
 ATON.MRes       = MRes;
-ATON.ASCII      = ASCII;
-ATON.REQ        = REQ;
+//ATON.NX         = NX;
 
 //==============================================================
 // Consts
@@ -96,10 +94,25 @@ ATON.NTYPES.SCENE  = 3;
 ATON.NTYPES.SEM    = 4;
 ATON.NTYPES.UI     = 5;
 
+// Folders
+ATON.BASE_URL           = window.location.origin;
+ATON.PATH_RESTAPI       = `${ATON.BASE_URL}/api/`; // "../api/";
+ATON.PATH_RESTAPI_SCENE = `${ATON.PATH_RESTAPI}scene/`;
+ATON.PATH_WAPPS         = `${ATON.BASE_URL}/a/`;
+ATON.PATH_MODS          = `${ATON.BASE_URL}/mods/`; // "../mods/";
+//ATON.PATH_THREE         = ATON.PATH_MODS + "three/";
+ATON.PATH_DRACO_LIB     = `${ATON.BASE_URL}/dist/draco/`; //ATON.PATH_THREE+"examples/js/libs/draco/";
+ATON.PATH_BASIS_LIB     = `${ATON.BASE_URL}/dist/basis/`; //ATON.PATH_THREE+"examples/js/libs/basis/";
+ATON.PATH_IFC_LIB       = "ifc/"; //ATON.BASE_URL + "/dist/ifc/";
+
+ATON.PATH_COLLECTION = `${ATON.BASE_URL}/collections/`; // "../collection/";
+ATON.PATH_SCENES     = `${ATON.BASE_URL}/scenes/`; // "../scenes/";
+ATON.PATH_RES        = `${ATON.BASE_URL}/res/`; // "../res/";
+ATON.PATH_FE         = `${ATON.BASE_URL}/s/`; // "/fe/";
 
 ATON.SHADOWS_NEAR = 0.1;
-ATON.SHADOWS_FAR  = 100.0; //50.0;
-ATON.SHADOWS_SIZE = 50.0;
+ATON.SHADOWS_FAR  = 50.0; //50.0;
+ATON.SHADOWS_SIZE = 15.0;
 ATON.SHADOWS_RES  = 1024; // 512
 
 ATON.AMB_L = 0.2; // 0.1 - Ambient for shadowed areas (without LPs)
@@ -114,40 +127,11 @@ ATON.SCALE_VERYSMALL = -10;
 
 
 // Flares (plugins)
-ATON.Flares = {};
-ATON._fReqList = [];
-
-ATON._bInitialized = false;
-ATON._b2D = false;
+ATON._flares = [];
 
 // Resource mappers
 ATON._resMappers = [];
 
-// Clip-planes
-ATON._clipPlanes = [];
-
-/**
-Set ATON base url (root)
-@param {string} baseurl - baseurl
-*/
-ATON.setBaseURL = (baseurl)=>{
-    ATON.BASE_URL           = baseurl;
-    ATON.PATH_RESTAPI       = `${ATON.BASE_URL}/api/`;
-    ATON.PATH_RESTAPI_SCENE = `${ATON.PATH_RESTAPI}scene/`;
-    ATON.PATH_RESTAPI2      = `${ATON.BASE_URL}/api/v2/`;
-    ATON.PATH_WAPPS         = `${ATON.BASE_URL}/a/`;
-    ATON.PATH_FLARES        = `${ATON.BASE_URL}/flares/`;
-    ATON.PATH_DRACO_LIB     = `${ATON.BASE_URL}/dist/draco/`; //ATON.PATH_THREE+"examples/js/libs/draco/";
-    ATON.PATH_BASIS_LIB     = `${ATON.BASE_URL}/dist/basis/`; //ATON.PATH_THREE+"examples/js/libs/basis/";
-    
-    ATON.PATH_COLLECTION = `${ATON.BASE_URL}/collections/`;
-    ATON.PATH_SCENES     = `${ATON.BASE_URL}/scenes/`;
-    ATON.PATH_RES        = `${ATON.BASE_URL}/res/`;
-    ATON.PATH_FE         = `${ATON.BASE_URL}/s/`;
-};
-
-// Defaults to current origin
-ATON.setBaseURL( window.location.origin );
 
 /**
 Set path collection (3D models, audio, panoramas, ...)
@@ -213,37 +197,17 @@ ATON._onUserInteraction = ()=>{
     }
 };
 
-// FIXME:
-ATON.rewindAllPlayingMedia = ()=>{
-    if (ATON._elPanoVideo) ATON._elPanoVideo.currentTime = 0;
-    if (ATON.XPFNetwork._elVid) ATON.XPFNetwork.currentTime = 0;
-
-    if (ATON._auMain){
-        ATON._auMain.stop();
-        ATON._auMain.play();
-    }
-
-    for (let v in ATON.MediaFlow._vStreams){
-        let vs = ATON.MediaFlow._vStreams[v].el;
-        if (vs.playing && !vs.uid){
-            vs.stop();
-            vs.play();
-        }
-    }
+/* TODO: plugin
+ATON.addRay = (jspath)=>{
+    let s = document.createElement('script');
+    s.setAttribute('src', jspath);
+    s.async = false;
+    document.body.appendChild(s);
 };
+*/
 
 // Auth
 ATON.checkAuth = (onLogged, onNotLogged)=>{
-    ATON.REQ.get("user",
-        (data)=>{
-            if (data && onLogged) onLogged(data);
-            else if (onNotLogged) onNotLogged();
-        },
-        (err)=>{
-            if (onNotLogged) onNotLogged(); 
-        }
-    );
-/*
     $.ajax({
         type: 'GET',
         url: ATON.PATH_RESTAPI+"user",
@@ -259,7 +223,6 @@ ATON.checkAuth = (onLogged, onNotLogged)=>{
             if (onNotLogged) onNotLogged();
         }
     });
-*/
 };
 
 
@@ -273,7 +236,7 @@ ATON._setupBaseListeners = ()=>{
     if (screenfull.isEnabled){
 	    screenfull.on('change', ()=>{
             ATON._bFS = screenfull.isFullscreen;
-            ATON.fire("Fullscreen", ATON._bFS);
+            ATON.fireEvent("Fullscreen", ATON._bFS);
 
 		    if (ATON._bFS) console.log("Now fullscreen");
             else console.log("Exit fullscreen");
@@ -283,7 +246,7 @@ ATON._setupBaseListeners = ()=>{
     document.addEventListener('fullscreenchange',(e)=>{
         ATON._bFS = document.fullscreenElement? true : false;
 
-        ATON.fire("Fullscreen", ATON._bFS);
+        ATON.fireEvent("Fullscreen", ATON._bFS);
 
         if (ATON._bFS) console.log("Now fullscreen");
         else console.log("Exit fullscreen");
@@ -326,8 +289,8 @@ ATON._setupBaseListeners = ()=>{
     ///el.addEventListener('dblclick', ATON._doubleTap, false);
 
     el.addEventListener('mousedown', (e)=>{
-        if (e.button === 1) ATON.fire("MouseMidButton");      // middle-click
-        if (e.button === 2) ATON.fire("MouseRightButton");    // right-click
+        if (e.button === 1) ATON.fireEvent("MouseMidButton");      // middle-click
+        if (e.button === 2) ATON.fireEvent("MouseRightButton");    // right-click
     });
 
     el.addEventListener( 'wheel', ATON._onMouseWheel, false );
@@ -384,7 +347,7 @@ ATON._setupBaseListeners = ()=>{
         ATON._bPointerDown = false;
         ATON._onUserInteraction();
 
-        ATON.fire("DoubleTap", e.srcEvent);
+        ATON.fireEvent("DoubleTap", e.srcEvent);
         //console.log(e.srcEvent);
     });
 
@@ -397,7 +360,7 @@ ATON._setupBaseListeners = ()=>{
         ATON._updateScreenMove(e.srcEvent);
         ATON._handleQueries();
 
-        ATON.fire("Tap", e.srcEvent);
+        ATON.fireEvent("Tap", e.srcEvent);
         //console.log(e.srcEvent);
 
         // UI selection
@@ -427,8 +390,8 @@ ATON._setupBaseListeners = ()=>{
         
         if (!ATON._bListenKeyboardEvents) return;
 
-        ATON.fire("KeyPress", e.key);
-        //ATON.fire("KeyPress/"+e.key);
+        ATON.fireEvent("KeyPress", e.key);
+        //ATON.fireEvent("KeyPress/"+e.key);
     }, false);
 
     window.addEventListener("keyup", (e)=>{
@@ -439,8 +402,8 @@ ATON._setupBaseListeners = ()=>{
 
         if (!ATON._bListenKeyboardEvents) return;
 
-        ATON.fire("KeyUp", e.key);
-        //ATON.fire("KeyUp/"+e.key);
+        ATON.fireEvent("KeyUp", e.key);
+        //ATON.fireEvent("KeyUp/"+e.key);
     }, false);
 
     // Defaults
@@ -483,7 +446,7 @@ ATON._onResize = ()=>{
 ATON._onMouseWheel = (e)=>{
     e.preventDefault();
 
-    ATON.fire("MouseWheel", e.deltaY);
+    ATON.fireEvent("MouseWheel", e.deltaY);
 };
 
 ATON.focusOn3DView = ()=>{
@@ -512,7 +475,7 @@ ATON._stdActivation = ()=>{
     if (!ATON.Nav._bControl) return;
 
     if (ATON.XPFNetwork._semCurr !== undefined){
-        ATON.fire("SemanticMaskSelect", ATON.XPFNetwork._semCurr);
+        ATON.fireEvent("SemanticMaskSelect", ATON.XPFNetwork._semCurr);
     }
 
     // Handle active immersive AR/VR session
@@ -550,7 +513,7 @@ ATON._stdActivation = ()=>{
     }
 
     // TODO: leave this and disable requestPOVbyNode
-    //if (ATON._hoveredSemNode) ATON.fire("SemanticNodeSelect", ATON._hoveredSemNode);
+    //if (ATON._hoveredSemNode) ATON.fireEvent("SemanticNodeSelect", ATON._hoveredSemNode);
 
     // In orbit mode, focus on selected SemNode...
     let hsn = ATON.getSemanticNode(ATON._hoveredSemNode);
@@ -625,8 +588,6 @@ ATON.realize = ( bNoRender )=>{
         antialias: true, //ATON.device.isMobile? false : true,
         alpha: true,     // required for AR
 
-        //logarithmicDepthBuffer: true, // issues with postfx (SSAO)
-
         //powerPreference: "high-performance",
 
         ///pecision: "lowp", //"mediump"
@@ -681,7 +642,7 @@ ATON.realize = ( bNoRender )=>{
     ATON._renderer.toneMappingExposure = 1.0;
     //ATON._renderer.gammaOutput = true;
     //ATON._renderer.gammaFactor = 2.2;
-    //ATON._renderer.useLegacyLights = true;
+    //ATON._renderer.physicallyCorrectLights = true;
 
     //console.log(ATON._renderer.getPixelRatio());
 
@@ -709,7 +670,6 @@ ATON.realize = ( bNoRender )=>{
     //canvas.style.height  = "100%";
 
     ATON.UI.init();
-    ATON.REQ.init();
 
     // Multimedia
     ATON._vpanoPlaying = false;
@@ -717,7 +677,6 @@ ATON.realize = ( bNoRender )=>{
 
     ATON.EventHub.init();
     ATON.MatHub.init();
-    ATON.ASCII.init();
 
     //ATON._setupLoadManager();
     ATON._assetsManager = {};
@@ -769,7 +728,7 @@ ATON.realize = ( bNoRender )=>{
     ATON._lps = []; // list of lightprobes
     ATON._bAutoLP = false;
     ATON._envMapInt = 1.0;
-    ATON._numLPbounces = 1; //2;
+    ATON._numLPbounces = 2;
     ATON._lpbCount = 0;
     
     // Shadows
@@ -820,6 +779,9 @@ ATON.realize = ( bNoRender )=>{
 
     // XPF-Network
     ATON.XPFNetwork.init();
+
+    // NX
+    //ATON.NX.init();
 
     // FX Composer setup
     if (!ATON.device.lowGPU && !ATON.device.isMobile) ATON.FX.init();
@@ -890,71 +852,18 @@ ATON.realize = ( bNoRender )=>{
 
     if (ATON.device.isMobile) ATON._readDeviceOrientationMode();
 
-    // Start loading required flares (if any)
-    ATON._fLoading  = 0;
-    ATON._fRequired = ATON._fReqList.length;
+    // Plugins
+    for (let p in ATON._flares){
+        let P = ATON._flares[p];
 
-    ATON._loadFlares();
-
-    // Gizmo transforms
-    ATON._gizmo  = undefined;
-    ATON._bGizmo = false;
-
-    ATON.focusOn3DView();
-
-    ATON._bInitialized = true;
-};
-
-// TODO
-ATON.realize2D = ()=>{
-    ATON._b2D = true;
-
-    ATON.UI.init();
-    ATON.REQ.init();
-
-    document.body.classList.add("aton-body2D");
-    document.body.oncontextmenu = null;
-
-    ATON.EventHub.init();
-    //ATON.Photon.init();
-
-    //ATON.MediaFlow.init();
-
-    ATON._bInitialized = true;
-};
-
-/**
-Add (register) globally a flare (ATON plugin)
-@param {Flare} P - The flare object
-*/
-ATON.addFlare = (P)=>{
-    if (P === undefined) return;
-
-    let numFlares = Object.keys(ATON.Flares).length;
-
-    let fid = P.getID();
-
-    if (fid) ATON.Flares[fid] = P;
-    else ATON.Flares[ "F"+numFlares ] = P;
-};
-
-ATON.registerFlare = ATON.addFlare;
-
-/*
-ATON._setupFlares = ()=>{
-    for (let p in ATON.Flares){
-        let P = ATON.Flares[p];
-
-        // Experimental (TODO: move in _setupFlareScripts)
+        // Experimental
         if (P._deps.length > 0){
             let cc = P._deps.length;
 
             for (let s in P._deps){
                 let jss = document.createElement("script");
                 jss.src = P._deps[s];
-                jss.async = false;
-                //document.documentElement.firstChild.appendChild(jss);
-                document.head.appendChild(jss);
+                document.documentElement.firstChild.appendChild(jss);
 
                 jss.onload = ()=>{
                     cc--;
@@ -973,116 +882,24 @@ ATON._setupFlares = ()=>{
         if (P.setup !== undefined)  P.setup();
         if (P.update !== undefined) ATON.addUpdateRoutine( P.update );
     }
+
+    // Gizmo transforms
+    ATON._gizmo  = undefined;
+    ATON._bGizmo = false;
+
+    ATON.focusOn3DView();
 };
-*/
 
 /**
-Get ATON flare via id
-@param {string} id - The local flare ID
-@returns {Flare}
+Add (register) globally a flare (ATON plugin)
+@param {Flare} P - The flare object
 */
-ATON.getFlare = (id)=>{
-    return ATON.Flares[id];
-}
-
-ATON.loadScript = (src, onLoad, onError)=>{
-    let jss = document.createElement("script");
-    
-    jss.src   = src;
-    jss.async = false;
-    document.head.appendChild(jss);
-
-    if (onLoad)  jss.onload  = onLoad;
-    if (onError) jss.onerror = onError;
+ATON.addFlare = (P)=>{
+    if (P === undefined) return;
+    ATON._flares.push(P);
 };
 
-ATON._loadFlare = (fid)=>{
-    ATON._fLoading++;
-
-    $.get(ATON.PATH_RESTAPI2+"flares/"+fid, (f)=>{
-        let files = f.files;
-        if (files){
-            let numscripts = files.length;
-
-            for (let s in files){
-
-                ATON.loadScript(ATON.PATH_FLARES + fid+"/"+files[s],
-                    ()=>{
-                        numscripts--;
-                        if (numscripts <= 0) ATON._onFlareLoaded(fid);
-                    },
-                    ()=>{
-                        console.log("Missing flare '"+fid+"' dependency: " + files[s]);
-                        numscripts--;
-                        if (numscripts <= 0) ATON._onFlareLoaded(fid);
-                    }
-                );
-/*
-                let jss = document.createElement("script");
-                jss.src = "/flares/"+fid+"/"+files[s];
-                jss.async = false;
-                document.head.appendChild(jss);
-
-                jss.onload = ()=>{
-                    numscripts--;
-                    if (numscripts <= 0) ATON._onFlareLoaded(fid);
-                };
-
-                jss.onerror = ()=>{
-                    console.log("Missing flare '"+fid+"' dependency: " + files[s]);
-                    numscripts--;
-                    if (numscripts <= 0) ATON._onFlareLoaded(fid);
-                };
-*/
-            }
-        }
-    }).fail(()=>{
-        console.log("Flare "+fid+" not found.");
-
-        ATON._onFlareError(fid);
-    });
-};
-
-ATON._loadFlares = ()=>{
-    if (ATON._fRequired <= 0){
-        ATON.fire("AllFlaresReady");
-        return;
-    }
-
-    for (let f in ATON._fReqList) ATON._loadFlare( ATON._fReqList[f] );
-};
-
-ATON._onFlareLoaded = (fid)=>{
-    console.log("All deps loaded for flare '"+fid+"'");
-    ATON._deployNewFlares();
-    
-    ATON._fLoading--;
-    if (ATON._fLoading <= 0) ATON._onAllFlaresLoaded();
-};
-
-ATON._onFlareError = (fid)=>{
-    ATON._fLoading--;
-    if (ATON._fLoading <= 0) ATON._onAllFlaresLoaded();  
-};
-
-ATON._onAllFlaresLoaded = ()=>{
-    console.log("All Flares ready!");
-    ATON.fire("AllFlaresReady");
-};
-
-ATON._deployFlare = (F)=>{
-    if (F._bDeployed) return;
-
-    if (F.setup !== undefined)  F.setup();
-    if (F.update !== undefined) ATON.addUpdateRoutine( F.update );
-
-    F._bDeployed = true;
-};
-
-ATON._deployNewFlares = ()=>{
-    for (let f in ATON.Flares) ATON._deployFlare( ATON.Flares[f] );
-};
-
+ATON.registerFlare = ATON.addFlare;
 
 /**
 Set ATON collection path modifier
@@ -1135,12 +952,12 @@ ATON._setupLoadManager = ()=>{
     ATON._loadManager = new THREE.LoadingManager();
     ATON._loadManager.onStart = ( url, itemsLoaded, itemsTotal )=>{
 	    console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
-        ATON.fire("NodeRequestFired", url);
+        ATON.fireEvent("NodeRequestFired", url);
     };
 
     ATON._loadManager.onLoad = ()=>{
 	    console.log( 'Loading complete!');
-        ATON.fire("AllNodeRequestsCompleted");
+        ATON.fireEvent("AllNodeRequestsCompleted");
     };
 
     ATON._loadManager.onProgress = ( url, itemsLoaded, itemsTotal )=>{
@@ -1182,11 +999,11 @@ ATON.resetPixelDensity = ()=>{
 ATON._readDeviceOrientationMode = ()=>{
     if (Math.abs(window.orientation) === 90){
         console.log("Landscape Mode");
-        ATON.fire("MobileLandscapeMode");
+        ATON.fireEvent("MobileLandscapeMode");
     }
     else {
         console.log("Portrait Mode");
-        ATON.fire("MobilePortraitMode");
+        ATON.fireEvent("MobilePortraitMode");
     }
 
     setTimeout( ATON._onResize, 500);
@@ -1258,6 +1075,9 @@ Get a previously created semantic node
 @returns {Node}
 */
 ATON.getSemanticNode = (id)=>{
+    // console.log("********************");
+    // console.log(id);
+    
     if (id === undefined) return undefined; 
     return ATON.semnodes[id];
 };
@@ -1396,11 +1216,11 @@ ATON.getWorldScale = ()=>{
 // Asset loading routines
 ATON._assetReqNew = (url)=>{
     ATON._numReqLoad++;
-    ATON.fire("NodeRequestFired", url);
+    ATON.fireEvent("NodeRequestFired", url);
 };
 
 ATON._assetReqComplete = (url)=>{
-    ATON.fire("NodeRequestCompleted", url);
+    ATON.fireEvent("NodeRequestCompleted", url);
     ATON._numReqLoad--;
 
     if (ATON._numReqLoad <= 0) ATON._onAllReqsCompleted();
@@ -1417,12 +1237,12 @@ ATON._onAllReqsCompleted = ()=>{
 
     //ATON._bDirtyLP = true;
 
-    ATON.fire("AllNodeRequestsCompleted");
+    ATON.fireEvent("AllNodeRequestsCompleted");
 
     ATON._postAllReqsCompleted();
 
     // FIXME: dirty
-//    setTimeout( ()=>{
+    setTimeout( ()=>{
         //if (c && ATON._mMainPano) ATON._mMainPano.position.copy(c);
         ATON.updateLightProbes();
 
@@ -1431,7 +1251,7 @@ ATON._onAllReqsCompleted = ()=>{
             ATON._dMainL.shadow.autoUpdate = false;
             console.log("Lazy shadows");
         }
-//    }, 1000);
+    }, 1000);
 };
 
 ATON._postAllReqsCompleted = (R)=>{
@@ -1477,7 +1297,7 @@ ATON.recomputeSceneBounds = ( ubs )=>{
     ATON.bounds.center = BS.center;
     ATON.bounds.radius = BS.radius;
 */
-    //console.log(ATON.bounds);
+    console.log(ATON.bounds);
 
     if (ATON.bounds.radius <= 0.0) return;
 
@@ -1516,34 +1336,22 @@ ATON.recomputeSceneBounds = ( ubs )=>{
 };
 
 /**
-Register a node resource handler
-@param {string} id - the handler ID (e.g. "ifc")
-@param {function} handler - handler consuming the resource url and ATON Node hosting the final resource. Must return true if handled, false otherwise
+Register a node resource handler for a given extension
+@param {string} ext - the file extension (e.g. "ifc")
+@param {function} routine - handler consuming the resource url and ATON node argument hosting the final resource
 @example
 ATON.registerNodeResourceHandler("ifc", ( resurl, N )=>{
-    if (!resurl.endsWith(".ifc")) return false;
-
-    // do stuff to load and convert "resurl" into a THREE resource object
+    // do stuff to load "resurl" into a THREE resource object
     N.add( resource );
-    
-    return true;
 });
 */
-ATON.registerNodeResourceHandler = (id, handler)=>{
+ATON.registerNodeResourceHandler = (ext, routine)=>{
     if (!ATON._resHandler) ATON._resHandler = {};
 
-    ATON._resHandler[id] = handler;
-    console.log("Registered resource handler '"+id+"'");
+    ATON._resHandler[ext] = routine;
+    console.log("Registered handler for extension: "+ext);
 };
 
-/**
-Remove a node resource handler
-@param {string} id - the handler ID to remove (e.g. "ifc")
-*/
-ATON.removeNodeResourceHanlder = (id)=>{
-    if (!ATON._resHandler) return;
-    if (ATON._resHandler[id]) ATON._resHandler[id] = undefined;
-};
 
 ATON.initGraphs = ()=>{
     // Global root
@@ -1568,21 +1376,19 @@ ATON.initGraphs = ()=>{
     ATON._mainRoot.add(ATON._rootUI);
 
     // Uniform lighting
-    ATON.ambLight = new THREE.AmbientLight( ATON.MatHub.colors.white /*ATON._mainRoot.background*/ );
-    ATON.ambLight.intensity = 3.0;
+    ATON.ambLight = new THREE.AmbientLight( new THREE.Color(1,1,1) /*ATON._mainRoot.background*/ );
+    //ATON.ambLight.intensity = 1.5;
     ATON._rootVisibleGlobal.add(ATON.ambLight);
 
     // Point light
     ATON.plight = new THREE.PointLight();
     ATON.plight.intensity = 0.0;
-    ATON.plight.decay     = 0.2;
     ATON._rootVisibleGlobal.add(ATON.plight);
 
 };
 
 ATON.enablePointLight = ()=>{
-    ATON.plight.intensity = 3.0; //0.2;
-    //console.log(ATON.plight)
+    ATON.plight.intensity = 2.0;
 
     //if (pos) ATON.plight.position.copy(pos);
     //if (rad) ATON.plight.distance = rad;
@@ -1652,27 +1458,6 @@ ATON.getNumLightProbes = ()=>{
     return ATON._lps.length;
 };
 
-ATON.clearLightProbes = ()=>{
-    for (let i in ATON._lps){
-        if (ATON._lps[i]){
-            ATON._lps[i].clear();
-            delete ATON._lps[i];
-        }
-    }
-    ATON._lps = [];
-
-    ATON.setNeutralAmbientLight(1);
-
-    ATON._rootVisible.traverse((o) => {
-        let LP = o.userData.LP;
-        if (LP && LP instanceof ATON.LightProbe){
-            o.material.envMap  = null;
-            o.material.envMapIntensity = null;
-            o.material.needsUpdate     = true;
-        }
-    });
-};
-
 // Internal routine to update LPs
 ATON._updLP = ()=>{
     for (let i in ATON._lps) ATON._lps[i].update();
@@ -1719,7 +1504,7 @@ ATON.dirtyLightProbes = (n)=>{
 Update all LightProbes in the scene
 */
 ATON.updateLightProbes = ()=>{
-    //if (ATON.XR._bPresenting) return; // CHECK
+    if (ATON.XR._bPresenting) return; // CHECK
     if (ATON._lps.length === 0) return;
 
     for (let p=0; p<ATON._numLPbounces; p++) ATON._updLP(); // multi-bounce LP captures
@@ -1772,8 +1557,6 @@ ATON.setMainPanorama = (path)=>{
         ATON._mMainPano.layers.disable(ATON.NTYPES.SCENE);
         ATON._mMainPano.layers.disable(ATON.NTYPES.SEM);
         ATON._mMainPano.layers.disable(ATON.NTYPES.UI);
-
-        ATON._mMainPano.raycast = ATON.Utils.VOID_CAST;
         
         ATON.setMainPanoramaRadius(ATON.Nav.STD_FAR * 0.8);
         ///ATON.setMainPanoramaRadius(100.0);
@@ -1835,7 +1618,7 @@ ATON.setMainPanorama = (path)=>{
         //console.log(ATON._elPanoVideo);
 
         ATON._realizeOrUpdateMainPano(tpano);
-        ATON.fire("MainPanoVideo");
+        ATON.fireEvent("MainPanoVideo");
     }
     // Static Panorama
     else {
@@ -1847,7 +1630,7 @@ ATON.setMainPanorama = (path)=>{
                 hdr.colorSpace  = ATON._stdEncoding;
 
                 ATON._realizeOrUpdateMainPano(hdr);
-                ATON.fire("MainPanoHDR");
+                ATON.fireEvent("MainPanoHDR");
             });
 
             return;
@@ -1861,7 +1644,7 @@ ATON.setMainPanorama = (path)=>{
                 exr.colorSpace  = ATON._stdEncoding;
 
                 ATON._realizeOrUpdateMainPano(exr);
-                ATON.fire("MainPanoHDR");
+                ATON.fireEvent("MainPanoHDR");
             });
 
             return;
@@ -1879,7 +1662,7 @@ ATON.setMainPanorama = (path)=>{
 		    tex.generateMipmaps = true;
 
             ATON._realizeOrUpdateMainPano(tex);
-            ATON.fire("MainPano");
+            ATON.fireEvent("MainPano");
         });
 
     }
@@ -2048,7 +1831,7 @@ ATON.setMainLightDirection = (v)=>{
         ATON._dMainL = new THREE.DirectionalLight( new THREE.Color(1,1,1), 1.0 );
         ATON._dMainL.castShadow = false;
 
-        ATON._dMainL.intensity = 2.0; //0.8;
+        ATON._dMainL.intensity = 0.8;
 
         ATON._dMainLtgt = new THREE.Object3D();
         ATON._rootVisibleGlobal.add(ATON._dMainLtgt);
@@ -2126,9 +1909,6 @@ ATON.adjustShadowsParamsFromSceneBounds = ()=>{
         ATON._bShadowsFixedBound = true;
         ATON._shadowsFixedBoundCenter = c;
         ATON._shadowsSize = r * 1.5;
-
-        //ATON._shadowsNear = ATON.SHADOWS_NEAR;
-        //ATON._shadowsFar  = r * 20.0;
 
         //console.log(ATON._shadowsNear,ATON._shadowsFar);
     }
@@ -2284,18 +2064,6 @@ ATON.toggleAdaptiveDensity = (b)=>{
 };
 
 /**
-Set dynamic density range
-@param {number} min - minimum density (default 0.2)
-@param {number} max - maximum density (default 1.5)
-*/
-ATON.setAdaptiveDensityRange = (min, max)=>{
-    if (min >= max) return;
-
-    ATON._adMin = min;
-    ATON._adMax = max;
-};
-
-/**
 Set dynamic rendering FPS budgets. Default values are 20 and 55
 @param {number} minBudget - the lower bound to trigger a lower rendering profile
 @param {number} maxBudget - the upper bound to trigger a higher rendering profile
@@ -2335,7 +2103,7 @@ ATON._handleDynamicRenderProfiles = ()=>{
 */
         //ATON.toggleShadows(false);
 
-        ATON.fire("RequestLowerRender");
+        ATON.fireEvent("RequestLowerRender");
         //console.log("Need lower render profile");
     }
 
@@ -2361,7 +2129,7 @@ ATON._handleDynamicRenderProfiles = ()=>{
             if (et > 1.0) ATON.MRes.setTSetsErrorTarget(et);
         }
 */
-        ATON.fire("RequestHigherRender");
+        ATON.fireEvent("RequestHigherRender");
         //console.log("Can request higher render profile");
     }
 /*
@@ -2382,7 +2150,7 @@ ATON._onFrame = ()=>{
     
     ATON._markFPS();
 
-    //ATON.fire("preframe");
+    //ATON.fireEvent("preframe");
 
     // Render
     //ATON._renderer.render( ATON._mainRoot, ATON.Nav._camera );
@@ -2430,7 +2198,7 @@ ATON._onFrame = ()=>{
         ATON._lpbCount--;
     }
 */
-    //ATON.fire("frame");
+    //ATON.fireEvent("frame");
 };
 
 // Render frame
@@ -2667,32 +2435,6 @@ ATON.getSceneQueriedNormal = ()=>{
 };
 
 /**
-Get queried object name (if any) on visible scene.
-If nothing is queried or object has no name, return undefined
-@returns {String}
-@example
-let ob = ATON.getSceneQueriedObjectName()
-*/
-ATON.getSceneQueriedObjectName = ()=>{
-    if (ATON._queryDataScene === undefined) return undefined;
-    if (ATON._queryDataScene.o === undefined) return undefined;
-    
-    return ATON._queryDataScene.o.name;
-};
-
-/**
-Get queried uv on currently picked surface if any.
-If no surface is currently queried, return undefined
-@returns {THREE.Vector2}
-@example
-let uv = ATON.getSceneQueriedUV()
-*/
-ATON.getSceneQueriedUV = ()=>{
-    if (ATON._queryDataScene === undefined) return undefined;
-    return ATON._queryDataScene.uv;
-};
-
-/**
 Set query range
 @param {number} near - near distance (default: 0.0)
 @param {number} far - far distance (default: Infinity) 
@@ -2730,7 +2472,7 @@ ATON._handleQuerySemantics = ()=>{
         ATON._queryDataSem = undefined;
 
         if (ATON._hoveredSemNode){
-            ATON.fire("SemanticNodeLeave", ATON._hoveredSemNode);
+            ATON.fireEvent("SemanticNodeLeave", ATON._hoveredSemNode);
             let S = ATON.getSemanticNode(ATON._hoveredSemNode);
             if (S && S.onLeave) S.onLeave();
         }
@@ -2749,7 +2491,7 @@ ATON._handleQuerySemantics = ()=>{
             ATON._queryDataSem = undefined;
 
             if (ATON._hoveredSemNode){
-                ATON.fire("SemanticNodeLeave", ATON._hoveredSemNode);
+                ATON.fireEvent("SemanticNodeLeave", ATON._hoveredSemNode);
                 let S = ATON.getSemanticNode(ATON._hoveredSemNode);
                 if (S && S.onLeave) S.onLeave();
             }
@@ -2778,7 +2520,7 @@ ATON._handleQuerySemantics = ()=>{
     if (hsn){
         if (ATON._hoveredSemNode !== hsn){
             if (ATON._hoveredSemNode){
-                ATON.fire("SemanticNodeLeave", ATON._hoveredSemNode);
+                ATON.fireEvent("SemanticNodeLeave", ATON._hoveredSemNode);
                 let S = ATON.getSemanticNode(ATON._hoveredSemNode);
                 if (S && S.onLeave) S.onLeave();
                 
@@ -2786,7 +2528,7 @@ ATON._handleQuerySemantics = ()=>{
             }
 
             ATON._hoveredSemNode = hsn;
-            ATON.fire("SemanticNodeHover", hsn);
+            ATON.fireEvent("SemanticNodeHover", hsn);
             let S = ATON.getSemanticNode(hsn);
             if (S && S.onHover) S.onHover();
 
@@ -2813,7 +2555,7 @@ ATON._handleQueryUI = ()=>{
         ATON._queryDataUI = undefined;
 
         if (ATON._hoveredUI){
-            ATON.fire("UINodeLeave", ATON._hoveredUI);
+            ATON.fireEvent("UINodeLeave", ATON._hoveredUI);
             const S = ATON.getUINode(ATON._hoveredUI);
             if (S && S.onLeave) S.onLeave();
         }
@@ -2832,7 +2574,7 @@ ATON._handleQueryUI = ()=>{
             ATON._queryDataUI = undefined;
 
             if (ATON._hoveredUI){
-                ATON.fire("UINodeLeave", ATON._hoveredUI);
+                ATON.fireEvent("UINodeLeave", ATON._hoveredUI);
                 const S = ATON.getUINode(ATON._hoveredUI);
                 if (S && S.onLeave) S.onLeave();
             }
@@ -2861,7 +2603,7 @@ ATON._handleQueryUI = ()=>{
     if (hui){
         if (ATON._hoveredUI !== hui){
             if (ATON._hoveredUI){
-                ATON.fire("UINodeLeave", ATON._hoveredUI);
+                ATON.fireEvent("UINodeLeave", ATON._hoveredUI);
                 const S = ATON.getUINode(ATON._hoveredUI);
                 if (S && S.onLeave) S.onLeave();
                 
@@ -2869,7 +2611,7 @@ ATON._handleQueryUI = ()=>{
             }
 
             ATON._hoveredUI = hui;
-            ATON.fire("UINodeHover", hui);
+            ATON.fireEvent("UINodeHover", hui);
             const S = ATON.getUINode(hui);
             if (S && S.onHover) S.onHover();
 
@@ -2906,32 +2648,6 @@ ATON.clearToken = (servicename)=>{
 };
 
 /*
-    Sections
-================================================*/
-ATON.enableClipPlanes = ()=>{
-    if (!ATON._renderer) return;
-    ATON._renderer.localClippingEnabled = true;
-};
-
-ATON.disableClipPlanes = ()=>{
-    if (!ATON._renderer) return;
-    ATON._renderer.localClippingEnabled = false;
-    ATON._clipPlanes = [];
-};
-
-ATON.addClipPlane = (dir, loc)=>{
-    ATON.enableClipPlanes();
-
-    let P = new THREE.Plane();
-    P.setFromNormalAndCoplanarPoint(dir, loc); 
-    ATON._clipPlanes.push( P );
-
-    ATON.Utils._visitorCP();
-    
-    return P;
-};
-
-/*
     Built-in gizmos
 ================================================*/
 ATON.useGizmo = (b)=>{
@@ -2941,8 +2657,6 @@ ATON.useGizmo = (b)=>{
 };
 
 ATON._setupGizmo = ()=>{
-    return; // TODO
-
     if (!ATON._bGizmo){
         if (ATON._gizmo) ATON._gizmo.detach();
         return;

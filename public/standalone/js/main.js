@@ -16,7 +16,7 @@ ATON.setAsStandalone();
 
 // This is our assets root folder
 // In this sample App, scene descriptors (.json) are also placed there, but you are free to organize folders as you like
-APP.assetsPath = APP.basePath + "assets/";
+APP.assetsPath = APP.basePath + "samples/models/CaveOfAnimals.glb";
 
 // Tell ATON to look for 3D content here
 ATON.setPathCollection(APP.assetsPath);

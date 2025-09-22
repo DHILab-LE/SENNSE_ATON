@@ -167,8 +167,6 @@ Hide this node (and sub-graph), also invisible to queries (ray casting, picking)
 myNode.hide()
 */
 hide(){
-    let bPrev = this.visible;
-
     this.visible = false;
 
     //this.traverse((o) => { o.layers.disable(this.type); });
@@ -176,10 +174,6 @@ hide(){
 
     if (ATON._renderer.shadowMap.enabled){
         ATON._dMainL.shadow.needsUpdate = true;
-    }
-
-    if (bPrev){
-        ATON.updateLightProbes();
     }
 
     return this;
@@ -191,8 +185,6 @@ Show this node (and sub-graph). If pickable, becomes sensible to queries (ray ca
 myNode.show()
 */
 show(){
-    let bPrev = this.visible;
-
     this.visible = true;
 
     //if (this.bPickable) ATON.Utils.setPicking(this, this.type, true); //this.traverse((o) => { o.layers.enable(this.type); });
@@ -200,10 +192,6 @@ show(){
 
     if (ATON._renderer.shadowMap.enabled){
         if (ATON._dMainL!==undefined && ATON._dMainL.shadow!==undefined) ATON._dMainL.shadow.needsUpdate = true;
-    }
-
-    if (!bPrev){
-        ATON.updateLightProbes();
     }
 
     return this;
@@ -550,7 +538,6 @@ autoFit(bCenter, maxRad){
         this.scale.set(s,s,s);
     }
 
-    return this;
 }
 
 /**
@@ -599,32 +586,11 @@ setRotation(rx,ry,rz){
     
     return this;
 }
-
 /**
 Orient this node to current camera
 */
 orientToCamera(){
     this.quaternion.copy( ATON.Nav._qOri );
-    return this;
-}
-
-/**
-Orient this node to a location
-*/
-orientToLocation(x,y,z){
-    if (x instanceof THREE.Vector3) this.lookAt(x);
-    else this.lookAt(x,y,z);
-
-    return this;
-}
-
-/**
-Orient this node to another node
-*/
-orientToNode(N){
-    if (!N) return this;
-    this.orientToLocation(N.position);
-
     return this;
 }
 
@@ -681,8 +647,8 @@ load(url, onComplete){
     
     let ext = ATON.Utils.getFileExtension(url);
 
-    // Cesium 3D Tiles datasets
-    if ( ext === "json" || ext === "dzi" ){
+    // Tileset
+    if ( ext === "json" ){
         ATON.MRes.loadTileSetFromURL(url, N);
         //ATON._bqScene = true;
         if (onComplete) onComplete();
@@ -690,7 +656,6 @@ load(url, onComplete){
     }
 
     // IFC
-/*
     if ( ext === "ifc" && ATON._ifcLoader!==undefined ){
         // TODO:
 
@@ -709,13 +674,11 @@ load(url, onComplete){
 
         return N;
     }
-*/
-    // Check custom resource handlers if any match
-    if ( ATON._resHandler){
-        for (let rh in ATON._resHandler){
-            let br = ATON._resHandler[rh](url, N);
-            if ( br ) return N;
-        }
+
+    // Check custom resource handler for given extension if any
+    if ( ATON._resHandler && ATON._resHandler[ext] ){
+        ATON._resHandler[ext]( url, N );
+        return N;
     }
 
     // [C] Promise already requested

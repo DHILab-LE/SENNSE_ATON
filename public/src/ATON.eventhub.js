@@ -17,10 +17,9 @@ EventHub.init = ()=>{
     EventHub.evLocal   = {};
     EventHub.evNetwork = {};
 
+    // Expose
     ATON.on                 = EventHub.on;
-    ATON.fire               = EventHub.fire;
-    ATON.fireEvent          = EventHub.fire; // Backwards compatibility
-
+    ATON.fireEvent          = EventHub.fireEvent;
     ATON.clearEventHandlers = EventHub.clearEventHandlers
 };
 
@@ -72,22 +71,21 @@ EventHub.on = (evtname, handlerLocal, handlerNetwork)=>{
 
 /**
 Fire a local (and optionally network) event, with data.
-This is also accessible as ATON.fire()
-ATON.fireEvent is deprecated, but maps the same routine.
+This is also accessible as ATON.fireEvent()
 @param {string} evtname - event name
 @param {object} data - object containing data to be transmitted with this event
 @param {bool} bReplicate - if true, it will replicate (broadcast) the event to other connected peers in the same scene (see Photon)
 @example
-ATON.EventHub.fire("myEvent", data)
+ATON.EventHub.fireEvent("myEvent", data)
 @example
-ATON.fire("myEvent", data)
+ATON.fireEvent("myEvent", data)
 */
-EventHub.fire = (evtname, data, bReplicate)=>{
+EventHub.fireEvent = (evtname, data, bReplicate)=>{
     const ehList = EventHub.evLocal[evtname];
     EventHub.executeHandlers(ehList, data);
 
     if (!bReplicate) return;
-    ATON.Photon.fire(evtname, data);
+    ATON.Photon.fireEvent(evtname, data);
 };
 
 export default EventHub;
