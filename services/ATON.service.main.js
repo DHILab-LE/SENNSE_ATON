@@ -26,6 +26,7 @@ const Core = require('./Core');
 const Auth = require('./Auth');
 const Render = require('./Render');
 const API  = require("./API/v2"); // v2
+const bodyParser = require("body-parser");
 
 
 // Initialize & load config files
@@ -95,6 +96,11 @@ app.use((req, res, next)=>{
 */
 app.use(express.json({ limit: '50mb' }));
 
+// Serve static files from the "public" folder
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
+app.use(bodyParser.json()); // Middleware to parse JSON requests
+
 // Scenes redirect /s/<sid>
 /*
 app.get(/^\/s\/(.*)$/, function(req,res,next){
@@ -163,6 +169,17 @@ app.use('/svrc', createProxyMiddleware({
 	secure: true,
 	changeOrigin: true 
 }));
+
+// Proxy route
+app.use('/api', (req, res) => {
+    const url = 'https://sennse.ispc.cnr.it' + req.url; // replace with your API URL
+    req.pipe(request(url)).pipe(res);
+});
+
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "upgrade-insecure-requests");
+    next();
+});
 
 // WebDav
 /*

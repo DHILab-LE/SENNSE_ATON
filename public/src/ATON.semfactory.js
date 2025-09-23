@@ -230,29 +230,59 @@ NOTE: if semid exists, add mesh under the same semantic id
 let S = ATON.SemFactory.createConvexShape("face", points)
 */
 SemFactory.createConvexShape = (semid, points)=>{
-    let geom   = new THREE.ConvexGeometry( points ); // CHECK: it was THREE.ConvexBufferGeometry( points );
-    let semesh = new THREE.Mesh( geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape );
+    console.log("Here we gooooooo!");
+    console.log(semid);
 
-    semesh.userData._convexPoints = [];
-    for (let i=0; i<points.length; i++){
-        let p = points[i];
-        ATON.Utils.setVectorPrecision(p,4);
+    if (semid.includes("Logger")) {
+        let geom = new THREE.ConvexGeometry(points); // CHECK: it was THREE.ConvexBufferGeometry( points );
+        let semesh = new THREE.Mesh(geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-        semesh.userData._convexPoints.push( p.x );
-        semesh.userData._convexPoints.push( p.y );
-        semesh.userData._convexPoints.push( p.z );
+        semesh.userData._convexPoints = [];
+        for (let i = 0; i < points.length; i++) {
+            let p = points[i];
+            ATON.Utils.setVectorPrecision(p, 4);
+
+            semesh.userData._convexPoints.push(p.x);
+            semesh.userData._convexPoints.push(p.y);
+            semesh.userData._convexPoints.push(p.z);
+        }
+
+        ATON.SUI.addSemIcon(semid, semesh);
+
+        let S = ATON.getOrCreateSemanticNode(semid);
+        S.add(semesh);
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+
+        S.enablePicking();
+        ATON._bqSem = true;
+
+        return S;
     }
+    else {
+        let geom = new THREE.ConvexGeometry(points); // CHECK: it was THREE.ConvexBufferGeometry( points );
+        let semesh = new THREE.Mesh(geom, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-    ATON.SUI.addSemIcon(semid, semesh);
+        semesh.userData._convexPoints = [];
+        for (let i = 0; i < points.length; i++) {
+            let p = points[i];
+            ATON.Utils.setVectorPrecision(p, 4);
 
-    let S = ATON.getOrCreateSemanticNode(semid);
-    S.add(semesh);
-    S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+            semesh.userData._convexPoints.push(p.x);
+            semesh.userData._convexPoints.push(p.y);
+            semesh.userData._convexPoints.push(p.z);
+        }
 
-    S.enablePicking();
-    ATON._bqSem = true;
+        ATON.SUI.addSemIcon(semid, semesh);
 
-    return S;
+        let S = ATON.getOrCreateSemanticNode(semid);
+        S.add(semesh);
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial /*ATON.MatHub.materials.semanticShapeHL*/);
+
+        S.enablePicking();
+        ATON._bqSem = true;
+
+        return S;
+    }
 };
 
 /**
@@ -292,44 +322,81 @@ NOTE: if semid exists, add mesh under the same semantic id
 @example
 let S = ATON.SemFactory.createSphere("face", THREE.Vector3(0,0,0), 1.5)
 */
-SemFactory.createSphere = (semid, location, radius)=>{
+SemFactory.createSphere = (semid, location, radius) => {
+
+    console.log("Check over heeeeeeeeeeeeeeeeeeeeeer !");
+
     if (location === undefined) return undefined;
     if (radius === undefined) return undefined;
 
-/*
-    if (ATON.getSemanticNode(semid)){
-        console.log("ERROR SemFactory: semantic node "+semid+" already exists.");
-        return false;
-    }
-*/
-    if (semid === undefined) semid = "sem"+SemFactory._numShapes;
+    /*
+        if (ATON.getSemanticNode(semid)){
+            console.log("ERROR SemFactory: semantic node "+semid+" already exists.");
+            return false;
+        }
+    */
+    if (semid === undefined) semid = "sem" + SemFactory._numShapes;
 
     let S = ATON.getOrCreateSemanticNode(semid);
 
-    //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
-    let M = new THREE.Mesh( ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape );
-    
-    // Note: we add multiple spheres to the same <semid> node
-    let sphere = new THREE.Object3D();
-    sphere.position.copy(location);
-    sphere.scale.set(radius, radius, radius);
-    sphere.add(M);
+    console.log("ATON Sematic Factory ***************************!!");
+    console.log(semid);
 
-    // XPF test
-    //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
+    const regex = /_[a-zA-Z0-9]{5}$/; // Matches "_XXXXX" at the end of the string
+    if (semid.includes("Temperature_r8FGV")) {
+        console.log("There is string contains !!!");
+    }
+    if (regex.test(semid)) {
+        //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
+        let M = new THREE.Mesh(ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger);
 
-    ATON.SUI.addSemIcon(semid, sphere);
+        // Note: we add multiple spheres to the same <semid> node
+        let sphere = new THREE.Object3D();
+        sphere.position.copy(location);
+        sphere.scale.set(radius, radius, radius);
+        sphere.add(M);
 
-    S.add( sphere );
-    S.enablePicking();
-    S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
+        // XPF test
+        //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
 
-    //SemFactory.currParent.add( S );
+        ATON.SUI.addSemIcon(semid, sphere);
 
-    SemFactory._numShapes++;
-    ATON._bqSem = true;
+        S.add(sphere);
+        S.enablePicking();
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShapeForDataLogger, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
 
-    return S;
+        //SemFactory.currParent.add( S );
+
+        SemFactory._numShapes++;
+        ATON._bqSem = true;
+
+        return S;
+    } else {
+        //let g = new THREE.SphereGeometry( 1.0, 16, 16 );
+        let M = new THREE.Mesh(ATON.Utils.geomUnitSphere, /*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape);
+
+        // Note: we add multiple spheres to the same <semid> node
+        let sphere = new THREE.Object3D();
+        sphere.position.copy(location);
+        sphere.scale.set(radius, radius, radius);
+        sphere.add(M);
+
+        // XPF test
+        //sphere.xpf = ATON.XPFNetwork.getCurrentXPFindex();
+
+        ATON.SUI.addSemIcon(semid, sphere);
+
+        S.add(sphere);
+        S.enablePicking();
+        S.setDefaultAndHighlightMaterials(/*SemFactory.currMaterial*/ATON.MatHub.materials.semanticShape, SemFactory.currMaterial/*ATON.MatHub.materials.semanticShapeHL*/);
+
+        //SemFactory.currParent.add( S );
+
+        SemFactory._numShapes++;
+        ATON._bqSem = true;
+
+        return S;
+    }
 };
 
 /**

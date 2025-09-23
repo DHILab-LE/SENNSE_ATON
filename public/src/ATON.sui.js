@@ -395,11 +395,30 @@ SUI.getInfoNode = ()=>{
 Set text for main info node
 @param {string} txt - the text
 */
-SUI.setInfoNodeText = (txt)=>{
+SUI.setInfoNodeText = (txt) => {
     if (!SUI.bShowInfo) return;
-    SUI.infoNodeText.set({ content: txt });
-    
-    ThreeMeshUI.update();  
+
+    // Check if the input is an image URL
+    if (txt.startsWith("https") && (txt.endsWith(".jpg") || txt.endsWith(".png") || txt.endsWith(".svg") || txt.endsWith(".jpeg") || txt.endsWith(".gif"))) {
+        // Remove any existing text content
+        SUI.infoContainer.remove(SUI.infoNodeText);
+
+        // Create a new Three.js PlaneGeometry for the image
+        let imgPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.2, 0.2), // Adjust width and height as needed
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(txt), transparent: true })
+        );
+
+        // Add the image plane to the info container
+        SUI.infoContainer.add(imgPlane);
+    } else {
+        // Restore text behavior if not an image URL
+        SUI.infoContainer.remove(SUI.infoNodeText); // Remove old image if any
+        SUI.infoNodeText.set({ content: txt });
+        SUI.infoContainer.add(SUI.infoNodeText);
+    }
+
+    ThreeMeshUI.update(); // Ensure updates are reflected
 };
 
 /**

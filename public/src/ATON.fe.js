@@ -10,7 +10,12 @@ Generic front-end routines for ATON-based web-apps.
 A set of blueprints to facilitate or support creation of a front-end
 @namespace FE
 */
+
+import html2canvas from 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.esm.js';
+
 let FE = {};
+
+let configData = null;
 
 // Semantic-shapes types
 FE.SEMSHAPE_SPHERE = 0;
@@ -104,6 +109,637 @@ FE._handleHomeReq = ()=>{
     //console.log(ATON.Nav.homePOV);
 };
 
+
+// Load configuration JSON file
+async function loadConfig() {
+    try {
+        // Extract path dynamically from URL
+        let fullUrl = window.location.href;
+        let match = fullUrl.match(/\/s\/(.+)$/);
+        let extractedPath = match ? match[1] : '';
+
+        if (!extractedPath) {
+            throw new Error("Invalid URL structure: Unable to extract the config path.");
+        }
+
+        console.log("Extracted Config Path:", extractedPath);
+
+        // Fetch the JSON file dynamically based on the extracted path
+        const response = await fetch(`/auth/sennse?path=${encodeURIComponent(extractedPath)}`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch configuration file: ${response.statusText}`);
+        }
+
+        configData = await response.json();
+        console.log("Loaded Config:", configData);
+    } catch (error) {
+        console.error("Error loading configuration file:", error);
+    }
+}
+
+
+/**
+Add basic front-end events such as showing spinner while loading assets and home viewpoint setup
+*/
+
+// Generic function to fetch telemetry data
+async function fetchTelemetryData(accessToken, deviceId, keys, startTs, endTs, labels, units) {
+    const thingsboardUrl = configData.sennseURL;
+    const headers = {
+        "Content-Type": "application/json",
+        "X-Authorization": `Bearer ${accessToken}`
+    };
+
+    const keyList = Array.isArray(keys) ? keys.join(',') : keys;
+    const fetchUrl = `${thingsboardUrl}/api/plugins/telemetry/DEVICE/${deviceId}/values/timeseries?keys=${keyList}&startTs=${startTs}&endTs=${endTs}&limit=9000`;
+
+    console.log("Fetch URL: " + fetchUrl);
+
+    try {
+        const response = await fetch(fetchUrl, { headers });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const data = await response.json();
+        const results = {};
+
+        const deviceInfo = configData.deviceIds.find(device => device.nodeId === deviceId);
+        const nodeName = deviceInfo ? deviceInfo.nodeName : "Unknown";
+        // Process each key separately
+        const processKey = (key, unit) => {
+            if (!data[key]) return [];
+
+            const allData = data[key].map(entry => ({
+                timestamp: entry.ts,
+                value: parseFloat(entry.value).toFixed(2),
+                unit: unit,
+                label: labels[key] || key,
+                nodeName: nodeName // Add nodeName here
+            }));
+
+            // Downsample to one data point per hour
+            const hourlyData = [];
+            const hourMillis = 60 * 60 * 1000;
+            for (let i = startTs; i < endTs; i += hourMillis) {
+                const closestPoint = allData.reduce((closest, point) =>
+                    Math.abs(point.timestamp - i) < Math.abs(closest.timestamp - i) ? point : closest
+                    , allData[0]);
+                hourlyData.push({ ...closestPoint, timestamp: i });
+            }
+            return hourlyData;
+        };
+
+        if (Array.isArray(keys)) {
+            keys.forEach((key, index) => {
+                results[key] = processKey(key, units[index]);
+            });
+        } else {
+            results[keys] = processKey(keys, units);
+        }
+
+        return results;
+
+    } catch (error) {
+        console.error(`Error fetching data:`, error);
+        return {};
+    }
+}
+
+// Generic function to authenticate to the SENNSE platform
+async function login() {
+    const loginUrl = `${configData.sennseURL}/api/auth/login`;
+
+    const credentials = {
+        username: configData.username,
+        password: configData.password
+    };
+
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    try {
+        const response = await fetch(loginUrl, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(credentials)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.token;
+        } else {
+            console.error("Login failed:", await response.text());
+            return null;
+        }
+    } catch (error) {
+        console.error("Error during login:", error);
+        return null;
+    }
+}
+
+// Generic function to build a telemetry map to store all the Data needs
+function buildTelemetryMap(accessToken) {
+    const telemetryMap = {};
+
+    for (const device of configData.deviceIds) {
+        const deviceId = device.nodeId;
+
+        for (const sensor of device.sensors) {
+            for (let [sensorKey, sensorName] of Object.entries(sensor)) {
+                let startTs, endTs, keys, labels, units;
+
+                // console.log("Check this bloc !!!");
+                // console.log(sensorKey);
+                // console.log(sensorName);
+
+                if (sensorName.includes("_&_") && sensorName.includes("Logger_")) {
+                    // Existing Logger_ condition
+                    const parts = sensorName.split("_&_").map(part => {
+                        const cleaned = part.replace("Logger_", "");
+                        return {
+                            key: cleaned,
+                            unit: cleaned.includes("TempC") ? "°C" :
+                                cleaned.includes("Temperature") ? "°C" :
+                                    cleaned.includes("Humidity") ? "%" :
+                                        cleaned.includes("Lux") ? "lx" : ""
+                        };
+                    });
+
+                    keys = parts.map(p => p.key);
+                    units = parts.map(p => p.unit);
+                    labels = {};
+                    parts.forEach((part, index) => {
+                        const formattedLabel = part.key.replace(/([A-Z])/g, ' $1').trim();
+                        labels[keys[index]] = formattedLabel;
+                    });
+                    endTs = 1738159200000;
+                    startTs = endTs - (5 * 60 * 60 * 1000);
+
+                }
+                else if (sensorName.includes("LightIntensity")) {
+                    console.log("Check this condition Light Intensity Logger !!");
+                    console.log(sensorName.replace("Logger_", ""));
+
+                    // Remove Logger_ prefix and handle as a single key
+                    const cleanedKey = sensorName.replace("Logger_", "");
+                    keys = [cleanedKey];
+                    units = [cleanedKey.includes("TempC") ? "°C" :
+                        cleanedKey.includes("Temperature") ? "°C" :
+                            cleanedKey.includes("Humidity") ? "%" :
+                                cleanedKey.includes("Lux") ? "lx" :
+                                cleanedKey.includes("LightIntensity") ? "lx" : ""];
+                    labels = { [cleanedKey]: sensorKey };
+                    endTs = 1732540140000;
+                    startTs = 1731930900000;
+                }
+                else if (sensorName.includes("Logger_")) {
+
+                    // Remove Logger_ prefix and handle as a single key
+                    const cleanedKey = sensorName.replace("Logger_", "");
+                    keys = [cleanedKey];
+                    units = [cleanedKey.includes("TempC") ? "°C" :
+                        cleanedKey.includes("Temperature") ? "°C" :
+                            cleanedKey.includes("Humidity") ? "%" :
+                                cleanedKey.includes("Lux") ? "lx" : ""];
+                    labels = { [cleanedKey]: sensorKey };
+                    endTs = 1738159200000;
+                    startTs = endTs - (5 * 60 * 60 * 1000);
+
+                }
+                else if (sensorName.includes("_&_") && !sensorName.includes("Logger_")) {
+                    console.log("This filter started !!");
+
+                    // **New condition for keys like TempC_ESP32_001_&_Humidity_ESP32_001**
+                    const parts = sensorName.split("_&_").map(part => {
+                        return {
+                            key: part,
+                            unit: part.includes("TempC") ? "°C" :
+                                part.includes("Temperature") ? "°C" :
+                                    part.includes("Humidity") ? "%" :
+                                        part.includes("Lux") ? "lx" : ""
+                        };
+                    });
+
+                    keys = parts.map(p => p.key);
+                    units = parts.map(p => p.unit);
+                    labels = {};
+                    parts.forEach((part, index) => {
+                        const formattedLabel = part.key.replace(/([A-Z])/g, ' $1').trim();
+                        labels[keys[index]] = formattedLabel;
+                    });
+                    endTs = Date.now();
+                    startTs = endTs - (5 * 60 * 60 * 1000);
+
+                } else {
+                    // Default case
+                    const now = Date.now();
+                    const cleanedKey = sensorName.replace("Logger_", "");
+                    keys = [cleanedKey];
+                    units = [sensorName.includes("TempC") ? "°C" :
+                        sensorName.includes("Temperature") ? "°C" :
+                            sensorName.includes("Humidity") ? "%" :
+                                sensorName.includes("Lux") ? "lx" : ""];
+                    labels = { [cleanedKey]: sensorKey };
+                    startTs = sensorName.includes("Logger_") ? 1731502800000 : now - (5 * 60 * 60 * 1000);
+                    endTs = now;
+                }
+
+                telemetryMap[sensorName] = async () =>
+                    await fetchTelemetryData(
+                        accessToken,
+                        deviceId,
+                        keys,
+                        startTs,
+                        endTs,
+                        labels,
+                        units
+                    );
+            }
+        }
+    }
+
+    return telemetryMap;
+}
+
+// Generic function to build a Dynamic widget for the different sensor type 
+function createDynamicWidget(telemetryMap, sensorData) {
+
+    // Create the widget container
+    const widget = document.createElement("div");
+    widget.id = "widget"; // Add an ID
+    widget.style.cssText = "background: linear-gradient(145deg, #2e3b4e, #1c2533); border-radius: 20px; width: 380px; padding: 25px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), inset 0 -1px 10px rgba(255, 255, 255, 0.1); position: relative; overflow: hidden;";
+    widget.style.position = "absolute";
+    widget.style.top = "-9999px";
+
+    const gradientOverlay = document.createElement("div");
+    gradientOverlay.style.cssText = "position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(255, 82, 82, 0.15), rgba(255, 152, 0, 0.15)); z-index: 0; pointer-events: none;";
+
+    const widgetContent = document.createElement("div");
+    widgetContent.style.cssText = "position: relative; z-index: 1;";
+
+
+    const title = document.createElement("h2");
+    title.id = "temperatureTitle";
+    title.textContent = "";
+    title.style.cssText = "font-size: 1.6rem; margin: 0; color: #e0e5ec; text-transform: uppercase; text-align: center; letter-spacing: 1px; margin-bottom: 10px;";
+
+
+    const sensorName = document.createElement("div");
+    sensorName.innerHTML = `Last 5 Hours SENNSE <br>${telemetryMap}`;
+    // sensorName.textContent = `Last 5 Hours <br> SENNSE`;
+
+    sensorName.style.cssText = "font-size: 0.95rem; color: #aab4be; margin-bottom: 15px; text-align: center;";
+
+    const temperature = document.createElement("div");
+    temperature.style.cssText = "font-size: 4.5rem; color: #ff6e6e; text-align: center; font-weight: bold; margin-bottom: 20px; position: relative; display: flex; justify-content: center; align-items: center;";
+
+    const arrow = document.createElement("span");
+    arrow.textContent = "\u2191";
+    arrow.style.cssText = "display: inline-block; color: #ff6e6e; font-size: 2.8rem; vertical-align: middle; margin-right: 10px;";
+
+    const temperatureValue = document.createElement("span");
+    temperatureValue.id = "temperature-value";
+    temperatureValue.textContent = "";
+    temperatureValue.style.cssText = "font-size: 2.5rem;";
+
+    const degreeSymbol = document.createElement("span");
+    degreeSymbol.textContent = "";
+    degreeSymbol.style.cssText = "font-size: 1.8rem;";
+
+    temperature.appendChild(arrow);
+    temperature.appendChild(temperatureValue);
+    temperature.appendChild(degreeSymbol);
+
+
+    const chartContainer = document.createElement("div");
+    chartContainer.style.cssText = "border-top: 2px solid rgba(255, 255, 255, 0.2); padding-top: 15px; margin-top: 15px;";
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "chart";
+    canvas.style.cssText = "width: 100%; height: 150px;";
+    chartContainer.appendChild(canvas);
+
+    const timestamp = document.createElement("div");
+    timestamp.id = "timestamp";
+    // timestamp.textContent = `Last updated: ${new Date(sensorData[4].timestamp).toLocaleString()}`;
+    timestamp.style.cssText = "font-size: 0.9rem; color: #90a4ae; text-align: center; margin-top: 15px; font-style: italic;";
+
+
+    widgetContent.appendChild(title);
+    widgetContent.appendChild(sensorName);
+    widgetContent.appendChild(temperature);
+    widgetContent.appendChild(chartContainer);
+    widgetContent.appendChild(timestamp);
+
+
+    widget.appendChild(gradientOverlay);
+    widget.appendChild(widgetContent);
+
+    return widget;
+}
+
+// Generic Function to draw the Humidity sensor chart for the Dynamic widget
+function drawTemp_HumSensorChart(dataPoints, canvas, widgetElement) {
+    return new Promise((resolve, reject) => {
+        try {
+            // Update UI elements (if they exist)
+            const timestampElement = widgetElement.querySelector("#timestamp"); // Add this line
+            const tempValueElement = widgetElement.querySelector("#temperature-value");
+            const temperatureTitleElement = widgetElement.querySelector("#temperatureTitle");
+            const ctx = canvas.getContext("2d");
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            const numHorizontalLines = 5;
+            const numVerticalLines = 10;
+
+            // Get all keys from the dataPoints object
+            const sensorKeys = Object.keys(dataPoints);
+
+            // Validate if there are sensors available
+            if (sensorKeys.length === 0) {
+                console.error("No sensor data found!");
+                resolve(); // Resolve to avoid blocking the application
+                return;
+            }
+
+
+
+            // if (timestampElement) {
+            //     timestampElement.textContent = `Last updated: ${new Date(latestDataPoint.timestamp).toLocaleString()}`;
+            // }
+
+
+            // Set canvas dimensions
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Create gradient background
+            gradient.addColorStop(0, "rgba(255, 105, 180, 0.4)");
+            gradient.addColorStop(1, "rgba(75, 192, 192, 0.1)");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Grid Lines
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= numHorizontalLines; i++) {
+                const y = (canvas.height / numHorizontalLines) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            for (let i = 0; i <= numVerticalLines; i++) {
+                const x = (canvas.width / numVerticalLines) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Iterate over all sensor keys and process each sensor's data
+            sensorKeys.forEach(sensorKey => {
+                const sensorData = dataPoints[sensorKey];
+
+                const latestValue = sensorData[sensorData.length - 1].value;
+
+                if (temperatureTitleElement) {
+                    if (tempValueElement) {
+                        let values = tempValueElement.textContent.split(" / ").filter(v => v); // Split by " / " and remove empty values
+
+                        if (values.length >= 2) {
+                            values.shift(); // Remove the oldest value, keeping only one
+                        }
+
+                        values.push(`${latestValue}${sensorData[0].unit}`); // Add the new value
+                        tempValueElement.textContent = values.join(" | "); // Join without "/"
+                    }
+                    temperatureTitleElement.textContent = sensorData[0].nodeName;
+                }
+
+
+                // Validate if sensorData is an array and contains data
+                if (!Array.isArray(sensorData) || sensorData.length === 0) {
+                    console.error(`Data for sensor ${sensorKey} is empty or not an array!`);
+                    return; // Skip to next sensor
+                }
+
+                // Log the data points for debugging
+                console.log(`Temperature and Humidity Data for ${sensorKey}:`, sensorData);
+
+                // Separate temperature and humidity data
+                let temperatureData = sensorData.filter(dp => dp.unit.includes("°C") || dp.label.includes("Temperature"));
+                let humidityData = sensorData.filter(dp => dp.unit.includes("%") || dp.label.includes("Humidity"));
+
+                // Log the separated data
+                console.log(`Temperature Data for ${sensorKey}:`, temperatureData);
+                console.log(`Humidity Data for ${sensorKey}:`, humidityData);
+
+                // Get min/max values for proper scaling (considering data for each sensor separately)
+                const tempMin = Math.min(...temperatureData.map(dp => dp.value), 18);
+                const tempMax = Math.max(...temperatureData.map(dp => dp.value), 25);
+
+                const humMin = 0;
+                const humMax = 100;
+
+                // Function to scale Y-coordinates
+                const scaleY = (value, min, max) =>
+                    canvas.height - ((value - min) / (max - min)) * canvas.height;
+
+                // Function to draw a line graph
+                const drawGraph = (data, color, min, max) => {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+
+                    data.forEach((point, index) => {
+                        const x = (canvas.width / (data.length - 1)) * index;
+                        const y = scaleY(point.value, min, max);
+                        if (index === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+
+                    ctx.stroke();
+                };
+
+                // Draw Temperature Line
+                if (temperatureData.length > 0) {
+                    drawGraph(temperatureData, "#ffd700", tempMin, tempMax);
+                }
+
+                // Draw Humidity Line
+                if (humidityData.length > 0) {
+                    drawGraph(humidityData, "#4d94ff", humMin, humMax);
+                }
+
+                // Draw Data Points
+                const drawPoints = (data, color, min, max) => {
+                    data.forEach((point, index) => {
+                        const x = (canvas.width / (data.length - 1)) * index;
+                        const y = scaleY(point.value, min, max);
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.fillStyle = color;
+                        ctx.fill();
+                        ctx.strokeStyle = "#fff";
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        ctx.font = "12px Arial";
+                        ctx.fillStyle = "#fff";
+                        ctx.textAlign = "center";
+                        ctx.fillText(`${point.value}${point.unit}`, x, y - 10);
+                        ctx.fillText(
+                            new Date(point.timestamp).toLocaleTimeString(),
+                            x,
+                            canvas.height - 10
+                        );
+                    });
+                };
+
+                // Draw Temperature Points
+                if (temperatureData.length > 0) {
+                    drawPoints(temperatureData, "#ff6e6e", tempMin, tempMax);
+                }
+
+                // Draw Humidity Points
+                if (humidityData.length > 0) {
+                    drawPoints(humidityData, "#4d94ff", humMin, humMax);
+                }
+            });
+
+            resolve();
+        } catch (error) {
+            console.error("Error drawing temperature/humidity chart:", error);
+            reject(error);
+        }
+    });
+}
+
+// Generic Function to draw the Luminosity Sensor chart for the Dynamic widget
+
+async function drawLumxSensorChart(dataPoints, widgetElement) {
+    console.log("The data Point for the Luminosity Sensor !!!");
+    console.log(dataPoints);
+
+    // Extract the first key (e.g., "Lux_ESP32_001")
+    const firstSensorKey = Object.keys(dataPoints)[0];
+
+    // Get the actual data array for that sensor
+    const sensorData = dataPoints[firstSensorKey];
+
+    // Check if there are any data points for the sensor
+    if (!Array.isArray(sensorData) || sensorData.length === 0) {
+        console.error("No data points available to draw the chart.");
+        return;
+    }
+
+    // Update the latest value in the widget
+    const latestValue = sensorData[sensorData.length - 1].value;  // Adjusted for 'value' field
+    const tempValueElement = widgetElement.querySelector("#temperature-value");
+    const timestampElement = widgetElement.querySelector("#timestamp");
+    const temperatureTitleElement = widgetElement.querySelector("#temperatureTitle");
+    const canvas = widgetElement.querySelector("#chart");
+    const ctx = canvas.getContext("2d");
+    const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+
+    if (tempValueElement) {
+        tempValueElement.textContent = latestValue + " " + sensorData[sensorData.length - 1].unit;
+    }
+    if (timestampElement) {
+        timestampElement.textContent = `Last updated: ${new Date().toLocaleString()}`;
+    }
+    console.log("Illuminate Value !!");
+    console.log(sensorData);
+
+    if (temperatureTitleElement) {
+        temperatureTitleElement.textContent = sensorData[0].label;
+    }
+
+    if (!canvas) {
+        console.log("Canvas element not found.");
+        return;
+    }
+
+    gradient.addColorStop(0, "rgba(255, 165, 0, 0.4)");
+    gradient.addColorStop(1, "rgba(75, 192, 192, 0.1)");
+
+    // Wait for Chart.js to load and render
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Dynamically import Chart.js and the date adapter
+            await import('https://cdn.jsdelivr.net/npm/chart.js');
+            await import('https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns');
+
+            // Create the chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sensorData.map(point => new Date(point.timestamp)), // Convert timestamps to dates
+                    datasets: [{
+                        label: 'Illuminance (lx)',
+                        data: sensorData.map(point => ({ x: point.timestamp, y: point.value })), // Chart.js uses objects for time-series
+                        borderColor: '#ff9800',
+                        backgroundColor: gradient,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour' // Customize as needed
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Illuminance (lx)'
+                            }
+                        }
+                    },
+                    animation: {
+                        onComplete: () => {
+                            resolve(); // Resolve the promise when rendering is complete
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Error loading Chart.js or drawing chart:", error);
+            reject(error);
+        }
+    });
+}
+
+
+// Call the EndPoint to saving the image (Dynamic Widget) inside the server 
+async function saveImageToServer(imageData) {
+    try {
+        const response = await fetch("/save-image", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ image: imageData })
+        });
+        if (response.ok) {
+            console.log("Response is Okay !!");
+        }
+    } catch (error) {
+        throw new Error("Failed to save image on the server");
+    }
+}
+
 /**
 Add basic front-end events such as showing spinner while loading assets and home viewpoint setup
 */
@@ -151,12 +787,78 @@ FE.addBasicLoaderEvents = ()=>{
     });
 
     // Semantic
-    ATON.on("SemanticNodeHover", (semid)=>{
+    ATON.on("SemanticNodeHover", async (semid) => {
+        // Load the configuration file
+        await loadConfig();
+        // Connect and Authenticate to the Server
+        const accessToken = await login();
+        // Inject the telemetryMap with the data needs
+        const telemetryMap = buildTelemetryMap(accessToken);
+
+        console.log("Check Semantic ID !!");
+        console.log(semid);
+
+        // Fetch telemetry data
+        const sensorData = await telemetryMap[semid]();
+
+        // Generate and display the widget
+        const widgetElement = createDynamicWidget(semid, sensorData);
+        // Declaration of image variable to store the path of each Image String
+        let imageResult;
+        // Getting a Semantic ID Node
         let S = ATON.getSemanticNode(semid);
+
+        if (!accessToken) {
+            console.error("Unable to retrieve access token.");
+            return;
+        }
+
+        document.body.appendChild(widgetElement);
+
+        console.log("Sensor Data");
+        console.log(sensorData);
+
+        // Get the first sensor key (e.g., "Temperature_Wf9Bj" or "Humidity_5un4a")
+        const firstSensorKey = Object.keys(sensorData)[0];
+
+        // Get the first data point of that sensor
+        const firstDataPoint = sensorData[firstSensorKey][0];
+
+        // Now safely check the unit
+        if (firstDataPoint.unit.includes("lx")) {
+            console.log("This is true !!!!");
+            let drawChartPromise = drawLumxSensorChart(sensorData, widgetElement);
+            await drawChartPromise;
+        } else {
+            console.log("This is false !!!!");
+
+            let drawChartPromise = drawTemp_HumSensorChart(
+                sensorData,
+                widgetElement.querySelector("#chart"),
+                widgetElement
+            );
+            await drawChartPromise;
+        }
+
+        try {
+            const canvasImage = await html2canvas(widgetElement);
+            const imageData = canvasImage.toDataURL("image/png");
+            await saveImageToServer(imageData);
+        } catch (error) {
+            console.error("Error capturing or saving widget image:", error);
+        }
+
         if (S === undefined) return;
 
-        FE.showSemLabel(semid);
-        FE._bSem = true;
+        if (telemetryMap[semid]) {
+            FE.showSemLabel("https://150.145.56.22:8083/images/widget.png");
+            FE._bSem = true;
+        }
+
+        else {
+            FE.showSemLabel(semid);
+            FE._bSem = true;
+        }
 
         S.highlight();
         $('canvas').css({ cursor: 'crosshair' });
@@ -192,10 +894,17 @@ FE.addBasicLoaderEvents = ()=>{
     ATON.addUpdateRoutine(FE._update);
 };
 
-FE.showSemLabel = (txt)=>{
+// Change the Semantic ID from a simple String Text to displaying an image
+FE.showSemLabel = (txt) => {
     if (!FE._bShowSemLabel) return;
 
-    $("#idPopupLabel").html(txt);
+    if (txt.startsWith("https") && (txt.endsWith(".jpg") || txt.endsWith(".png") || txt.endsWith(".svg") || txt.endsWith(".jpeg") || txt.endsWith(".gif"))) {
+        // If the input is an image URL, show an image
+        $("#idPopupLabel").html(`<img src="${txt}" alt="Semantic Label Image" style="max-width: 300px; max-height: 500px;">`);
+    } else {
+        // If the input is not an image URL, show the text
+        $("#idPopupLabel").html(txt);
+    }
     $("#idPopupLabel").show();
 
     ATON.SUI.setInfoNodeText(txt);

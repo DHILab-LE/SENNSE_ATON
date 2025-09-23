@@ -60,4 +60,6 @@ setRoleAdmin(){
 }
 
 
-export default User;
+// export default User;
+
+module.exports = User;

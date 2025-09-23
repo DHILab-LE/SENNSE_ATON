@@ -1,9 +1,8 @@
 version: '3'
 
 services:
-  star:
-    build: .
-    volumes:
-      - ./data:/aton/data
+  sennse_aton:
+    image: sennse_aton:2.0.9
     ports:
-      - 8088:8080
+      - "8083:8083"
+    restart: unless-stopped
