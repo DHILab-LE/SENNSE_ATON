@@ -6,24 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" href="/res/aton-logo.png" sizes="512x512" type="image/png">
+    <link rel="icon" href="/aton/res/aton-logo.png" sizes="512x512" type="image/png">
 
     <!-- Add iOS meta tags and icons -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="ATON Sample">
-    <link rel="apple-touch-icon" href="/res/aton-logo.png">
+    <link rel="apple-touch-icon" href="/aton/res/aton-logo.png">
     <meta name="description" content="ATON Sample">
     <!-- Add meta theme-color -->
     <meta name="theme-color" content="#000000" />
 
     <title>ATON Sample</title>
-    <link rel="stylesheet" type="text/css" href="/res/css/aton.css">
+    <link rel="stylesheet" type="text/css" href="/aton/res/css/aton.css">
 
-	<script type="text/javascript" src="/vendors/vendors.min.js"></script>
+	<script type="text/javascript" src="/aton/vendors/vendors.min.js"></script>
 
-    <script type="text/javascript" src="/dist/THREE.bundle.js"></script>
-    <script type="module" src="/src/ATON.js"></script>
+    <script type="text/javascript" src="/aton/dist/THREE.bundle.js"></script>
+    <script type="module" src="/aton/src/ATON.js"></script>
 
 <script>
 window.addEventListener( 'load', ()=>{
@@ -62,36 +62,36 @@ window.addEventListener( 'load', ()=>{
     suiButtons.push( new ATON.SUI.Button("SUI_VR") );
     
     ATON.getUINode("SUI_Home")
-        .setIcon(ATON.PATH_RES+"icons/home.png")
+        .setIcon("/aton/res/icons/home.png")
         .onSelect = ()=>{
             ATON.Nav.requestHome();
         };
 
     ATON.getUINode("SUI_Prev")
-        .setIcon(ATON.PATH_RES+"icons/prev.png")
+        .setIcon("/aton/res/icons/prev.png")
         .onSelect = ()=>{
             let N = ATON.getSceneNode("item");
             currItem--;
             if (currItem<0) currItem = (itemURLs.length-1);
             N.removeChildren();
             N.load(itemURLs[currItem]);
-            ATON.AudioHub.playOnceGlobally(ATON.PATH_RES+"audio/blop.mp3");
+            ATON.AudioHub.playOnceGlobally("aton/res/audio/blop.mp3");
         };
 
     ATON.getUINode("SUI_Next")
-        .setIcon(ATON.PATH_RES+"icons/next.png")
+        .setIcon("/aton/res/icons/next.png")
         .onSelect = ()=>{
             let N = ATON.getSceneNode("item");
             currItem = (currItem+1)%itemURLs.length;
             N.removeChildren();
             N.load(itemURLs[currItem]);
-            ATON.AudioHub.playOnceGlobally(ATON.PATH_RES+"audio/blop.mp3");
+            ATON.AudioHub.playOnceGlobally("/aton/res/audio/blop.mp3");
         };
 
     ATON.getUINode("SUI_VR")
         .setText("")
         .setBaseColor(ATON.MatHub.colors.red)
-        .setIcon(ATON.PATH_RES+"icons/vr.png")
+        .setIcon("/aton/res/icons/vr.png")
         .onSelect = ()=>{
             ATON.XR.toggle();
         };

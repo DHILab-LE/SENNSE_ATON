@@ -671,7 +671,7 @@
             }
 
             try {
-                const response = await fetch("/save-json", {
+                const response = await fetch("/aton/save-json", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ path: window.savePath, data: jsonData }),

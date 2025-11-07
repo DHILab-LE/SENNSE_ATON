@@ -65,6 +65,8 @@
         //================================================
         let requestSceneCreation = () => {
 
+            console.log("Request Scene Creation - Check N° 1");
+            
             composeScene();
 
             let o = {};
@@ -74,7 +76,7 @@
 
             console.log(o);
 
-            ATON.Utils.postJSON(ATON.PATH_RESTAPI + "new/scene", o, handleServerResponse);
+            ATON.Utils.postJSON("/aton/api/new/scene", o, handleServerResponse);
         };
 
         let handleServerResponse = (r) => {
@@ -346,7 +348,7 @@
                 formData.append("modelFile", file);
 
                 try {
-                    const response = await fetch("/upload", {
+                    const response = await fetch("/aton/upload", {
                         method: "POST",
                         body: formData,
                     });
@@ -396,6 +398,7 @@
                     // Clear file input
                     e.target.value = '';
                 }
+                SHU.uiAttachModelsInputList(elNIDAdd);
             });
 
 
@@ -534,7 +537,7 @@
                     sobj.environment.mainpano.url = path;
 
                     // fetch preview
-                    if (!path.startsWith("http")) path = ATON.PATH_COLLECTION + path;
+                    if (!path.startsWith("http")) path = "/aton/collections/" + path;
 
                     if (ATON.Utils.isVideo(path)) $("#idpanopreview").html("<video src='" + path + "' autoplay='true' style='width:90%;height:auto'>");
                     else $("#idpanopreview").html("<img src='" + path + "' style='width:90%;height:auto'>");

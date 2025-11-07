@@ -32,7 +32,7 @@ UI.init = ()=>{
     if (!window.bootstrap) return;
     if (!window.bootstrap.Offcanvas) return; // tmp hack
 
-    UI.PATH_RES_ICONS = ATON.PATH_RES+"icons/";
+    UI.PATH_RES_ICONS = "/aton/res/icons/";
 
     UI._bModal     = false;
     UI._bSidePanel = false;
@@ -350,7 +350,7 @@ UI.prependIcon = (el, icon)=>{
 
 UI.createSceneCoverIMG = (sid)=>{
     let im = document.createElement("img");
-    im.src = ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover";
+    im.src = "/aton/api/v2/scenes/"+sid+"/cover";
     im.onerror = ()=>{
         im.src = ATON.PATH_RES+"scenecover.png";
     };
@@ -1050,7 +1050,7 @@ UI.createSceneCard = (options)=>{
         size: options.size,
         useblurtint: options.useblurtint,
         classes: options.classes,
-        cover: ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover",
+        cover: "/aton/api/v2/scenes/"+sid+"/cover",
         url: ATON.PATH_FE + sid,
         subtitle: elSub,
         footer: options.footer,

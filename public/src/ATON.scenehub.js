@@ -58,7 +58,9 @@ SceneHub.load = (reqpath, sid, onSuccess/*, onFail*/)=>{
     //let args = reqpath.split(',');
 
     SceneHub._bLoading = true;
+    console.log("JSON URL: "+reqpath);
     console.log("Loading Scene: "+sid);
+    
 
     return $.getJSON( reqpath, ( data )=>{
         SceneHub.currData  = data;
@@ -821,7 +823,7 @@ SceneHub.patch = (patch, mode, onComplete)=>{
     O = null;
 
     $.ajax({
-        url: ATON.PATH_RESTAPI2 + "scenes/"+sid, //ATON.PATH_RESTAPI+"edit/scene",
+        url: "/aton/api/v2/scenes/"+sid, //ATON.PATH_RESTAPI+"edit/scene",
         type:"PATCH",
         data: jstr,
         contentType:"application/json; charset=utf-8",

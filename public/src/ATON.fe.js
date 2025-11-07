@@ -33,7 +33,7 @@ Initialize Front-end
 FE.realize = ()=>{
     if (FE._bRealized) return;
 
-    FE.PATH_RES_ICONS = ATON.PATH_RES+"icons/";
+    FE.PATH_RES_ICONS = "/aton/res/icons/";
 
     FE._bPopup     = false;  // showing popup
     FE._tPopup     = undefined;
@@ -125,7 +125,7 @@ async function loadConfig() {
         console.log("Extracted Config Path:", extractedPath);
 
         // Fetch the JSON file dynamically based on the extracted path
-        const response = await fetch(`/auth/sennse?path=${encodeURIComponent(extractedPath)}`);
+        const response = await fetch(`/aton/auth/sennse?path=${encodeURIComponent(extractedPath)}`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch configuration file: ${response.statusText}`);
@@ -725,7 +725,7 @@ async function drawLumxSensorChart(dataPoints, widgetElement) {
 // Call the EndPoint to saving the image (Dynamic Widget) inside the server 
 async function saveImageToServer(imageData) {
     try {
-        const response = await fetch("/save-image", {
+        const response = await fetch("/aton/save-image", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -851,7 +851,7 @@ FE.addBasicLoaderEvents = ()=>{
         if (S === undefined) return;
 
         if (telemetryMap[semid]) {
-            FE.showSemLabel("https://150.145.56.22:8083/images/widget.png");
+            FE.showSemLabel("https://sennse.digilab-dev.e-rihs.it/aton/images/widget.png");
             FE._bSem = true;
         }
 
@@ -1056,7 +1056,7 @@ FE.uiBasicSetup = ()=>{
 
 FE._uiSetupBase = ()=>{
     $("#idPopup").click( FE.popupClose );
-    $("#idLoader").html("<img src='"+ATON.PATH_RES+"loader.png'>");
+    $("#idLoader").html("<img src='/aton/res/loader.png'>");
 
     $("body").prepend("<div class='atonPopupLabelContainer'><div id='idPopupLabel' class='atonPopupLabel'></div></div>");
     FE.hideSemLabel();
@@ -1401,7 +1401,7 @@ FE.uiAttachCollectionItemsToInput = (idinput, type)=>{
     $("#"+idinput).attr("list", idinput+"-list");
     $("#"+idinput).attr("name", idinput+"-list");
 
-    $.getJSON( ATON.PATH_RESTAPI+"c/"+type+"/", ( data )=>{
+    $.getJSON( "/aton/api/c/"+type+"/", ( data )=>{
         //let folders = {};
         //SHU._cModelDirs = {};
         
@@ -2036,7 +2036,7 @@ FE.popupUser = ()=>{
             }
 
             $("#idLogoutBTN").click(()=>{
-                $.get(ATON.PATH_RESTAPI+"logout", (r)=>{
+                $.get("/aton/api/logout", (r)=>{
                     console.log(r);
 
                     ATON.SceneHub.setEditMode(false);
@@ -2050,10 +2050,10 @@ FE.popupUser = ()=>{
             });
 
             $("#idSHUscenes").click(()=>{
-                ATON.Utils.goToURL("/shu/scenes/");
+                ATON.Utils.goToURL("/aton/shu/scenes/");
             });
             $("#idSHUuser").click(()=>{
-                ATON.Utils.goToURL("/shu/auth/");
+                ATON.Utils.goToURL("/aton/shu/auth/");
             });
 
             $("#idUIProfiles").on("change", ()=>{
@@ -2081,7 +2081,7 @@ FE.popupUser = ()=>{
                 });
 
                 $.ajax({
-                    url: ATON.PATH_RESTAPI+"login",
+                    url: "/aton/api/login",
                     type:"POST",
                     data: jstr,
                     contentType:"application/json; charset=utf-8",

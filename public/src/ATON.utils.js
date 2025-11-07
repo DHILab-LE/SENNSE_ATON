@@ -54,10 +54,11 @@ Utils.goToURL = (url)=>{
 };
 
 Utils.goToScene = (sid, vrc)=>{
+    console.log("Go To Scene function !!! : ", sid);
     if (sid === undefined) return;
     if (sid.length < 2) return;
 
-    let feURL = ATON.PATH_FE + sid; //"?s="+sid;
+    let feURL = ATON.PATH_FE+ sid; //"?s="+sid;
     if (vrc !== undefined) feURL += "&vrc="+vrc;
 
     window.location.href = feURL;
@@ -227,7 +228,7 @@ Utils.URLify = (string)=>{
     const urls = string.match(/(((ftp|https?):\/\/)[\-\w@:%_\+.~#?,&\/\/=]+)/g);
     if (urls){
         urls.forEach(function(url){
-            string = string.replace(url, "<a target='_blank' href='" + url + "'><img class='atonSmallIcon' src='"+ATON.PATH_RES+"icons/link.png'></a>");
+            string = string.replace(url, "<a target='_blank' href='" + url + "'><img class='atonSmallIcon' src='"+"/aton/res/icons/link.png'></a>");
         });
     }
 
@@ -240,7 +241,7 @@ Utils.resolveCollectionURL = (url)=>{
     if (ATON._collMod) url = ATON._collMod(url);
 
     if (url.startsWith("http")) return url;
-    return ATON.PATH_COLLECTION+url;
+    return "/aton/collections/"+url;
 };
 
 Utils.tryLoadFromService = (url, N)=>{
@@ -723,7 +724,7 @@ Utils.parseMD = (md)=>{
 Utils.checkAuth = (onReceive)=>{
     $.ajax({
         type: 'GET',
-        url: ATON.PATH_RESTAPI+"user",
+        url: "/aton/api/user",
         xhrFields: { withCredentials: true },            
         dataType: 'json',
 
@@ -959,7 +960,7 @@ Utils.createATONCube = (id)=>{
 
     let mat = new THREE.MeshStandardMaterial();
 
-    Utils.textureLoader.load((ATON.PATH_RES+"models/aton-cube.jpg"), (tex)=>{
+    Utils.textureLoader.load(("/aton/res/models/aton-cube.jpg"), (tex)=>{
         tex.colorSpace = ATON._stdEncoding;
         mat.map = tex;
     });
@@ -979,18 +980,18 @@ Utils.createATONCubePBR = (id)=>{
     let mat = new THREE.MeshStandardMaterial();
     mat.metalness = 1.0;
 
-    Utils.textureLoader.load((ATON.PATH_RES+"models/aton-cube.jpg"), (tex)=>{
+    Utils.textureLoader.load(("/aton/res/models/aton-cube.jpg"), (tex)=>{
         tex.colorSpace = ATON._stdEncoding;
         mat.map = tex;
     });
 
-    Utils.textureLoader.load((ATON.PATH_RES+"models/aton-cube-pbr.jpg"), (tex)=>{
+    Utils.textureLoader.load(("/aton/res/models/aton-cube-pbr.jpg"), (tex)=>{
         tex.colorSpace = ATON._stdEncoding;
         mat.metalnessMap = tex;
         mat.roughnessMap = tex;
     });
 
-    Utils.textureLoader.load((ATON.PATH_RES+"models/aton-cube-nrm.png"), (tex)=>{
+    Utils.textureLoader.load(("/aton/res/models/aton-cube-nrm.png"), (tex)=>{
         tex.colorSpace  = ATON._stdEncoding;
         mat.normalMap = tex;
 

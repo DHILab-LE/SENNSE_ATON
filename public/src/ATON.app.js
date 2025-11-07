@@ -312,10 +312,12 @@ You can use ATON.on("SceneJSONLoaded", ...) to perform additional tasks when the
 @param {function} onSuccess - (optional) routine after the scene descriptor JSON was loaded. You can alternatively use ATON.on("SceneJSONLoaded", ...)
 */
 App.loadScene = (sid, onSuccess)=>{
+    console.log("Load Scene function !!!!!");
+    
     if (sid === undefined) return;
 
     ATON.SceneHub.load(
-        ATON.PATH_RESTAPI2+"scenes/"+sid, 
+        "/aton/api/v2/scenes/"+sid, 
         sid,
         onSuccess
     );

@@ -47,12 +47,12 @@ let deleteUser = (username)=>{
 let renderForm = ()=>{
     let htmlcontent = "";
 
-    $.getJSON( ATON.PATH_RESTAPI+"users/", (data)=>{
+    $.getJSON( "/aton/api/users/", (data)=>{
 
         htmlcontent += "<div class='atonBlockRound'>";
         htmlcontent += "<div style='white-space:nowrap; display:inline'>username:<input id='idNewUsername' type='text' maxlength='15' size='15' autocomplete='off'></div><br>";
         htmlcontent += "<div style='white-space:nowrap; display:inline'>password:<input id='idNewPassword' type='password' maxlength='15' size='15' autocomplete='off'></div><br>";
-        htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-horizontal' id='idNewUser'><img src='"+ATON.PATH_RES+"icons/user.png'>Add User</div>";
+        htmlcontent += "<div class='atonBTN atonBTN-green atonBTN-horizontal' id='idNewUser'><img src='/aton/res/icons/user.png'>Add User</div>";
         htmlcontent += "<div id='idResponse'></div>";
         htmlcontent += "</div><br><br>";
 
@@ -67,9 +67,9 @@ let renderForm = ()=>{
             htmlcontent += "<td>"+u+"</td>";
             htmlcontent += "<td>"+U.username+"</td>";
             htmlcontent += (U.admin)? "<td>Admin</td>" : "<td>Default</td>";
-            htmlcontent += "<td><div class='atonBTN' style='width:100px'><img src='"+ATON.PATH_RES+"icons/edit.png'>change</div></td>";
+            htmlcontent += "<td><div class='atonBTN' style='width:100px'><img src='/aton/res/icons/edit.png'>change</div></td>";
             htmlcontent += "<td>";
-            htmlcontent += "<div class='atonBTN atonBTN-red' style='width:150px'><img src='"+ATON.PATH_RES+"icons/trash.png'>delete</div>";
+            htmlcontent += "<div class='atonBTN atonBTN-red' style='width:150px'><img src='/aton/res/icons/trash.png'>delete</div>";
             htmlcontent += "</td>";
             
             //htmlcontent += "<div class='atonBTN' style='display:block'>"+username+"</div>";

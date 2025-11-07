@@ -6,21 +6,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/res/aton-logo.png" sizes="512x512" type="image/png">
+<link rel="icon" href="/aton/res/aton-logo.png" sizes="512x512" type="image/png">
 
 <!-- Add iOS meta tags and icons -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="ATON Examples">
-<link rel="apple-touch-icon" href="/res/aton-logo.png">
+<link rel="apple-touch-icon" href="/aton/res/aton-logo.png">
 <meta name="description" content="ATON Examples">
 
 <!-- Add meta theme-color -->
 <meta name="theme-color" content="#000000" />
 
 <title>ATON Examples</title>
-<link rel="stylesheet" type="text/css" href="/res/css/aton.css">
-<script type="text/javascript" src="/vendors/vendors.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/aton/res/css/aton.css">
+<script type="text/javascript" src="/aton/vendors/vendors.min.js"></script>
 
 <script>
 let urlParams = new URLSearchParams(window.location.search);
@@ -106,7 +106,7 @@ let searchTerm = (searchTerm)=>{
 window.addEventListener( 'load', ()=>{
     let htmlcontent = "";
     
-    let htdescr = "<img src='/res/icons/samples.png' style='float:left'>This is a list of interactive examples built on top of ATON framework for developers. Each example has source-code commented so you can get started very quickly. You can search (top left) using keywords like "+createKeywordEl("basic")+", "+createKeywordEl("navigation")+", "+createKeywordEl("pbr")+", "+createKeywordEl("collaborative")+", etc... There is also an example of <a href='minimal/'>minimal setup</a> (the minimal html required to present an interactive 3D scene or model).";
+    let htdescr = "<img src='/aton/res/icons/samples.png' style='float:left'>This is a list of interactive examples built on top of ATON framework for developers. Each example has source-code commented so you can get started very quickly. You can search (top left) using keywords like "+createKeywordEl("basic")+", "+createKeywordEl("navigation")+", "+createKeywordEl("pbr")+", "+createKeywordEl("collaborative")+", etc... There is also an example of <a href='minimal/'>minimal setup</a> (the minimal html required to present an interactive 3D scene or model).";
 
     $("#idDescr").html(htdescr);
 
@@ -190,8 +190,8 @@ window.addEventListener( 'load', ()=>{
 
 <body class="atonDefaultBody">
     <div id="idTopToolbar" class="atonToolbar atonToolbar-top-left scrollableX shuTopToobar" style="background-color: rgba(0,0,0, 0.5);">
-        <a class='atonBTN' href='/'><img src='/res/icons/aton.png'></a>
-        <div class='atonBTN' onclick="$('#idSearch').val(''); showAllBlocks();"><img src='/res/icons/search-clear.png'></div>
+        <a class='atonBTN' href='/aton'><img src='/aton/res/icons/aton.png'></a>
+        <div class='atonBTN' onclick="$('#idSearch').val(''); showAllBlocks();"><img src='/aton/res/icons/search-clear.png'></div>
         <input id="idSearch" type="text" size="12" style="width:200px" >
         <a class='atonBTN atonBTN-text' href='../apidoc/client/'>API docs</a>
         <a class='atonBTN atonBTN-text' href='../apidoc/server/'>REST API docs</a>

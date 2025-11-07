@@ -189,7 +189,7 @@ Photon.initMaterials = ()=>{
     // AudioUI user materials
     Photon.uspritemats = [];
 
-    let texAUI = new THREE.TextureLoader().load( ATON.PATH_RES+"useraui.png" );
+    let texAUI = new THREE.TextureLoader().load( "/aton/res/useraui.png" );
     for (let c=0; c<Photon.ucolors.length; c++){
         let smat = new THREE.SpriteMaterial({ 
             map: texAUI,
@@ -204,7 +204,7 @@ Photon.initMaterials = ()=>{
     // Focal points
     Photon.ufocmats = [];
 
-    let texFocP = new THREE.TextureLoader().load( ATON.PATH_RES+"focus.png" );
+    let texFocP = new THREE.TextureLoader().load( "/aton/res/focus.png" );
     for (let c=0; c<Photon.ucolors.length; c++){
         let smat = new THREE.SpriteMaterial({ 
             map: texFocP,
@@ -350,14 +350,14 @@ Photon.connect = (ssid)=>{
 
     // Secure connection
     if (ATON.Utils.isConnectionSecure()){
-        opts.path = '/svrc/socket.io';
+        opts.path = '/aton/svrc/socket.io';
         opts.secure = true;
         opts.rejectUnauthorized = false;
         //opts.transports = ['websocket']; 
         //opts.upgrade = false 
     }
     else {
-        opts.path = '/vrc/socket.io';
+        opts.path = '/aton/vrc/socket.io';
         //opts.transports = ['websocket'];
         //opts.upgrade = false;
     }
@@ -841,7 +841,7 @@ Photon.touchAvatar = (uid)=>{
         let ava = new Photon.Avatar(uid);
         ava.attachTo(Photon.avaGroup);
         
-        ava.loadRepresentation(ATON.PATH_RES+"models/vrc/head.glb");
+        ava.loadRepresentation("/aton/res/models/vrc/head.glb");
         //console.log(Photon.avaGroup);
 
         Photon.avatarList[uid] = ava;

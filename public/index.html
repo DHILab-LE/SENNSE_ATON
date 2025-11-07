@@ -6,23 +6,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" href="/res/aton-logo.png" sizes="512x512" type="image/png">
+<link rel="icon" href="/aton/res/aton-logo.png" sizes="512x512" type="image/png">
 
 <!-- Add iOS meta tags and icons -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="ATON Framework">
-<link rel="apple-touch-icon" href="/res/aton-logo.png">
+<link rel="apple-touch-icon" href="/aton/res/aton-logo.png">
 <meta name="description" content="ATON Framework">
 <!-- Add meta theme-color -->
 <meta name="theme-color" content="#000000" />
 
 <title>ATON Framework</title>
-<link rel="stylesheet" type="text/css" href="res/css/aton.css">
-<script type="text/javascript" src="vendors/vendors.min.js"></script>
-<script type="text/javascript" src="dist/THREE.bundle.js"></script>
-<script type="text/javascript" src="dist/ATON.min.js"></script>
-<script type="text/javascript" src="shu/shu.js"></script>
+<link rel="stylesheet" type="text/css" href="/aton/res/css/aton.css">
+<script type="text/javascript" src="/aton/vendors/vendors.min.js"></script>
+<script type="text/javascript" src="/aton/dist/THREE.bundle.js"></script>
+<script type="text/javascript" src="/aton/dist/ATON.min.js"></script>
+<script type="text/javascript" src="/aton/shu/shu.js"></script>
 
 <script>
 let urlParams = new URLSearchParams(window.location.search);
@@ -100,7 +100,7 @@ let onLandingData = (data)=>{
     }
 
     if (query){
-        if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'><img class='atonDefIcon' src='"+ATON.PATH_RES+"icons/gallery.png'>"+query+"</div><br>";
+        if ( !ohide["term"] ) htmlcontent += "<div id='gTitle' class='atonBlockTitle'><img class='atonDefIcon' src='/aton/res/icons/gallery.png'>"+query+"</div><br>";
         htmlcontent += "<div id='idPubGallery'></div>";
 
         htmlcontent += "<br><br>";
@@ -122,10 +122,10 @@ let onLandingData = (data)=>{
     }
 
     if (data.gallery){
-        htmlcontent += "<br><a href='shu/scenes/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/user.png'></a>";
+        htmlcontent += "<br><a href='/aton/shu/auth/' class='atonBTN'><img src= /aton/res/icons/user.png></a>";
         htmlcontent += "<div id='idScenes' style='display:inline-block; width:50%; max-width:500px; margin-right:15px'></div>";
-        htmlcontent += "<div id='btn-go' class='atonBTN atonBTN-green' style='display:inline-block;'><img src='"+ATON.PATH_RES+"icons/play.png'></div>";
-        if (data.samples === undefined || data.samples === true) htmlcontent += "<a href='examples/' class='atonBTN'><img src='"+ATON.PATH_RES+"icons/samples.png'></a>";
+        htmlcontent += "<div id='btn-go' class='atonBTN atonBTN-green' style='display:inline-block;'><img src= /aton/res/icons/play.png'></div>";
+        if (data.samples === undefined || data.samples === true) htmlcontent += "<a href='examples/' class='atonBTN'><img src= /aton/res/icons/samples.png></a>";
         htmlcontent += "<br>";
 
         //htmlcontent += "<div class='atonBlockTitle'>Public Scenes</div><br>";
@@ -143,7 +143,7 @@ let onLandingData = (data)=>{
         ATON.UI.loadPartial("/common/"+data.header, "idMainContent", true);
     }
     //else htmlcontent += "<img src='/res/aton-logo.png' style='width:100px; height:auto;'><br>";
-    else document.getElementById("idMainContent").prepend( ATON.UI.createElementFromHTMLString("<img src='/res/aton-logo.png' style='width:100px; height:auto;'>") );
+    else document.getElementById("idMainContent").prepend( ATON.UI.createElementFromHTMLString("<img src='/aton/res/aton-logo.png' style='width:100px; height:auto;'>") );
 
     if (data.gallery){
         SHU.createScenesInputList("idScenes", openSID, search, (scenes)=>{
@@ -192,7 +192,7 @@ let onLandingData = (data)=>{
 window.addEventListener( 'load', ()=>{
     //ATON.realize2D();
 
-    $.getJSON( ATON.PATH_RESTAPI+"landing", onLandingData );
+    $.getJSON("/aton/api/landing/", onLandingData );
 });
 
 </script>

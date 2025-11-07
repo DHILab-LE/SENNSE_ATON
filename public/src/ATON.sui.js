@@ -42,8 +42,8 @@ SUI.init = ()=>{
     //SUI.enableSemIcons();
 
     // Main Font
-    if (!SUI.PATH_FONT_JSON) SUI.PATH_FONT_JSON = ATON.PATH_RES+"fonts/custom-msdf.json"
-    if (!SUI.PATH_FONT_TEX)  SUI.PATH_FONT_TEX  = ATON.PATH_RES+"fonts/custom.png"
+    if (!SUI.PATH_FONT_JSON) SUI.PATH_FONT_JSON = "/aton/res/fonts/custom-msdf.json"
+    if (!SUI.PATH_FONT_TEX)  SUI.PATH_FONT_TEX  = "/aton/res/fonts/custom.png"
 /*
     ThreeMeshUI.FontLibrary.addFont("mainFont", 
         SUI.PATH_FONT_JSON, 

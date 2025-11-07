@@ -71,7 +71,10 @@ SHU.goToScene = (sid, vrc)=>{
     if (sid === undefined) return;
     if (sid.length < 2) return;
 
-    let feURL = ATON.PATH_FE + sid; //"?s="+sid;
+    let feURL = "/aton/s/" + sid; //"?s="+sid;
+
+    console.log("Go TO Scene: ", feURL);
+    
     if (vrc !== undefined) feURL += "&vrc="+vrc;
 
     window.location.href = feURL;
@@ -91,7 +94,7 @@ SHU.uiBuildFooter = (elid)=>{
 };
 
 SHU.getScenesSelect = (idselect)=>{
-    $.getJSON( ATON.PATH_RESTAPI+"scenes/", ( data )=>{
+    $.getJSON( "/aton/api/scenes/", ( data )=>{
         let list = "<option value=''>Choose scene ID...</option>";
 
         for (let s in data){
@@ -106,7 +109,7 @@ SHU.getScenesSelect = (idselect)=>{
 SHU.createScenesInputList = (idlist, onkeyenter, onkeyinput, onData)=>{
     let htmlcontent = "<input id='sid' type='text' list='sidlist' style='width:100%'>";
 
-    $.getJSON( ATON.PATH_RESTAPI+"scenes/", ( data )=>{
+    $.getJSON( "/aton/api/scenes/", ( data )=>{
         htmlcontent += "<datalist id='sidlist'>";
         for (let s in data) htmlcontent += "<option>"+data[s].sid+"</option>";
         htmlcontent += "</datalist>";
@@ -140,16 +143,20 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
 
     SHU.pubScenesKwords = {};
 
-    $.getJSON( ATON.PATH_RESTAPI+"scenes/", ( data )=>{
+    $.getJSON( "/aton/api/scenes/", ( data )=>{
         data.sort( SHU.sidCompare );
 
         for (let s in data){
             let scene = data[s];
             let sid   = scene.sid;
+            console.log("SID !!!!");
+            
+            console.log(sid);
+            
             let user  = SHU.getUserFromSID(sid);
 
             if ( bSamples || user !== "samples" ){
-                let urlCover = ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover"; // (scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
+                let urlCover = "/aton/api/v2/scenes/"+sid+"/cover"; // (scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
                 let title = (scene.title)? scene.title : sid;
 
                 let terms = title.trim().toLowerCase();
@@ -178,7 +185,7 @@ SHU.createPubScenesGallery = (idcontainer, bSamples, onComplete, opts)=>{
                 
                 if (viewparams) sid += "?"+viewparams;
 
-                htmlcontent += "<a class='atonCover' href='/s/"+sid+"'>";
+                htmlcontent += "<a class='atonCover' href='/aton/s/"+sid+"'>";
                 htmlcontent += "<img src='"+urlCover+"' style='width:200px; height:auto'>";
                 htmlcontent += "</a>";
 
@@ -205,18 +212,18 @@ SHU.uiAddMainToolbar = (idcontainer)=>{
     let htmlcode = "";
 
     ATON.Utils.checkAuth((data)=>{
-        htmlcode += "<a id='btn-t-aton' class='atonBTN' href='"+window.location.origin+"'><img src='"+ATON.PATH_RES+"icons/aton.png'></a>";
+        htmlcode += "<a id='btn-t-aton' class='atonBTN' href='"+window.location.origin+"/aton'><img src='/aton/res/icons/aton.png'></a>";
 
-        if (data.username) htmlcode += "<a id='btn-t-user' class='atonBTN' href='../../shu/auth/'><img src='"+ATON.PATH_RES+"icons/user.png'>"+data.username+"</a>";
-        else htmlcode += "<a id='btn-t-user' class='atonBTN' href='../../shu/auth/'><img src='"+ATON.PATH_RES+"icons/user.png'>User</a>";
+        if (data.username) htmlcode += "<a id='btn-t-user' class='atonBTN' href='../../shu/auth/'><img src='/aton/res/icons/user.png'>"+data.username+"</a>";
+        else htmlcode += "<a id='btn-t-user' class='atonBTN' href='../../shu/auth/'><img src='/aton/res/icons/user.png'>User</a>";
 
         //htmlcode += "<a id='btn-t-collection' class='atonBTN' href='../../shu/collection/'><img src='"+ATON.PATH_RES+"icons/collection.png'>Collection</a>";
-        htmlcode += "<a id='btn-t-scenes' class='atonBTN' href='../../shu/scenes/'><img src='"+ATON.PATH_RES+"icons/scene.png'>Scenes</a>";
+        htmlcode += "<a id='btn-t-scenes' class='atonBTN' href='../../shu/scenes/'><img src='/aton/res/icons/scene.png'>Scenes</a>";
 
         if (data.username && data.admin){
-            htmlcode += "<a id='btn-t-users' class='atonBTN' href='../../shu/users/'><img src='"+ATON.PATH_RES+"icons/users.png'>Users</a>";
-            htmlcode += "<a id='btn-t-wapps' class='atonBTN' href='../../shu/wapps/'><img src='"+ATON.PATH_RES+"icons/app.png'>Apps</a>";
-            htmlcode += "<a id='btn-t-wapps' class='atonBTN' href='../../shu/info/'><img src='"+ATON.PATH_RES+"icons/info.png'>Info</a>";
+            htmlcode += "<a id='btn-t-users' class='atonBTN' href='../../shu/users/'><img src='/aton/res/icons/users.png'>Users</a>";
+            htmlcode += "<a id='btn-t-wapps' class='atonBTN' href='../../shu/wapps/'><img src='/aton/res/icons/app.png'>Apps</a>";
+            htmlcode += "<a id='btn-t-wapps' class='atonBTN' href='../../shu/info/'><img src='/aton/res/icons/info.png'>Info</a>";
         }
 
         $("#"+idcontainer).append(htmlcode);
@@ -227,7 +234,7 @@ SHU.uiAttachModelsInputList = (elid)=>{
     //let htmlcontent = "<input id='"+elid+"' type='text' list='"+elid+"-list' style='width:80%'>";
     let htmlcontent = "";
 
-    $.getJSON( ATON.PATH_RESTAPI+"c/models/", ( data )=>{
+    $.getJSON( "/aton/api/c/models/", ( data )=>{
         //let folders = {};
         SHU._cModelDirs = {};
         
@@ -259,7 +266,7 @@ SHU.uiAttachModelsInputList = (elid)=>{
 };
 
 SHU.appendModelsToSelect = (idselect)=>{
-    $.getJSON( ATON.PATH_RESTAPI+"c/models/", ( data )=>{
+    $.getJSON( "/aton/api/c/models/", ( data )=>{
         let list = "";
         let folders = {};
 
@@ -281,7 +288,7 @@ SHU.appendModelsToSelect = (idselect)=>{
 SHU.uiAttachPanoramasToInputList = (elid)=>{
     let htmlcontent = "";
 
-    $.getJSON( ATON.PATH_RESTAPI+"c/panoramas/", ( data )=>{
+    $.getJSON("/aton/api/c/panoramas/", ( data )=>{
         htmlcontent += "<datalist id='"+elid+"-list'>";
 
         for (let p in data){
@@ -296,7 +303,7 @@ SHU.uiAttachPanoramasToInputList = (elid)=>{
 };
 
 SHU.appendPanoramasToSelect = (idselect)=>{
-    $.getJSON( ATON.PATH_RESTAPI+"c/panoramas/", ( data )=>{
+    $.getJSON("/aton/api/c/panoramas/", ( data )=>{
         let list = "";
 
         for (let p in data){

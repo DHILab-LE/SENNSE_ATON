@@ -22,7 +22,7 @@ sharp.cache(false);
 
 
 let API = {};
-API.BASE = "/api/v2/";
+API.BASE = "/aton/api/v2/";
 API.DOCS = "/apiv2-docs";
 
 Core.API = API;

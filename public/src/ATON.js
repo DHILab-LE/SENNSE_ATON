@@ -131,10 +131,10 @@ Set ATON base url (root)
 @param {string} baseurl - baseurl
 */
 ATON.setBaseURL = (baseurl)=>{
-    ATON.BASE_URL           = baseurl;
-    ATON.PATH_RESTAPI       = `${ATON.BASE_URL}/api/`;
+    ATON.BASE_URL           = `${baseurl}/aton`;
+    ATON.PATH_RESTAPI       = `${baseurl}/api/`;
     ATON.PATH_RESTAPI_SCENE = `${ATON.PATH_RESTAPI}scene/`;
-    ATON.PATH_RESTAPI2      = `${ATON.BASE_URL}/api/v2/`;
+    ATON.PATH_RESTAPI2      = `${baseurl}/api/v2/`;
     ATON.PATH_WAPPS         = `${ATON.BASE_URL}/a/`;
     ATON.PATH_FLARES        = `${ATON.BASE_URL}/flares/`;
     ATON.PATH_DRACO_LIB     = `${ATON.BASE_URL}/dist/draco/`; //ATON.PATH_THREE+"examples/js/libs/draco/";
@@ -143,7 +143,7 @@ ATON.setBaseURL = (baseurl)=>{
     ATON.PATH_COLLECTION = `${ATON.BASE_URL}/collections/`;
     ATON.PATH_SCENES     = `${ATON.BASE_URL}/scenes/`;
     ATON.PATH_RES        = `${ATON.BASE_URL}/res/`;
-    ATON.PATH_FE         = `${ATON.BASE_URL}/s/`;
+    ATON.PATH_FE         = `${ATON.BASE_URL}/aton/s/`;
 };
 
 // Defaults to current origin
@@ -176,9 +176,9 @@ ATON.setAsStandalone = (rootpath)=>{
     if (!rootpath) rootpath = "../";
 
     // Configure local paths
-    ATON.PATH_DRACO_LIB = rootpath + "dist/draco/";
-    ATON.PATH_BASIS_LIB = rootpath + "dist/basis/";
-    ATON.PATH_RES       = rootpath + "res/";
+    ATON.PATH_DRACO_LIB = rootpath + "aton/dist/draco/";
+    ATON.PATH_BASIS_LIB = rootpath + "/aton/dist/basis/";
+    ATON.PATH_RES       = rootpath + "aton/res/";
 };
 
 /**
@@ -999,7 +999,7 @@ ATON.loadScript = (src, onLoad, onError)=>{
 ATON._loadFlare = (fid)=>{
     ATON._fLoading++;
 
-    $.get(ATON.PATH_RESTAPI2+"flares/"+fid, (f)=>{
+    $.get("/aton/api/v2/flares/"+fid, (f)=>{
         let files = f.files;
         if (files){
             let numscripts = files.length;

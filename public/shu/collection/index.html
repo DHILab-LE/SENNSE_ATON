@@ -31,7 +31,7 @@ const renderForm = ()=>{
     // 3D Models
     $('#idContent').append("<div class='atonBlockGroup'><div class='atonBlockTitle'>3D Models</div>");
 
-    $.getJSON( ATON.PATH_RESTAPI+"c/models", (data)=>{
+    $.getJSON( "/aton/api/c/models", (data)=>{
 
         for (let m=0; m<data.length; m++){
             let murl = data[m];

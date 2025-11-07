@@ -39,12 +39,12 @@ let renderGallery = ()=>{
 */
     htmlcontent += "<div class='atonGalleryItem' style='width:250px; height:320px; background-color:rgba(0,255,0, 0.1)'>";
     htmlcontent += "<div class='atonBlurBG' style='width:250px; height:320px; background-image: url(\""+ATON.PATH_RES+"scenecover.png"+"\")'></div>";
-    htmlcontent += "<a href='/shu/newscene/' class='atonBTN atonBTN-green atonCenterItem' style='padding:20px'><h3>New Scene</h3></a>"; // <img src='"+ATON.PATH_RES+"icons/scene.png' style='width:64px; height:64px'><br>
+    htmlcontent += "<a href='/aton/shu/newscene/' class='atonBTN atonBTN-green atonCenterItem' style='padding:20px'><h3>New Scene</h3></a>"; // <img src='"+ATON.PATH_RES+"icons/scene.png' style='width:64px; height:64px'><br>
     htmlcontent += "</div>";
 
     $('#idContent').append(htmlcontent);
 
-    $.getJSON( ATON.PATH_RESTAPI+"scenes/own", (data)=>{
+    $.getJSON( "/aton/api/scenes/own", (data)=>{
 
         data.sort( SHU.sidCompare );
 
@@ -52,7 +52,7 @@ let renderGallery = ()=>{
             let scene = data[i];
             let sid = scene.sid;
 
-            let urlCover = ATON.PATH_RESTAPI2+"scenes/"+sid+"/cover"; //(scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
+            let urlCover = "/aton/api/v2/scenes/"+sid+"/cover"; //(scene.cover)? ATON.PATH_SCENES+sid+"/cover.png" : ATON.PATH_RES+"scenecover.png";
             //let urlCover = ATON.PATH_RESTAPI+"cover/"+sid;
 
             let shtml = "";
@@ -64,13 +64,13 @@ let renderGallery = ()=>{
             // gallery item content
             shtml += "<div style='width:250px; height:320px; position:absolute; top:0; left:0'>";
             shtml += "<div class='atonBlockSubTitle'>"+sid+"</div><br>";
-            shtml += "<a class='atonCover' href='/s/"+sid+"'>";
+            shtml += "<a class='atonCover' href='/aton/s/"+sid+"'>";
             shtml += "<img src='"+urlCover+"' style='width:200px; height:auto'>";
             shtml += "</a>";
 
             shtml += "<br>";
-            shtml += "<a class='atonBTN atonBTN-text' href='/shu/scenes/?s="+sid+"'><img src='"+ATON.PATH_RES+"icons/settings.png'>Manage</a>";
-            shtml += "<a class='atonBTN atonBTN-text atonBTN-orange' href='/s/"+sid+"?uip=editor'><img src='"+ATON.PATH_RES+"icons/edit.png'>Edit</a>";
+            shtml += "<a class='atonBTN atonBTN-text' href='/aton/shu/scenes/?s="+sid+"'><img src='/aton/res/icons/settings.png'>Manage</a>";
+            shtml += "<a class='atonBTN atonBTN-text atonBTN-orange' href='/s/"+sid+"?uip=editor'><img src='/aton/res/icons/edit.png'>Edit</a>";
             shtml += "</div>";
             
 /*
@@ -281,8 +281,8 @@ let renderScene = (sid)=>{
         });
 
         $('#delYES').click(()=>{
-            ATON.Utils.postJSON(ATON.PATH_RESTAPI+"del/scene", {sid: sid}, (b)=>{
-                if (b) window.location.href = "/shu/scenes";
+            ATON.Utils.postJSON("/aton/api/del/scene", {sid: sid}, (b)=>{
+                if (b) window.location.href = "/aton/shu/scenes";
             });
         });
 

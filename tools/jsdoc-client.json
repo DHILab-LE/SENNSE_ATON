@@ -62,7 +62,7 @@
 
         "_theme_opts": {
             "theme__": "dark",
-            "title": "<div style='text-align:center'><img src='/res/aton-logo.png' style='width:100px;height:auto'><br>ATON 3.0 API</div>",
+            "title": "<div style='text-align:center'><img src='/aton/res/aton-logo.png' style='width:100px;height:auto'><br>ATON 3.0 API</div>",
             "footer": "ATON 3.0 API",
 
             "_include_css": ["./public/res/css/apidoc.css"],

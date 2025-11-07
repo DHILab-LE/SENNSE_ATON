@@ -792,7 +792,8 @@ load(url, onComplete){
         },
         undefined,
         (err)=>{
-            //console.log(err);
+            console.log("Error detecting on this bloc !!");
+            console.log(err);
             //reject(model);
             console.log("%cError loading model "+url, "color:red");
 

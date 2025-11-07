@@ -90,7 +90,7 @@ window.addEventListener( 'load', ()=>{
                                                 onpress: ()=>{
                                                         if (!uname) return;
 
-                                                        const pp = ATON.PATH_COLLECTION + localPath;
+                                                        const pp = "/aton/collections/" + localPath;
                                                         popupPreview(pp);
                                                 }
                                         }),
@@ -103,7 +103,7 @@ window.addEventListener( 'load', ()=>{
                                                 onpress: ()=>{
                                                         if (!uname) return;
 
-                                                        const pp = ATON.PATH_COLLECTION + localPath;
+                                                        const pp = "/aton/collections/" + localPath;
                                                         console.log(pp)
                                                         navigator.clipboard.writeText(pp);
                                                 }

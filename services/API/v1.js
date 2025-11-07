@@ -67,15 +67,15 @@ let BaseAPI = (app) => {
 	});
 
 	/**
-		* @api {get} /api/landing
+		* @api {get} /aton/api/landing
 		* @apiGroup Misc
 	
 		* @apiDescription Retrieve ATON landing page rendering options
 	*/
-	app.get("/api/landing/", (req, res, next) => {
+	app.get("/aton/api/landing/", (req, res, next) => {
 		let o = {};
 		if (Core.config.landing !== undefined) o = Core.config.landing;
-
+		
 		res.send(o);
 	});
 
@@ -116,14 +116,14 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {get} /api/scenes/	List public scenes
+		* @api {get} /aton/api/scenes/	List public scenes
 		* @apiGroup Scenes
 		* @apiPermission none
 	
 		* @apiDescription List all public scenes
 		* @apiSuccess {Array} list scenes object list
 	*/
-	app.get("/api/scenes/", function (req, res, next) {
+	app.get("/aton/api/scenes/", function (req, res, next) {
 
 		//res.send( Core.Maat.getPublicScenes() );
 		Core.Maat.getPublicScenes().then(R => {
@@ -190,14 +190,14 @@ let BaseAPI = (app) => {
 	});
 
 	/**
-		* @api {post} /api/del/scene	Delete a scene
+		* @api {post} /aton/api/del/scene	Delete a scene
 		* @apiGroup Scenes
 		* @apiPermission user
 	
 		* @apiDescription Deletes a scene by providing scene-ID. Operation is possible only for authenticated users on their own scenes 
 		* @apiSuccess {Boolean} bool True on success, false otherwise
 	*/
-	app.post("/api/del/scene/", (req, res, next) => {
+	app.post("/aton/api/del/scene/", (req, res, next) => {
 		let O = req.body;
 		let sid = O.sid;
 
@@ -227,14 +227,14 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {post} /api/cover/scene	Set scene cover
+		* @api {post} /aton/api/cover/scene	Set scene cover
 		* @apiGroup Scenes
 		* @apiPermission user
 	
 		* @apiDescription Set a cover image for given scene by providing base64 img
 		* @apiSuccess {Boolean} bool True on success, false otherwise
 	*/
-	app.post("/api/cover/scene/", (req, res, next) => {
+	app.post("/aton/api/cover/scene/", (req, res, next) => {
 		let O = req.body;
 		let sid = O.sid;
 		let img = O.img;
@@ -258,13 +258,13 @@ let BaseAPI = (app) => {
 	});
 
 	/**
-		* @api {get} /api/cover/:sid	Get scene cover (image)
+		* @api {get} /aton/api/cover/:sid	Get scene cover (image)
 		* @apiGroup Scenes
 		* @apiPermission none
 	
 		* @apiDescription Get cover image for given scene by providing Scene-ID
 	*/
-	app.get(/^\/api\/cover\/(.*)$/, (req, res, next) => {
+	app.get(/^\/aton\/api\/cover\/(.*)$/, (req, res, next) => {
 		let sid = req.params[0];
 
 		let coverfile = path.join(Core.getSceneFolder(sid), Core.STD_COVERFILE);
@@ -403,7 +403,7 @@ let BaseAPI = (app) => {
 	});
 
 	// New Scene
-	app.post('/api/new/scene', (req, res) => {
+	app.post('/aton/api/new/scene', (req, res) => {
 		// Only auth users
 		if (req.user === undefined) {
 			res.send(false);
@@ -452,14 +452,14 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {get} /api/scenes/own List own scenes
+		* @api {get} /aton/api/scenes/own List own scenes
 		* @apiGroup Scenes
 		* @apiPermission user
 	
 		* @apiDescription Retrieve currently authenticated user scenes
 		* @apiSuccess {Array} list Scenes
 	*/
-	app.get("/api/scenes/own/", (req, res, next) => {
+	app.get("/aton/api/scenes/own/", (req, res, next) => {
 		if (req.user === undefined) {
 			res.send([]);
 			return;
@@ -486,14 +486,14 @@ let BaseAPI = (app) => {
 	//=========================================================
 
 	/**
-		* @api {get} /api/c/models	List 3D models
+		* @api {get} /aton/api/c/models	List 3D models
 		* @apiGroup Collections
 		* @apiPermission user
 	
 		* @apiDescription Retrieve all 3D models owned by currently authenticated user. Paths are relative to the local ATON collection
 		* @apiSuccess {Array} list List of 3D models
 	*/
-	app.get("/api/c/models/", (req, res, next) => {
+	app.get("/aton/api/c/models/", (req, res, next) => {
 
 		if (req.user === undefined) {
 			res.send([]);
@@ -512,14 +512,14 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {get} /api/c/panoramas	List panoramas
+		* @api {get} /aton/api/c/panoramas	List panoramas
 		* @apiGroup Collections
 		* @apiPermission user
 	
 		* @apiDescription Retrieve all panoramas (360 images and videos) owned by currently authenticated user. Paths are relative to the local ATON collection
 		* @apiSuccess {Array} list List of panoramas
 	*/
-	app.get("/api/c/panoramas/", (req, res, next) => {
+	app.get("/aton/api/c/panoramas/", (req, res, next) => {
 		if (req.user === undefined) {
 			res.send([]);
 			return;
@@ -565,14 +565,14 @@ let BaseAPI = (app) => {
 	//=========================================================
 
 	/**
-		* @api {get} /api/wapps Get list of web-apps
+		* @api {get} /aton/api/wapps Get list of web-apps
 		* @apiGroup Apps
 		* @apiPermission none
 	
 		* @apiDescription Retrieve list of web-apps currently deployed on the ATON instance
 		* @apiSuccess {Array} list List of web-apps
 	*/
-	app.get("/api/wapps/", (req, res, next) => {
+	app.get("/aton/api/wapps/", (req, res, next) => {
 		let wapps = Core.Maat.getApps();
 
 		res.send(wapps);
@@ -604,7 +604,7 @@ let BaseAPI = (app) => {
 	//=========================================================
 
 	/**
-		* @api {post} /api/login Login
+		* @api {post} /aton/api/login Login
 		* @apiGroup Users
 	
 		* @apiParam {String} username	Username or uid
@@ -612,7 +612,7 @@ let BaseAPI = (app) => {
 	
 		* @apiDescription Login through username and password
 	*/
-	app.post('/api/login', Core.passport.authenticate('local'/*, { failureRedirect: '/login' }*/), (req, res) => {
+	app.post('/aton/api/login', Core.passport.authenticate('local'/*, { failureRedirect: '/login' }*/), (req, res) => {
 
 		let U = Core.createClientUserAuthResponse(req);
 
@@ -652,12 +652,12 @@ let BaseAPI = (app) => {
 	*/
 
 	/**
-		* @api {get} /api/logout Logout
+		* @api {get} /aton/api/logout Logout
 		* @apiGroup Users
 	
 		* @apiDescription Logout
 	*/
-	app.get('/api/logout', (req, res) => {
+	app.get('/aton/api/logout', (req, res) => {
 		console.log(req.user);
 
 		req.logout((err) => {
@@ -667,13 +667,13 @@ let BaseAPI = (app) => {
 	});
 
 	/**
-		* @api {get} /api/user		User data
+		* @api {get} /aton/api/user		User data
 		* @apiGroup Users
 		* @apiPermission user
 	
 		* @apiDescription Retrieve currently authenticated user information (object)
 	*/
-	app.get("/api/user", (req, res) => {
+	app.get("/aton/api/user", (req, res) => {
 		//console.log(req.session);
 
 		let U = Core.createClientUserAuthResponse(req);
@@ -683,13 +683,13 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {get} /api/users		List users
+		* @api {get} /aton/api/users		List users
 		* @apiGroup Users
 		* @apiPermission admin
 	
 		* @apiDescription Retrieve list of all users (only admin)
 	*/
-	app.get("/api/users", (req, res) => {
+	app.get("/aton/api/users", (req, res) => {
 
 		if (req.user === undefined || !req.user.admin) {
 			res.send([]);
@@ -707,7 +707,7 @@ let BaseAPI = (app) => {
 
 
 	/**
-		* @api {post} /api/new/user		New user
+		* @api {post} /aton/api/new/user		New user
 		* @apiGroup Users
 	
 		* @apiParam {String} username	Username or uid
@@ -718,7 +718,7 @@ let BaseAPI = (app) => {
 	
 		* @apiDescription Create a new user (only admin)
 	*/
-	app.post('/api/new/user', (req, res) => {
+	app.post('/aton/api/new/user', (req, res) => {
 		if (req.user === undefined || !req.user.admin) {
 			res.send(false);
 			return;
@@ -732,7 +732,7 @@ let BaseAPI = (app) => {
 	});
 
 	/**
-		* @api {post} /api/delete/user	Delete user
+		* @api {post} /aton/api/delete/user	Delete user
 		* @apiGroup Users
 	
 		* @apiParam {String} username	Username or uid
@@ -741,7 +741,7 @@ let BaseAPI = (app) => {
 	
 		* @apiDescription Delete user (only admin)
 	*/
-	app.post('/api/delete/user', (req, res) => {
+	app.post('/aton/api/delete/user', (req, res) => {
 		if (req.user === undefined || !req.user.admin) {
 			res.send(false);
 			return;
@@ -767,7 +767,7 @@ let BaseAPI = (app) => {
 	});
 
 	// Route to serve sennse.json
-	app.get('/auth/sennse', (req, res) => {
+	app.get('/aton/auth/sennse', (req, res) => {
 		const extractedPath = req.query.path; // Get the dynamic path from the query parameter
 
 		if (!extractedPath) {
@@ -801,7 +801,7 @@ let BaseAPI = (app) => {
 	});
 
 
-	app.post("/delete-sensor", (req, res) => {
+	app.post("/aton/delete-sensor", (req, res) => {
 
 		const { selectedSensorValue, selectedNodeId, extractedPath } = req.body;
 
@@ -865,7 +865,7 @@ let BaseAPI = (app) => {
 
 
 	// Endpoint to save the image
-	app.post('/save-image', (req, res) => {
+	app.post('/aton/save-image', (req, res) => {
 		const imageData = req.body.image; // Base64 image data
 		const base64Data = imageData.replace(/^data:image\/png;base64,/, ''); // Strip metadata
 
@@ -883,7 +883,7 @@ let BaseAPI = (app) => {
 
 
 	// Endpoint to delete the image
-	app.delete('/delete-image', (req, res) => {
+	app.delete('/aton/delete-image', (req, res) => {
 		const filePath = path.join(__dirname, '../../public/images', 'widget.png'); // Define the file path
 
 		// Check if the file exists
@@ -905,11 +905,11 @@ let BaseAPI = (app) => {
 		});
 	});
 
-	app.get('/sennse', (req, res) => {
+	app.get('/aton/sennse', (req, res) => {
 		res.sendFile(path.join(__dirname, '../../public/hathor/sennse.html'));
 	});
 
-	app.post("/save-json", (req, res) => {
+	app.post("/aton/save-json", (req, res) => {
 		const { path: savePath, data } = req.body;
 
 		if (!savePath || !data) {
@@ -954,7 +954,7 @@ let BaseAPI = (app) => {
 	const upload = multer({ storage });
 
 	// Upload route
-	app.post("/upload", upload.single("modelFile"), async (req, res) => {
+	app.post("/aton/upload", upload.single("modelFile"), async (req, res) => {
 		try {
 			if (!req.file) {
 				return res.status(400).json({ error: "No file uploaded" });

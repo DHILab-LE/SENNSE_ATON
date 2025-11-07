@@ -34,19 +34,22 @@ let renderForm = ()=>{
     // Hathor
     htmlcontent += divItem;
     htmlcontent += "<div class='atonBlockSubTitle'>hathor</div><br>";
-    htmlcontent += "<a href='/s/'>";
-    htmlcontent += "<img src='/hathor/appicon.png' style='width:200px; height:auto'>";
+    htmlcontent += "<a href='/aton/s/'>";
+    htmlcontent += "<img src='/aton/hathor/appicon.png' style='width:200px; height:auto'>";
     htmlcontent += "</a></div>";
 
-    $.getJSON( ATON.PATH_RESTAPI+"wapps/", (data)=>{
+    $.getJSON( "/aton/api/wapps/", (data)=>{
         for (let i in data){
             let A = data[i];
             let wappid = A.wappid;
-            let appicon = (A.icon)? ATON.PATH_WAPPS+wappid+"/appicon.png" : ATON.PATH_WAPPS+"app_template/appicon.png";
+            let appicon = (A.icon)? +wappid+"/appicon.png" : ATON.PATH_WAPPS+"app_template/appicon.png";
+
+            console.log(appicon);
+            
 
             htmlcontent += divItem;
             htmlcontent += "<div class='atonBlockSubTitle'>"+wappid+"</div><br>";
-            htmlcontent += "<a href='"+ATON.PATH_WAPPS+wappid+"' >";
+            htmlcontent += "<a href='/aton/a/"+wappid+"' >";
             htmlcontent += "<img src='"+appicon+"' style='width:200px; height:auto'>";
             htmlcontent += "</a></div>";
         }
@@ -64,7 +67,7 @@ window.addEventListener( 'load', ()=>{
             renderForm();
         }
         else {
-            window.location.href = "/shu/auth/?url="+window.location.href;
+            window.location.href = "/aton/shu/auth/?url="+window.location.href;
         }
     });
 

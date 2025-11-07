@@ -170,7 +170,7 @@ MatHub.addDefaults = ()=>{
         //flatShading: true,
         side: THREE.DoubleSide
     });
-    ATON.Utils.textureLoader.load(ATON.PATH_RES+"grad.png", (texture) => {
+    ATON.Utils.textureLoader.load("/aton/res/grad.png", (texture) => {
         MatHub.materials.teleportLoc.map = texture;
     });
 
@@ -375,7 +375,7 @@ MatHub.addDefaults = ()=>{
     });
 
 
-    let texPoint = new THREE.TextureLoader().load( ATON.PATH_RES+"point-mask.png");
+    let texPoint = new THREE.TextureLoader().load( "/aton/res/point-mask.png");
     texPoint.generateMipmaps = false;
     //texPoint.premultiplyAlpha = true;
     //texPoint.magFilter = THREE.NearestFilter;
